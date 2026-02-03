@@ -1,6 +1,8 @@
 
 g_path=$( cd "$(dirname "$0")" ; pwd )
 
+source ${g_path}/global.sh
+
 function install_rpm()
 {
     WRITE_LOG $FUNCNAME $LINENO "install rpm"
