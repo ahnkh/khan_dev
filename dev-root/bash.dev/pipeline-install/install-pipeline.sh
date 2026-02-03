@@ -18,11 +18,11 @@ function install_rpm()
     mkdir -p /home1/aivax/extension/rpm
     mkdir -p /home1/aivax/extension/rpm/3rd-repo/mariadb
 
-    \cp -rf extension/rpm-install/base-repo /home1/aivax/extension/rpm/
-    \cp -rf extension/rpm-install/extra-repo /home1/aivax/extension/rpm/
+    \cp -rfv extension/rpm-install/base-repo /home1/aivax/extension/rpm/
+    \cp -rfv extension/rpm-install/extra-repo /home1/aivax/extension/rpm/
 
-    \cp -rf extension/rpm-install/3rd-repo/mariadb/v11.3.2 /home1/aivax/extension/rpm/3rd-repo/mariadb/
-    \cp -rf extension/rpm-install/3rd-repo/libreoffice/office-headless /home1/aivax/extension/rpm/3rd-repo/
+    \cp -rfv extension/rpm-install/3rd-repo/mariadb/v11.3.2 /home1/aivax/extension/rpm/3rd-repo/mariadb/
+    \cp -rfv extension/rpm-install/3rd-repo/libreoffice/office-headless /home1/aivax/extension/rpm/3rd-repo/
 
     #createrepo 업데이트
     createrepo /home1/aivax/extension/rpm/base-repo/
@@ -31,14 +31,14 @@ function install_rpm()
     createrepo /home1/aivax/extension/rpm/3rd-repo/mariadb/v11.3.2/
     createrepo /home1/aivax/extension/rpm/3rd-repo/office-headless/
 
-    \cp -f extension/rpm-install/core-rpm/repos.d/aivax.repo /etc/yum.repos.d/
+    \cp -fv extension/rpm-install/core-rpm/repos.d/aivax.repo /etc/yum.repos.d/
 
     dnf clean all
     dnf makecache
 
-    dnf install --disablerepo="*" --enablerepo="aivax-repo" libreoffice-headless -y
-    dnf install --disablerepo="*" --enablerepo="aivax-repo" tesseract -y
-    dnf install --disablerepo="*" --enablerepo="aivax-repo" tesseract-langpack-kor -y
+    dnf install --disablerepo="*" --enablerepo="aivax-office" libreoffice-headless -y
+    dnf install --disablerepo="*" --enablerepo="local-aivax" tesseract -y
+    dnf install --disablerepo="*" --enablerepo="local-aivax" tesseract-langpack-kor -y
 }
 
 function install_python_pip()
@@ -46,7 +46,7 @@ function install_python_pip()
     WRITE_LOG $FUNCNAME $LINENO "install python pip"
 
     # uv 복사
-    \cp -f extension/python-install/uv /usr/local/bin/
+    \cp -fv extension/python-install/uv /usr/local/bin/
 
     #기존 설치된 venv는 백업후, 새로 만들자. uv가 만든게 아니면
     # 지식재산처 임시, 최초 패키지는 처음부터 uv로 만든다.
@@ -56,12 +56,13 @@ function install_python_pip()
     # uv venv 
 
     # pip 재설치
-    uv pip install --no-index --find-links=./offline-wheel/ -r aivax-requirement.txt --system
+    uv pip install --no-index --find-links=./extension/python-install/offline-wheel/ -r ./extension/python-install/aivax-requirement.txt --system
 
     # service 재설치
-    uv pip install pycomlib-1.1.2-py3-none-any.whl --force-reinstall --system
-    uv pip install pycomlibex-1.0.7-py3-none-any.whl --force-reinstall --system
-    uv pip install pyservice-1.0.2-py3-none-any.whl --force-reinstall --system
+    uv pip install ./extension/python-install/pycomlib-1.1.2-py3-none-any.whl --force-reinstall --system
+    uv pip install ./extension/python-install/pycomlibex-1.0.7-py3-none-any.whl --force-reinstall --system
+    uv pip install ./extension/python-install/pyservice-1.0.2-py3-none-any.whl --force-reinstall --system
+
 }
 
 function patch_pipeline()
@@ -70,7 +71,7 @@ function patch_pipeline()
 
     \mv -f /home1/aivax/pipeline /home1/aivax/pipeline.old.20260204
 
-    cp -rf aivax-patch/pipeline /home1/aivax/
+    \cp -rfv aivax-patch/pipeline /home1/aivax/
 
     systemctl restart aivax-pipeline
 }
@@ -139,7 +140,6 @@ function aivax_status()
 function main()
 {
     WRITE_LOG $FUNCNAME $LINENO "start install pipeline"
-
 
     # rpm 설치
     install_rpm
