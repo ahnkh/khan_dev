@@ -48,13 +48,20 @@ function install_python_pip()
     # uv 복사
     \cp -f extension/python-install/uv /usr/local/bin/
 
+    #기존 설치된 venv는 백업후, 새로 만들자. uv가 만든게 아니면
+    # 지식재산처 임시, 최초 패키지는 처음부터 uv로 만든다.
+    source /home1/aivax/aivax-venv/bin/activate
+
+    # mv /home1/aivax/aivax-venv /home1/aivax/aivax-venv.pip
+    # uv venv 
+
     # pip 재설치
-    uv pip install --no-index --find-links=./offline-wheel/ -r aivax-requirement.txt
+    uv pip install --no-index --find-links=./offline-wheel/ -r aivax-requirement.txt --system
 
     # service 재설치
-    uv pip install pycomlib-1.1.2-py3-none-any.whl --force-reinstall
-    uv pip install pycomlibex-1.0.7-py3-none-any.whl --force-reinstall
-    uv pip install pyservice-1.0.2-py3-none-any.whl --force-reinstall
+    uv pip install pycomlib-1.1.2-py3-none-any.whl --force-reinstall --system
+    uv pip install pycomlibex-1.0.7-py3-none-any.whl --force-reinstall --system
+    uv pip install pyservice-1.0.2-py3-none-any.whl --force-reinstall --system
 }
 
 function patch_pipeline()
