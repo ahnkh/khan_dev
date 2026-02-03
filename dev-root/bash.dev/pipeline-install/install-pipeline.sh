@@ -21,14 +21,14 @@ function install_rpm()
     \cp -rfv extension/rpm-install/base-repo /home1/aivax/extension/rpm/
     \cp -rfv extension/rpm-install/extra-repo /home1/aivax/extension/rpm/
 
-    \cp -rfv extension/rpm-install/3rd-repo/mariadb/v11.3.2 /home1/aivax/extension/rpm/3rd-repo/mariadb/
+    #\cp -rfv extension/rpm-install/3rd-repo/mariadb/v11.3.2 /home1/aivax/extension/rpm/3rd-repo/mariadb/
     \cp -rfv extension/rpm-install/3rd-repo/libreoffice/office-headless /home1/aivax/extension/rpm/3rd-repo/
 
     #createrepo 업데이트
     createrepo /home1/aivax/extension/rpm/base-repo/
     createrepo /home1/aivax/extension/rpm/extra-repo/
 
-    createrepo /home1/aivax/extension/rpm/3rd-repo/mariadb/v11.3.2/
+    #createrepo /home1/aivax/extension/rpm/3rd-repo/mariadb/v11.3.2/
     createrepo /home1/aivax/extension/rpm/3rd-repo/office-headless/
 
     \cp -fv extension/rpm-install/core-rpm/repos.d/aivax.repo /etc/yum.repos.d/
@@ -104,7 +104,7 @@ function aivax_status()
 
     # curl, pipeline 테스트 코드 호출 (지식재산처 전용, 향후에는 제거)
     curl -sk -X 'POST' \
-    'https://10.0.240.150:4000/openapi/v1/filter/multiple_filter' \
+    'http://127.0.0.1:9099/v1/filter/multiple_filter' \
     -H 'accept: application/json' \
     -H 'Content-Type: application/json' \
     -d '{
