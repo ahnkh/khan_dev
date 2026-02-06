@@ -126,11 +126,15 @@ function __install_rpm_repo()
     cd core-rpm/createrepo
     rpm -ivh createrepo_c-libs-0.20.1-4.el9.x86_64.rpm createrepo_c-0.20.1-4.el9.x86_64.rpm
 
+
+    #rpm은 미리 ./extensioni/rpm/ 디렉토리에 복사한채 빌드한다.
+
     # repo 복사, 우선, 그냥 작성한다.
     # rpm은 필요한 모듈만 복사한다.
     mkdir -p /home1/aivax/extension/rpm/
     mkdir -p /home1/aivax/extension/rpm/3rd-repo/mariadb/
 
+    #기본 및 확장 rpm 복사
     cp -rf ./extension/rpm/base-repo /home1/aivax/extension/rpm/
     cp -rf ./extension/rpm/extra-repo /home1/aivax/extension/rpm/
 
@@ -140,8 +144,7 @@ function __install_rpm_repo()
     #TODO: libreoffice, 분리해서 관리한다.
     cp -rf ./extension/rpm/3rd-repo/office-headless /home1/aivax/extension/rpm/3rd-repo/
 
-
-    #TODO: createrepo, 설치 시점에 다시 갱신한다.
+    #TODO: createrepo, 설치 시점에 다시 갱신한다.    
 
     dnf clean all
     dnf makecache
@@ -152,21 +155,100 @@ function __install_rpm_repo()
     WRITE_LOG $FUNCNAME $LINENO "finish install rpm repo"
 }
 
+
+# rpm 저장, 변경된 구조, pseudo 코드
+function __install_rpm_repo_v2()
+{
+    WRITE_LOG $FUNCNAME $LINENO "install rpm repo"
+
+    # aivax.repo, 비활성화된 rpm
+
+    #TODO: repo 경로는 고정이다. /home1/install
+    \cp -f ./extension/rpm-install/aivax.repo /etc/yum.repos.d/
+
+    #rpm 경로, 새로 만든다.
+    mkdir -p /home1/install/extension/rpm-repo/
+
+    #rpm 복사, 하나로 만든다.
+
+    # 기본 rpm
+    # jq, tree, strace, ltrace, tcpump
+    \cp -f ./extension/rpm-install/base-repo/*.rpm /home1/install/extension/rpm-repo/
+
+    # libreoffice
+    \cp -f ./extension/rpm-install/extra-repo/libreoffice-headless/*.rpm /home1/install/extension/rpm-repo/
+
+    # tesseract, ocr
+    \cp -f ./extension/rpm-install/extra-repo/tesseract/*.rpm /home1/install/extension/rpm-repo/
+
+    # nginx
+    \cp -f ./extension/rpm-install/extra-repo/nginx/*.rpm /home1/install/extension/rpm-repo/
+
+    # mariadb
+    \cp -f ./extension/rpm-install/extra-repo/mariadb/v11.3.2/*.rpm /home1/install/extension/rpm-repo/
+
+    #TODO: opensearch는 최종 확장 패키지로, 별도 설치.
+
+    # 기본 rpm, createrepo 설치, 프로그램에서는 개별로 설치, 설치 오류 대응.
+    rpm -ivh ./extension/rpm-install/createrepo/createrepo_c-libs-0.20.1-4.el9.x86_64.rpm 
+    rpm -ivh ./extension/rpm-install/createrepo/createrepo_c-0.20.1-4.el9.x86_64.rpm
+
+    #repo 다시 생성
+    createrepo /home1/install/extension/rpm-repo/
+
+    dnf clean all
+    dnf makecache
+
+    #테스트, 디버그용
+    dnf repolist all
+
+}
+
+#rpm, 한번에 설치하도록 변경, rpm은 한군데에서 최초 설치.
+function __istall_rpm_package_v2()
+{
+    dnf install jq --disablerepo="*" --enablerepo="aivax-repo" -y
+
+    dnf install tree --disablerepo="*" --enablerepo="aivax-repo" -y
+
+    dnf install sqlite --disablerepo="*" --enablerepo="aivax-repo" -y
+
+    # file 추출, OCR 관련
+    dnf install libreoffice-headless --disablerepo="*" --enablerepo="aivax-repo" -y
+
+    dnf install tesseract --disablerepo="*" --enablerepo="aivax-repo" -y 
+
+    dnf install tesseract-langpack-kor --disablerepo="*" --enablerepo="aivax-repo" -y 
+
+    #maridb 설치
+    dnf install MariaDB-server MariaDB-client --disablerepo="*" --enablerepo="aivax-repo" -y
+
+    dnf install nginx --disablerepo="*" --enablerepo="aivax-repo" -y
+
+    #TODO: C/C++ 개발 환경도 추가.
+
+    #TODO: opensearch, mariadb는 별도 설치.
+}
+
 # rpm 설치
 function __install_rpm_modules()
 {
     #rpm이 정상이면, dnf로 설치할수 있다.
     #예외처리는 프로그램으로. shell에서 실행하는 것 주의
 
-    dnf install jq -y
+    dnf install jq --disablerepo="*" --enablerepo="aivax" -y
 
-    dnf install sqlite -y
+    dnf install tree --disablerepo="*" --enablerepo="aivax" -y
 
-    dnf install libreoffice-headless -y #TODO: 서버용으로 설치
+    dnf install sqlite --disablerepo="*" --enablerepo="aivax" -y
 
-    dnf install tesseract -y 
+    dnf install libreoffice-headless --disablerepo="*" --enablerepo="aivax" -y #TODO: 서버용으로 설치
 
-    dnf install tesseract-langpack-kor -y 
+    dnf install tesseract --disablerepo="*" --enablerepo="aivax" -y 
+
+    dnf install tesseract-langpack-kor --disablerepo="*" --enablerepo="aivax" -y 
+
+    
 
     #TODO: C/C++ 개발 환경도 추가.
 
@@ -287,7 +369,7 @@ function __install_opensearch()
 {
     WRITE_LOG $FUNCNAME $LINENO "start install opensearch"
 
-    # opensearch 설치
+    # opensearch 설치, opensearch는 별도로 설치한다. 옵션화, (제거할수 있다)
     # 일단 작성후, 경로 또는 세부 테스트.
     dnf install ./extension/rpm/3rd-repo/opensearch/v3.3.2/opensearch-3.3.2-linux-x64.rpm -y
 
