@@ -11,7 +11,7 @@ function install_rpm()
     #cd extension/rpm-install/core-rpm/createrepo
 
     # repo 업데이트, 기본 비활성화
-    \cp -f extension/rpm-install/core-rpm/repos.d/aivax.repo /etc/yum.repos.d/
+    \cp -f extension/rpm-install/aivax.repo /etc/yum.repos.d/
 
     #TODO: 두번 설치 테스트 필요
     rpm -ivh extension/rpm-install/createrepo/createrepo_c-libs-0.20.1-4.el9.x86_64.rpm 

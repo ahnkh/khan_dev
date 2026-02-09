@@ -1,0 +1,15 @@
+{
+    "global_define":
+    {
+        "aivax_default_path" : "/home1/aivax"
+    },
+
+    "install_enable_flag":
+    {
+        "desc" : "설치, 활성,비활성 설정",
+
+        "enable_install_opensearch" : true,
+        "enable_install_mariadb" : true,
+        "enable_install_fluent_bit" : true
+    }
+}
