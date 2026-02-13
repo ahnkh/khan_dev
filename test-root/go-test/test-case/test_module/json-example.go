@@ -14,19 +14,19 @@ func (t *JsonExample) Test() {
 	t.testLoadJsonFile()
 }
 
-//json 파일 로딩 기능 테스트
+// json 파일 로딩 기능 테스트
 func (t *JsonExample) testLoadJsonFile() {
 
 	//기본 로그 출력, 아직 정착되지 않았다.
 	fmt.Println("test load json file")
 
 	data, err := os.ReadFile("test-resource/config.json")
-	if err != nil {
+	if nil != err {
 		panic(err)
 	}
 
 	var config map[string]interface{}
-	
+
 	if err := json.Unmarshal(data, &config); err != nil {
 		panic(err)
 	}
