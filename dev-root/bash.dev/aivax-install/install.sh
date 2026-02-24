@@ -36,6 +36,12 @@ function init_default_setup()
 
     # TODO: 디렉토리 이전, 네트워크 및 디스크 파티션도 생성 및 점검해야 한다.
     # /home1, /data 2개가 생성되어야 한다. -> sniperos 에서 지원하지 않으면 파티션 생성 기능이 만들어져야 한다.
+    mkdir -p /home1/aivax.old
+
+    TODAY=$(date +%Y%m%d)
+    #기존 디렉토리, 존재하면 이동, 없으면 그냥 오류
+    rm -rf /home1/aivax.old/aivax.$TODAY
+    mv -f /home1/aivax /home1/aivax.old/aivax.$TODAY
 
     # 경로 생성, 향후 경로를 지정후 설정한다.
     # 패치, 재생성시 과거 데이터를 백업후 설정하는 기능이 필요하고, 백업 경로도 지정하는 기능 필요
@@ -43,15 +49,17 @@ function init_default_setup()
     # 이경우 -> 사용자 대화식으로 UI, DIALOG 알람 기능이 필요하다.
     mkdir -p /home1/aivax/
     mkdir -p /home1/aivax/extension
-    mkdir -p /home1/aivax/temp
+    # mkdir -p /home1/aivax/temp
 
     mkdir -p /home1/aivax/data_resource
     mkdir -p /home1/aivax/data_resource/attach_file
 
-    mkdir -p /home1/aivax/.localconfig
+    # mkdir -p /home1/aivax/.localconfig
 
-    mkdir -p /home1/install/temp
-    mkdir -p /home1/install/extension
+    # mkdir -p /home1/install/temp
+    # mkdir -p /home1/install/extension
+
+    mkdir -p /home1/install/extension/rpm-repo/
 
     #TODO: opensearch data, 파티션 변경 필요 
     #/home1 => app, 또는 root, symbolic link
@@ -85,10 +93,14 @@ function install_module()
     # TODO: sniper_network, 확인 필요, 향후 자동화.
 
     # rpm 부터 설치, repo + rpm
-    __install_rpm_repo
+    # __install_rpm_repo
+    __install_rpm_repo_v2
 
     # rpm 설치
-    __install_rpm_modules
+    # __install_rpm_modules
+    __istall_rpm_package_v2
+
+    __install_python
 
     __install_fluentbit
 
@@ -100,65 +112,83 @@ function install_module()
 
     __install_opensearch
 
-    __install_python
-
     # __install_sslproxy_env
 
     WRITE_LOG $FUNCNAME $LINENO "finish install module"
 }
 
-function __install_rpm_repo()
-{
-    WRITE_LOG $FUNCNAME $LINENO "start install rpm repo"
+# function __install_rpm_repo()
+# {
+#     WRITE_LOG $FUNCNAME $LINENO "start install rpm repo"
 
-    # repo 설정, 기존 repos.d 복사후 한개만 설정
-    # aivax_repo_path=${CONST_DEFINE[aivax_rpm_repo_path]} => 일단 향후 고민.
+#     # repo 설정, 기존 repos.d 복사후 한개만 설정
+#     # aivax_repo_path=${CONST_DEFINE[aivax_rpm_repo_path]} => 일단 향후 고민.
 
-    # TODO: 프로그램에서는 경로는 config로 제어, 경로 변경시 바로 대응이 가능하도록 설계 할것
+#     # TODO: 프로그램에서는 경로는 config로 제어, 경로 변경시 바로 대응이 가능하도록 설계 할것
 
-    # config 복사    
-    mv /etc/yum.repos.d /etc/yum.repos.d_bak
-    mkdir -p /etc/yum.repos.d
-    cp -rf ./extension/rpm/core-rpm/repos.d/aivax.repo /etc/yum.repos.d/
+#     # config 복사
+#     # systemd의 환경은 수정하지 않는다.
+#     # mv /etc/yum.repos.d /etc/yum.repos.d_bak
+#     mkdir -p /etc/yum.repos.d
+#     # cp -rf ./extension/rpm/core-rpm/repos.d/aivax.repo /etc/yum.repos.d/
+#     cp -rf ./extension/rpm-install/aivax.repo /etc/yum.respos.d/
 
-    # createrepo, dnf 실수 방지용으로 설치한다.
+#     # createrepo, dnf 실수 방지용으로 설치한다.
+    
+#     rpm -ivh createrepo/createrepo_c-libs-0.20.1-4.el9.x86_64.rpm createrepo/createrepo_c-0.20.1-4.el9.x86_64.rpm
 
-    cd core-rpm/createrepo
-    rpm -ivh createrepo_c-libs-0.20.1-4.el9.x86_64.rpm createrepo_c-0.20.1-4.el9.x86_64.rpm
+#     #rpm은 미리 ./extensioni/rpm/ 디렉토리에 복사한채 빌드한다.
+
+#     # repo 복사, 우선, 그냥 작성한다.
+#     # rpm은 필요한 모듈만 복사한다.
+#     # mkdir -p /home1/aivax/extension/rpm/
+#     # mkdir -p /home1/aivax/extension/rpm/3rd-repo/mariadb/
+
+#     # #기본 및 확장 rpm 복사
+#     # cp -rf ./extension/rpm/base-repo /home1/aivax/extension/rpm/
+#     # cp -rf ./extension/rpm/extra-repo /home1/aivax/extension/rpm/
+
+#     # #mariadb, 버전 11.3.2
+#     # cp -rf ./extension/rpm/3rd-repo/mariadb/v11.3.2 /home1/aivax/extension/rpm/3rd-repo/mariadb/
+
+#     # #TODO: libreoffice, 분리해서 관리한다.
+#     # cp -rf ./extension/rpm/3rd-repo/office-headless /home1/aivax/extension/rpm/3rd-repo/
+
+#     # 기본 rpm
+#     # jq, tree, strace, ltrace, tcpump
+#     \cp -f ./extension/rpm-install/base-repo/*.rpm /home1/install/extension/rpm-repo/
+
+#     # libreoffice
+#     \cp -f ./extension/rpm-install/extra-repo/libreoffice-headless/*.rpm /home1/install/extension/rpm-repo/
+
+#     # tesseract, ocr
+#     \cp -f ./extension/rpm-install/extra-repo/tesseract/*.rpm /home1/install/extension/rpm-repo/
+
+#     # nginx
+#     \cp -f ./extension/rpm-install/extra-repo/nginx/*.rpm /home1/install/extension/rpm-repo/
+
+#     # mariadb
+#     \cp -f ./extension/rpm-install/extra-repo/mariadb/v11.3.2/*.rpm /home1/install/extension/rpm-repo/
 
 
-    #rpm은 미리 ./extensioni/rpm/ 디렉토리에 복사한채 빌드한다.
+#     #TODO: createrepo, 설치 시점에 다시 갱신한다.   
+#     createrepo /home1/install/extension/rpm-repo/ 
 
-    # repo 복사, 우선, 그냥 작성한다.
-    # rpm은 필요한 모듈만 복사한다.
-    mkdir -p /home1/aivax/extension/rpm/
-    mkdir -p /home1/aivax/extension/rpm/3rd-repo/mariadb/
+#     dnf clean all
+#     dnf makecache
 
-    #기본 및 확장 rpm 복사
-    cp -rf ./extension/rpm/base-repo /home1/aivax/extension/rpm/
-    cp -rf ./extension/rpm/extra-repo /home1/aivax/extension/rpm/
+#     # 테스트용, 출력
+#     dnf repolist
 
-    #mariadb, 버전 11.3.2
-    cp -rf ./extension/rpm/3rd-repo/mariadb/v11.3.2 /home1/aivax/extension/rpm/3rd-repo/mariadb/
-
-    #TODO: libreoffice, 분리해서 관리한다.
-    cp -rf ./extension/rpm/3rd-repo/office-headless /home1/aivax/extension/rpm/3rd-repo/
-
-    #TODO: createrepo, 설치 시점에 다시 갱신한다.    
-
-    dnf clean all
-    dnf makecache
-
-    # 테스트용, 출력
-    dnf repolist
-
-    WRITE_LOG $FUNCNAME $LINENO "finish install rpm repo"
-}
+#     WRITE_LOG $FUNCNAME $LINENO "finish install rpm repo"
+# }
 
 
 # rpm 저장, 변경된 구조, pseudo 코드
 function __install_rpm_repo_v2()
 {
+    WRITE_LOG $FUNCNAME $LINENO "start install rpm repo"
+
     WRITE_LOG $FUNCNAME $LINENO "install rpm repo"
 
     # aivax.repo, 비활성화된 rpm
@@ -202,14 +232,18 @@ function __install_rpm_repo_v2()
     #테스트, 디버그용
     dnf repolist all
 
+    WRITE_LOG $FUNCNAME $LINENO "finish install rpm package"
+
 }
 
 #rpm, 한번에 설치하도록 변경, rpm은 한군데에서 최초 설치.
 function __istall_rpm_package_v2()
 {
+    WRITE_LOG $FUNCNAME $LINENO "start install rpm package"
+
     dnf install jq --disablerepo="*" --enablerepo="aivax-repo" -y
 
-    dnf install tree --disablerepo="*" --enablerepo="aivax-repo" -y
+    # dnf install tree --disablerepo="*" --enablerepo="aivax-repo" -y
 
     dnf install sqlite --disablerepo="*" --enablerepo="aivax-repo" -y
 
@@ -228,32 +262,34 @@ function __istall_rpm_package_v2()
     #TODO: C/C++ 개발 환경도 추가.
 
     #TODO: opensearch, mariadb는 별도 설치.
+
+    WRITE_LOG $FUNCNAME $LINENO "finish install rpm package"
 }
 
-# rpm 설치
-function __install_rpm_modules()
-{
-    #rpm이 정상이면, dnf로 설치할수 있다.
-    #예외처리는 프로그램으로. shell에서 실행하는 것 주의
+# # rpm 설치
+# function __install_rpm_modules()
+# {
+#     #rpm이 정상이면, dnf로 설치할수 있다.
+#     #예외처리는 프로그램으로. shell에서 실행하는 것 주의
 
-    dnf install jq --disablerepo="*" --enablerepo="aivax" -y
+#     dnf install jq --disablerepo="*" --enablerepo="aivax" -y
 
-    dnf install tree --disablerepo="*" --enablerepo="aivax" -y
+#     dnf install tree --disablerepo="*" --enablerepo="aivax" -y
 
-    dnf install sqlite --disablerepo="*" --enablerepo="aivax" -y
+#     dnf install sqlite --disablerepo="*" --enablerepo="aivax" -y
 
-    dnf install libreoffice-headless --disablerepo="*" --enablerepo="aivax" -y #TODO: 서버용으로 설치
+#     dnf install libreoffice-headless --disablerepo="*" --enablerepo="aivax" -y #TODO: 서버용으로 설치
 
-    dnf install tesseract --disablerepo="*" --enablerepo="aivax" -y 
+#     dnf install tesseract --disablerepo="*" --enablerepo="aivax" -y 
 
-    dnf install tesseract-langpack-kor --disablerepo="*" --enablerepo="aivax" -y 
+#     dnf install tesseract-langpack-kor --disablerepo="*" --enablerepo="aivax" -y 
 
     
 
-    #TODO: C/C++ 개발 환경도 추가.
+#     #TODO: C/C++ 개발 환경도 추가.
 
-    #TODO: opensearch, mariadb는 별도 설치.
-}
+#     #TODO: opensearch, mariadb는 별도 설치.
+# }
 
 
 # fluentbit, 압축 해제 + 서비스 등록
@@ -371,42 +407,42 @@ function __install_opensearch()
 
     # opensearch 설치, opensearch는 별도로 설치한다. 옵션화, (제거할수 있다)
     # 일단 작성후, 경로 또는 세부 테스트.
-    dnf install ./extension/rpm/3rd-repo/opensearch/v3.3.2/opensearch-3.3.2-linux-x64.rpm -y
+    dnf install ./extension/rpm-install/3rd-repo/opensearch/v3.3.2/opensearch-3.3.2-linux-x64.rpm -y
 
     #TODO: 여러 경로로 이동 필요, temp 경로롤 이용한다. (/home1/install/temp)
 
     # 설치후, 데이터 복사, config, 권한 설정 필요
 
-    mkdir -p /home1/install/temp/opensearch
+    # mkdir -p /home1/install/temp/opensearch
 
-    mkdir -p /home1/install/temp/opensearch/config
-    mkdir -p /home1/install/temp/opensearch/data
+    # mkdir -p /home1/install/temp/opensearch/config
+    # mkdir -p /home1/install/temp/opensearch/data
 
-    tar xzvf ./extension/opensearch-install/opensearch.config.tar.gz -C /home1/install/temp/opensearch/config/
-    tar xzvf ./extension/opensearch-install/opensearch.data.tar.gz -C /home1/install/temp/opensearch/data/
+    # tar xzvf ./extension/opensearch-install/opensearch.config.tar.gz -C /home1/install/temp/opensearch/config/
+    # tar xzvf ./extension/opensearch-install/opensearch.data.tar.gz -C /home1/install/temp/opensearch/data/
 
-    # TODO: opensearch 경로 변경 필요 => 프로그램으로 해결 필요
+    # # TODO: opensearch 경로 변경 필요 => 프로그램으로 해결 필요
 
-    #TODO: config 복사, 미세 조정 필요, pem 등 
-    cp -rf /etc/opensearch/
+    # #TODO: config 복사, 미세 조정 필요, pem 등 
+    # cp -rf /etc/opensearch/
 
-    #TODO: data 복사 경로 복사 먼저 + opensearch.yml 쪽 먼저 수정 필요
-    # 프로그램으로 해결하거나, sed 명령으로 수정 필요
+    # #TODO: data 복사 경로 복사 먼저 + opensearch.yml 쪽 먼저 수정 필요
+    # # 프로그램으로 해결하거나, sed 명령으로 수정 필요
 
-    #TODO: 경로 확인 필요
-    cp -rf /home1/install/temp/opensearch/data/ /var/lib/opensearch/
+    # #TODO: 경로 확인 필요
+    # cp -rf /home1/install/temp/opensearch/data/ /var/lib/opensearch/
 
-    # 권한 설정 추가, SNIPER OS는 경로가 다르다. 경로를 외부 설정으로 제어
-    chown -R opensearch:opensearch /home1/aivax/data_resource/opensearch/
-    chmod -R 750 /home1/aivax/data_resource/opensearch/
+    # # 권한 설정 추가, SNIPER OS는 경로가 다르다. 경로를 외부 설정으로 제어
+    # chown -R opensearch:opensearch /home1/aivax/data_resource/opensearch/
+    # chmod -R 750 /home1/aivax/data_resource/opensearch/
 
-    chown -R opensearch:opensearch /etc/opensearch
-    chmod -R 750 /etc/opensearch
-    # chown -R opensearch:opensearch /var/lib/opensearch
+    # chown -R opensearch:opensearch /etc/opensearch
+    # chmod -R 750 /etc/opensearch
+    # # chown -R opensearch:opensearch /var/lib/opensearch
 
-    #VM size 설정
-    sysctl -w vm.max_map_count=262144
-    echo "vm.max_map_count=262144" >> /etc/sysctl.conf #영구설정
+    # #VM size 설정
+    # sysctl -w vm.max_map_count=262144
+    # echo "vm.max_map_count=262144" >> /etc/sysctl.conf #영구설정
 
     #TODO: systemd 수정
 
@@ -420,14 +456,14 @@ function __install_python()
     WRITE_LOG $FUNCNAME $LINENO "start install python"
 
     # python 복사, ldconfig
-    cp -rf ./extension/python/usr/local/bin/* /usr/local/bin/
-    cp -rf ./extension/python/usr/local/lib/* /usr/local/lib/
+    cp -rf ./extension/python-install/usr/local/bin/* /usr/local/bin/
+    cp -rf ./extension/python-install/usr/local/lib/* /usr/local/lib/
 
     #so 업데이트
     ldconfig
 
     #pip, uv로 교체
-    cp -rf ./extension/python/uv /usr/local/bin/
+    cp -rf ./extension/python-install/uv /usr/local/bin/
 
     # venv 생성, 여기서 python 버전은 세부 config로 제어
     # python3.13 -m venv /home1/aivax/aivax-venv
@@ -437,7 +473,15 @@ function __install_python()
     source /home1/aivax/aivax-venv/bin/activate
 
     #개선 필요
-    echo "source /home1/aivax/aivax-venv/bin/activate" >> /root/.bash_profile
+    # echo "source /home1/aivax/aivax-venv/bin/activate" >> /root/.bash_profile
+    if ! grep -q "# >>> AIVAX VENV >>>" "$FILE"; then
+cat << 'EOF' >> "$FILE"
+
+# >>> AIVAX VENV >>>
+source /home1/aivax/aivax-venv/bin/activate
+# <<< AIVAX VENV <<<
+EOF
+fi
 
     # offlinewheel
     # TODO: aivax-requirement는, 패키지 빌드 과정에서 생성
@@ -448,8 +492,8 @@ function __install_python()
     # pycomlib 설치, 버전 주의.
     #uv pip install pycom* --force-reinstall
 
-    uv pip install pycomlib-1.1.3-py3-none-any.whl --force-reinstall
-    uv pip install pycomlibex-1.0.6-py3-none-any.whl --force-reinstall
+    uv pip install pycomlib-1.1.4-py3-none-any.whl --force-reinstall
+    uv pip install pycomlibex-1.0.9-py3-none-any.whl --force-reinstall
     uv pip install pyservice-1.0.2-py3-none-any.whl --force-reinstall
 
     # 이후 pipeline 이하 appserver 설치는 다음 스텝으로.
@@ -627,13 +671,13 @@ function main()
     install_module
 
     # 외부 오픈소스 실행
-    build_install_slm
+    # build_install_slm
 
     # 소스 패치
-    patch_aivax_source
+    # patch_aivax_source
 
     # 프로세스 기동
-    start_aivax
+    # start_aivax
 }
 
 main $@
