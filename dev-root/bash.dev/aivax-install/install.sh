@@ -43,6 +43,8 @@ function init_default_setup()
     rm -rf /home1/aivax.old/aivax.$TODAY
     mv -f /home1/aivax /home1/aivax.old/aivax.$TODAY
 
+    #디렉토리, 존재하면 /home1/aivax.old/aivax.[오늘날짜 경로에 백업한다.]
+
     # 경로 생성, 향후 경로를 지정후 설정한다.
     # 패치, 재생성시 과거 데이터를 백업후 설정하는 기능이 필요하고, 백업 경로도 지정하는 기능 필요
     # 백업을 생성했다면, 존재여부를 확인하는 기능도 필요
