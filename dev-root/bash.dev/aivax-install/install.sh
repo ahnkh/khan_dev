@@ -135,73 +135,6 @@ function install_module()
     WRITE_LOG $FUNCNAME $LINENO "finish install module"
 }
 
-# function __install_rpm_repo()
-# {
-#     WRITE_LOG $FUNCNAME $LINENO "start install rpm repo"
-
-#     # repo 설정, 기존 repos.d 복사후 한개만 설정
-#     # aivax_repo_path=${CONST_DEFINE[aivax_rpm_repo_path]} => 일단 향후 고민.
-
-#     # TODO: 프로그램에서는 경로는 config로 제어, 경로 변경시 바로 대응이 가능하도록 설계 할것
-
-#     # config 복사
-#     # systemd의 환경은 수정하지 않는다.
-#     # mv /etc/yum.repos.d /etc/yum.repos.d_bak
-#     mkdir -p /etc/yum.repos.d
-#     # cp -rf ./extension/rpm/core-rpm/repos.d/aivax.repo /etc/yum.repos.d/
-#     cp -rf ./extension/rpm-install/aivax.repo /etc/yum.respos.d/
-
-#     # createrepo, dnf 실수 방지용으로 설치한다.
-    
-#     rpm -ivh createrepo/createrepo_c-libs-0.20.1-4.el9.x86_64.rpm createrepo/createrepo_c-0.20.1-4.el9.x86_64.rpm
-
-#     #rpm은 미리 ./extensioni/rpm/ 디렉토리에 복사한채 빌드한다.
-
-#     # repo 복사, 우선, 그냥 작성한다.
-#     # rpm은 필요한 모듈만 복사한다.
-#     # mkdir -p /home1/aivax/extension/rpm/
-#     # mkdir -p /home1/aivax/extension/rpm/3rd-repo/mariadb/
-
-#     # #기본 및 확장 rpm 복사
-#     # cp -rf ./extension/rpm/base-repo /home1/aivax/extension/rpm/
-#     # cp -rf ./extension/rpm/extra-repo /home1/aivax/extension/rpm/
-
-#     # #mariadb, 버전 11.3.2
-#     # cp -rf ./extension/rpm/3rd-repo/mariadb/v11.3.2 /home1/aivax/extension/rpm/3rd-repo/mariadb/
-
-#     # #TODO: libreoffice, 분리해서 관리한다.
-#     # cp -rf ./extension/rpm/3rd-repo/office-headless /home1/aivax/extension/rpm/3rd-repo/
-
-#     # 기본 rpm
-#     # jq, tree, strace, ltrace, tcpump
-#     \cp -f ./extension/rpm-install/base-repo/*.rpm /home1/install/extension/rpm-repo/
-
-#     # libreoffice
-#     \cp -f ./extension/rpm-install/extra-repo/libreoffice-headless/*.rpm /home1/install/extension/rpm-repo/
-
-#     # tesseract, ocr
-#     \cp -f ./extension/rpm-install/extra-repo/tesseract/*.rpm /home1/install/extension/rpm-repo/
-
-#     # nginx
-#     \cp -f ./extension/rpm-install/extra-repo/nginx/*.rpm /home1/install/extension/rpm-repo/
-
-#     # mariadb
-#     \cp -f ./extension/rpm-install/extra-repo/mariadb/v11.3.2/*.rpm /home1/install/extension/rpm-repo/
-
-
-#     #TODO: createrepo, 설치 시점에 다시 갱신한다.   
-#     createrepo /home1/install/extension/rpm-repo/ 
-
-#     dnf clean all
-#     dnf makecache
-
-#     # 테스트용, 출력
-#     dnf repolist
-
-#     WRITE_LOG $FUNCNAME $LINENO "finish install rpm repo"
-# }
-
-
 # rpm 저장, 변경된 구조, pseudo 코드
 function __install_rpm_repo_v2()
 {
@@ -286,32 +219,6 @@ function __istall_rpm_package_v2()
 
     WRITE_LOG $FUNCNAME $LINENO "finish install rpm package"
 }
-
-# # rpm 설치
-# function __install_rpm_modules()
-# {
-#     #rpm이 정상이면, dnf로 설치할수 있다.
-#     #예외처리는 프로그램으로. shell에서 실행하는 것 주의
-
-#     dnf install jq --disablerepo="*" --enablerepo="aivax" -y
-
-#     dnf install tree --disablerepo="*" --enablerepo="aivax" -y
-
-#     dnf install sqlite --disablerepo="*" --enablerepo="aivax" -y
-
-#     dnf install libreoffice-headless --disablerepo="*" --enablerepo="aivax" -y #TODO: 서버용으로 설치
-
-#     dnf install tesseract --disablerepo="*" --enablerepo="aivax" -y 
-
-#     dnf install tesseract-langpack-kor --disablerepo="*" --enablerepo="aivax" -y 
-
-    
-
-#     #TODO: C/C++ 개발 환경도 추가.
-
-#     #TODO: opensearch, mariadb는 별도 설치.
-# }
-
 
 # fluentbit, 압축 해제 + 서비스 등록
 function __install_fluentbit()
@@ -596,20 +503,6 @@ fi
     WRITE_LOG $FUNCNAME $LINENO "finish install python"
 }
 
-# 패치 시점이, 실제 구조는 프로그램으로 해결.
-# function __install_sslproxy_env()
-# {
-#     WRITE_LOG $FUNCNAME $LINENO "start install sslproxy env"
-
-#     # 이건 테스트 하면서, 
-#     cp -rf ./extension/lib/libnet.so.1.8.0 /lib64/
-
-#     #TODO -f 주의
-#     ln -s /lib64/libnet.so.1.8.0 /lib64/libnet.so.1
-
-#     WRITE_LOG $FUNCNAME $LINENO "finish install sslproxy env"
-# }
-
 ####################################### 외부 모듈
 
 function build_install_slm()
@@ -721,48 +614,20 @@ function start_aivax()
 {
     WRITE_LOG $FUNCNAME $LINENO "start aivax"
 
-    __setup_data_resource
-
-    __setup_aivax_service
-
-    __start_aivax_process
-
-    WRITE_LOG $FUNCNAME $LINENO "finish aivax"
-}
-
-# 디스크, 자원등 설정, 초기에 설정해야 하는 기능과 묶어서 관리 필요
-function __setup_data_resource()
-{
-    WRITE_LOG $FUNCNAME $LINENO "start setup data resource"
-
-    WRITE_LOG $FUNCNAME $LINENO "finish data resource"
-}
-
-# 서비스 등록
-function __setup_aivax_service()
-{
-    WRITE_LOG $FUNCNAME $LINENO "start setup aivax service"
-
-    WRITE_LOG $FUNCNAME $LINENO "finish setup aivax service"
-}
-
-# aivax 프로세스 실행
-function __start_aivax_process()
-{
-    WRITE_LOG $FUNCNAME $LINENO "start aivax process"
-
     systemctl start nginx
-    systemctl start opensearch
     systemctl start fluent-bit
+    systemctl start opensearch
+    
     systemctl start mariadb
 
     systemctl start aivax-management
     systemctl start aivax-pipeline
-    systemctl start aivax-apiserver
+    # systemctl start aivax-apiserver
     systemctl start aivax-sslproxy
 
-    WRITE_LOG $FUNCNAME $LINENO "start aivax process"
+    WRITE_LOG $FUNCNAME $LINENO "finish aivax"
 }
+
 
 ####################################### main, 실행
 
@@ -782,7 +647,150 @@ function main()
     patch_aivax_source
 
     # 프로세스 기동
-    # start_aivax
+    start_aivax
 }
 
 main $@
+
+
+
+# # rpm 설치
+# function __install_rpm_modules()
+# {
+#     #rpm이 정상이면, dnf로 설치할수 있다.
+#     #예외처리는 프로그램으로. shell에서 실행하는 것 주의
+
+#     dnf install jq --disablerepo="*" --enablerepo="aivax" -y
+
+#     dnf install tree --disablerepo="*" --enablerepo="aivax" -y
+
+#     dnf install sqlite --disablerepo="*" --enablerepo="aivax" -y
+
+#     dnf install libreoffice-headless --disablerepo="*" --enablerepo="aivax" -y #TODO: 서버용으로 설치
+
+#     dnf install tesseract --disablerepo="*" --enablerepo="aivax" -y 
+
+#     dnf install tesseract-langpack-kor --disablerepo="*" --enablerepo="aivax" -y 
+
+    
+
+#     #TODO: C/C++ 개발 환경도 추가.
+
+#     #TODO: opensearch, mariadb는 별도 설치.
+# }
+
+
+# function __install_rpm_repo()
+# {
+#     WRITE_LOG $FUNCNAME $LINENO "start install rpm repo"
+
+#     # repo 설정, 기존 repos.d 복사후 한개만 설정
+#     # aivax_repo_path=${CONST_DEFINE[aivax_rpm_repo_path]} => 일단 향후 고민.
+
+#     # TODO: 프로그램에서는 경로는 config로 제어, 경로 변경시 바로 대응이 가능하도록 설계 할것
+
+#     # config 복사
+#     # systemd의 환경은 수정하지 않는다.
+#     # mv /etc/yum.repos.d /etc/yum.repos.d_bak
+#     mkdir -p /etc/yum.repos.d
+#     # cp -rf ./extension/rpm/core-rpm/repos.d/aivax.repo /etc/yum.repos.d/
+#     cp -rf ./extension/rpm-install/aivax.repo /etc/yum.respos.d/
+
+#     # createrepo, dnf 실수 방지용으로 설치한다.
+    
+#     rpm -ivh createrepo/createrepo_c-libs-0.20.1-4.el9.x86_64.rpm createrepo/createrepo_c-0.20.1-4.el9.x86_64.rpm
+
+#     #rpm은 미리 ./extensioni/rpm/ 디렉토리에 복사한채 빌드한다.
+
+#     # repo 복사, 우선, 그냥 작성한다.
+#     # rpm은 필요한 모듈만 복사한다.
+#     # mkdir -p /home1/aivax/extension/rpm/
+#     # mkdir -p /home1/aivax/extension/rpm/3rd-repo/mariadb/
+
+#     # #기본 및 확장 rpm 복사
+#     # cp -rf ./extension/rpm/base-repo /home1/aivax/extension/rpm/
+#     # cp -rf ./extension/rpm/extra-repo /home1/aivax/extension/rpm/
+
+#     # #mariadb, 버전 11.3.2
+#     # cp -rf ./extension/rpm/3rd-repo/mariadb/v11.3.2 /home1/aivax/extension/rpm/3rd-repo/mariadb/
+
+#     # #TODO: libreoffice, 분리해서 관리한다.
+#     # cp -rf ./extension/rpm/3rd-repo/office-headless /home1/aivax/extension/rpm/3rd-repo/
+
+#     # 기본 rpm
+#     # jq, tree, strace, ltrace, tcpump
+#     \cp -f ./extension/rpm-install/base-repo/*.rpm /home1/install/extension/rpm-repo/
+
+#     # libreoffice
+#     \cp -f ./extension/rpm-install/extra-repo/libreoffice-headless/*.rpm /home1/install/extension/rpm-repo/
+
+#     # tesseract, ocr
+#     \cp -f ./extension/rpm-install/extra-repo/tesseract/*.rpm /home1/install/extension/rpm-repo/
+
+#     # nginx
+#     \cp -f ./extension/rpm-install/extra-repo/nginx/*.rpm /home1/install/extension/rpm-repo/
+
+#     # mariadb
+#     \cp -f ./extension/rpm-install/extra-repo/mariadb/v11.3.2/*.rpm /home1/install/extension/rpm-repo/
+
+
+#     #TODO: createrepo, 설치 시점에 다시 갱신한다.   
+#     createrepo /home1/install/extension/rpm-repo/ 
+
+#     dnf clean all
+#     dnf makecache
+
+#     # 테스트용, 출력
+#     dnf repolist
+
+#     WRITE_LOG $FUNCNAME $LINENO "finish install rpm repo"
+# }
+
+# 패치 시점이, 실제 구조는 프로그램으로 해결.
+# function __install_sslproxy_env()
+# {
+#     WRITE_LOG $FUNCNAME $LINENO "start install sslproxy env"
+
+#     # 이건 테스트 하면서, 
+#     cp -rf ./extension/lib/libnet.so.1.8.0 /lib64/
+
+#     #TODO -f 주의
+#     ln -s /lib64/libnet.so.1.8.0 /lib64/libnet.so.1
+
+#     WRITE_LOG $FUNCNAME $LINENO "finish install sslproxy env"
+# }
+
+# # 디스크, 자원등 설정, 초기에 설정해야 하는 기능과 묶어서 관리 필요
+# function __setup_data_resource()
+# {
+#     WRITE_LOG $FUNCNAME $LINENO "start setup data resource"
+
+#     WRITE_LOG $FUNCNAME $LINENO "finish data resource"
+# }
+
+# # 서비스 등록
+# function __setup_aivax_service()
+# {
+#     WRITE_LOG $FUNCNAME $LINENO "start setup aivax service"
+
+#     WRITE_LOG $FUNCNAME $LINENO "finish setup aivax service"
+# }
+
+
+# # aivax 프로세스 실행
+# function __start_aivax_process()
+# {
+#     WRITE_LOG $FUNCNAME $LINENO "start aivax process"
+
+#     systemctl start nginx
+#     systemctl start opensearch
+#     systemctl start fluent-bit
+#     systemctl start mariadb
+
+#     systemctl start aivax-management
+#     systemctl start aivax-pipeline
+#     systemctl start aivax-apiserver
+#     systemctl start aivax-sslproxy
+
+#     WRITE_LOG $FUNCNAME $LINENO "start aivax process"
+# }
