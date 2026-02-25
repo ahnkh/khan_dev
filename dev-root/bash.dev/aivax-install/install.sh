@@ -2,12 +2,10 @@ g_path=$( cd "$(dirname "$0")" ; pwd )
 
 TRACE_LOG="./trace-log"
 
+# declare -A CONST_DEFINE
 
-declare -A CONST_DEFINE
-
-CONST_DEFINE[aivax_rpm_repo_path]="extension/rpm/core-rpm/repos.d/aivax.repo"
-CONST_DEFINE[system_rpm_repo_path]="/etc/yum.repos.d/"
-
+# CONST_DEFINE[aivax_rpm_repo_path]="extension/rpm/core-rpm/repos.d/aivax.repo"
+# CONST_DEFINE[system_rpm_repo_path]="/etc/yum.repos.d/"
 
 function WRITE_LOG()
 {
@@ -23,6 +21,23 @@ function WRITE_LOG()
     echo -e "${GREEN}[$(date '+%Y/%m/%d %H:%M:%S')]${NC}${bold} $3 ${normal}"
     
     echo $string &>> ${g_path}/${TRACE_LOG}
+}
+
+function WRITE_ERROR()
+{
+
+    RED='\033[0;31m'    NC='\033[0m' # No Color
+
+    bold=$(tput bold)
+    normal=$(tput sgr0)
+
+    #화면출력
+    echo -e "${RED}${bold}[$(date '+%Y/%m/%d %H:%M:%S')] $3 ${normal} ${NC} "
+
+    #$$ = pid
+    local string="[$(date '+%Y/%m/%d %H:%M:%S')][$$][$1:($2)] $3 $4"
+        
+    echo $string &>> ${g_path}/${log_file}
 }
 
 
@@ -71,7 +86,8 @@ function init_default_setup()
     #mkdir -p /home1/install
 
     # rocky linux 기본 tar가 설치 안되는 경우가 있다. tar는 별도로 추가.
-    rpm -ivh tar-1.34-9.el9_7.x86_64.rpm
+    # tar는 제외, tar는 수동으로 설치하고, 압축을 푼 이후부터.. tar는 인스톨러에서 해결하자.
+    # rpm -ivh tar-1.34-9.el9_7.x86_64.rpm
 
     # 설치후 정상점검 -> 프로그램화가 필요하다.
 
@@ -217,6 +233,7 @@ function __install_rpm_repo_v2()
     \cp -f ./extension/rpm-install/extra-repo/nginx/*.rpm /home1/install/extension/rpm-repo/
 
     # mariadb
+    \cp -f ./extension/rpm-install/extra-repo/perl/*.rpm /home1/install/extension/rpm-repo/
     \cp -f ./extension/rpm-install/extra-repo/mariadb/v11.3.2/*.rpm /home1/install/extension/rpm-repo/
 
     #TODO: opensearch는 최종 확장 패키지로, 별도 설치.
@@ -261,7 +278,9 @@ function __istall_rpm_package_v2()
 
     dnf install nginx --disablerepo="*" --enablerepo="aivax-repo" -y
 
-    #TODO: C/C++ 개발 환경도 추가.
+    #TODO: C/C++ 개발 환경
+
+    dnf install libpcap --disablerepo="*" --enablerepo="aivax-repo" -y
 
     #TODO: opensearch, mariadb는 별도 설치.
 
@@ -309,11 +328,11 @@ function __install_fluentbit()
     #service, 경로문제, 프로그램에서 해결
     # 우선 fluent-bit 서비스 수동 절차 기술
 
-    cp -rf fluent-bit.service /etc/systemd/system/
+    cp -rf ./extension/fluent-bit/fluent-bit.service /etc/systemd/system/
 
     #권한 문제, 대응 필요
     chmod 755 /home1/aivax/fluent-bit/fluent-bit
-
+    
     systemctl daemon-reload
     systemctl enable fluent-bit.service
     systemctl start fluent-bit
@@ -327,7 +346,7 @@ function __install_mariadb()
 
     # rpm이 있다는 가정하에, dnf로 설치 가능하다.
     # dnf 설치시, 스크립트로 설치하는 것 주의, -y 비 대화형 모드로 설치되어야 한다.
-    dnf install MariaDB-server MariaDB-client -y
+    dnf install --disablerepo="*" --enablerepo="aivax-repo" MariaDB-server MariaDB-client -y
 
     #TODO: mariadb 기동후, setup 절차가 필요, mariadb는 서비스로 등록해야 할듯 하다.
 
@@ -348,6 +367,56 @@ function __install_mariadb()
     # GRANT ALL PRIVILEGES ON app.* TO 'app'@'localhost';
     # FLUSH PRIVILEGES;
 
+    cat <<EOF > /etc/my.cnf.d/custom.cnf
+[mysqld]
+innodb_buffer_pool_size = 4G
+default_time_zone = '+00:00'
+EOF
+
+    #먼저 기동해야 한다.
+    systemctl enable mariadb
+    systemctl start mariadb
+    
+
+    DB_USER="app"
+    DB_PASS="app"
+    DB_NAME="app"
+
+    # mariadb -u root < ./data-setup/mariadb-setup/aivax_db_dump.sql
+
+#TODO: drop이 되어야 한다.
+mariadb <<EOF
+DROP DATABASE IF EXISTS ${DB_NAME};
+CREATE DATABASE ${DB_NAME};
+EOF
+    
+# if mariadb -e "USE ${DB_NAME}" 2>/dev/null; then    
+#     WRITE_ERROR $FUNCNAME $LINENO "DB already exists. Skip import."
+# else
+#     mariadb ${DB_NAME} < dump.sql
+# fi
+
+    mariadb ${DB_NAME} < dump.sql
+
+    #TODO: GRANT 다시 정리 필요
+mariadb <<EOF
+DROP USER IF EXISTS '${DB_USER}'@'%';
+DROP USER IF EXISTS '${DB_USER}'@'localhost';
+CREATE USER IF NOT EXISTS '${DB_USER}'@'%' IDENTIFIED BY '${DB_PASS}';
+GRANT ALL PRIVILEGES ON *.* TO '${DB_USER}'@'%' WITH GRANT OPTION;
+
+CREATE USER IF NOT EXISTS '${DB_USER}'@'localhost' IDENTIFIED BY '${DB_PASS}';
+GRANT ALL PRIVILEGES ON ${DB_NAME}.* TO '${DB_USER}'@'localhost';
+
+FLUSH PRIVILEGES;
+EOF
+
+    # 체크 필요, migration dump가 아닌, 점검된 스크립트가 필요할것 같다.
+    # dump는 필요할때 1번만 추가
+    # grep -i user dump.sql
+    # grep -i grant dump.sql
+
+
     # my.cnf 설정 변경 => 기본값으로 복사, 또는 프로그램으로 편집, 쉘스크립트는 지양한다.
 
     # #메모리 제한 확인
@@ -355,6 +424,8 @@ function __install_mariadb()
 
     # [mysqld]
     # default_time_zone = '+00:00'
+
+    
 
     WRITE_LOG $FUNCNAME $LINENO "finish install mariadb"
 }
@@ -365,11 +436,14 @@ function __install_nginx()
 
     # yum이 설정되어, dnf로 설치한다.
 
-    dnf install nginx -y
+    dnf install --disablerepo="*" --enablerepo="aivax-repo" nginx -y
 
     # nginx config를 복사한다. TODO: 패키지의 압축을 해제하면, 필요한 몇을 제외하고는 압축되지 않는다.
-    cp -rf ./extension/nginx/nginx-conf/aivax.conf /etc/nginx/conf.d/
-    cp -rf ./extension/nginx/nginx-conf/ssl /etc/nginx/
+    # cp -rf ./extension/nginx/nginx-conf/aivax.conf /etc/nginx/conf.d/
+    # cp -rf ./extension/nginx/nginx-conf/ssl /etc/nginx/
+
+    \cp -rf ./data-setup/nginx-setup/nginx-conf/aivax.conf /etc/nginx/conf.d/
+    \cp -rf ./data-setup/nginx-setup/nginx-conf/ssl /etc/nginx/
 
     # 테스트, 아래 결과의 메시지 파싱, 프로그램으로 체크
     nginx -t
@@ -378,6 +452,9 @@ function __install_nginx()
     systemctl start nginx
 
     # systemctl reload nginx
+
+    # TODO: port, ip 등은 외부에서 지정할수 있어야 한다.
+    # port가 변경되면, 재설치 하도록 옵션화, 세부 프로그래밍이 되어야 한다.
 
     # 통신 체크 확인 필요, 프로그램으로 체크
     #ss -natup | grep 4000
@@ -391,9 +468,11 @@ function __install_nodejs()
     WRITE_LOG $FUNCNAME $LINENO "start install nodejs"
 
     # node.js extenstion 경로에 복사하면 끝
-    cp -rf ./extension/nodejs/nodejs /home1/aivax/extension/
+    cp -rf ./extension/nodejs-install/node /home1/aivax/extension/
 
     chmod 755 /home1/aivax/extension/node
+
+    # node.js, systemd 등록 필요 => aivax.conf를 별도로 추가한다. (다만 인스톨러에서 생성하고, /home1/aivax 안에서 관리한다.)
 
     # TODO: management 패치는, nodejs의 설치와 별도로 진행한다.
     # service 등록은 management 패치 시점에, 향후 패치 인스톨 고려시 다시.
@@ -469,13 +548,24 @@ function __install_python()
 
     # venv 생성, 여기서 python 버전은 세부 config로 제어
     # python3.13 -m venv /home1/aivax/aivax-venv
-    uv venv /home1/aivax/aivax-venv
+    # 설치시 기존에 존재하면 물어본다. 인스톨러에서는 옵션화
+    # 존재하면 삭제 또는 넘어가기, 일단 기본으로 넘어간다.
+    # uv venv /home1/aivax/aivax-venv
+    VENV="/home1/aivax/aivax-venv"
+
+    if [ ! -d "$VENV" ]; then
+        uv venv "$VENV"
+    fi
+
+    #매번 재생성은 uv venv --clear 이다.
 
     # bash 추가, sed
     source /home1/aivax/aivax-venv/bin/activate
 
     #개선 필요
     # echo "source /home1/aivax/aivax-venv/bin/activate" >> /root/.bash_profile
+    FILE="/root/.bash_profile"
+
     if ! grep -q "# >>> AIVAX VENV >>>" "$FILE"; then
 cat << 'EOF' >> "$FILE"
 
@@ -484,6 +574,8 @@ source /home1/aivax/aivax-venv/bin/activate
 # <<< AIVAX VENV <<<
 EOF
 fi
+
+    cd ./extension/python-install
 
     # offlinewheel
     # TODO: aivax-requirement는, 패키지 빌드 과정에서 생성
@@ -499,6 +591,7 @@ fi
     uv pip install pyservice-1.0.2-py3-none-any.whl --force-reinstall
 
     # 이후 pipeline 이하 appserver 설치는 다음 스텝으로.
+    cd -
 
     WRITE_LOG $FUNCNAME $LINENO "finish install python"
 }
@@ -555,7 +648,12 @@ function __patch_python_service()
 
     # 서비스 등록, 향후 프로그램으로 설치와 패치 분리
 
-    cp -rf aivax-pipeline.service /etc/systemd/system/
+    tar xzvf ./aivax-patch/pipeline.tar.gz 
+
+    \mv -f pipeline /home1/aivax/
+
+    #cp -rf aivax-pipeline.service /etc/systemd/system/
+    cp -rf ./aivax-patch/systemd/pipeline-install/aivax-pipeline.service /etc/systemd/system/
 
     systemctl daemon-reload
     systemctl enable aivax-pipeline
@@ -572,10 +670,10 @@ function __patch_management()
 
     # TODO: 빌드 스크립트에서 빌드된 manage 소스를 압축후 해제하는 정도로 마무리.
 
-    tar xzvf management.tar.gz 
-    mv management /home1/aivax/
+    tar xzvf ./aivax-patch/management.tar.gz 
+    \mv -f management /home1/aivax/
 
-    cp -rf aivax-management.service /etc/systemd/system/
+    \cp -rf ./aivax-patch/systemd/management-install/aivax-management.service /etc/systemd/system/
 
     systemctl daemon-reload
     systemctl enable aivax-management
@@ -589,21 +687,26 @@ function __patch_sslproxy()
     WRITE_LOG $FUNCNAME $LINENO "start patch sslproxy"
 
     # libpcap 설치, 우선 작성후 프로그램에서 모듈 분리
-    dnf install libpcap -y
+    # dnf install libpcap -y
+
+    tar xzvf ./aivax-patch/sslproxy.tar.gz 
+    \mv -f sslproxy /home1/aivax/
 
     # 이건 테스트 하면서, 
     cp -rf ./extension/lib/libnet.so.1.8.0 /lib64/
 
     #TODO -f 주의
-    ln -s /lib64/libnet.so.1.8.0 /lib64/libnet.so.9
+    ln -sf /lib64/libnet.so.1.8.0 /lib64/libnet.so.9
 
     ldconfig
 
     # network 설정
     # ip eth 정보를 알아야 한다. 프로그램으로 해결
-    bash network.sh enp1s0
+    # 일단 경로는 설치하는데 초점
+    ETH=$( ls /sys/class/net | grep -v '^lo$' | head -n 1)
+    bash /home1/aivax/sslproxy/network.sh ${ETH}
 
-    cp -rf aivax-sslproxy.service /etc/systemd/system/
+    cp -rf ./aivax-patch/systemd/sslproxy-install/aivax-sslproxy.service /etc/systemd/system/
 
     systemctl daemon-reload
     systemctl enable aivax-sslproxy.service
@@ -676,7 +779,7 @@ function main()
     # build_install_slm
 
     # 소스 패치
-    # patch_aivax_source
+    patch_aivax_source
 
     # 프로세스 기동
     # start_aivax
