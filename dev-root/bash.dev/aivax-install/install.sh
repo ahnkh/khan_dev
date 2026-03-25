@@ -486,7 +486,7 @@ function __install_suricata()
     # \cp -rf ./extenstion/lib/suricata/config/suricata_ai_mirror.lua /etc/suricata/
     # \cp -rf ./extenstion/lib/suricata/config/threshold.config /etc/suricata/
 
-    \cp -rf ./extenstion/lib/suricata/etc/config/* /etc/suricata/
+    \cp -rf ./extension/lib/suricata/etc/config/* /etc/suricata/
 
     # /var/lib 복사, TODO: 향후 suricata로 확정되면, 소스 정리 필요
     # mkdir /var/lib/suricata -p
@@ -524,7 +524,7 @@ function __patch_ai_engine()
 
     for i in 1 2 3 4; do
         systemctl enable ai-engine@$i.service
-        systemctl start ai-engine@$i.service
+        # systemctl start ai-engine@$i.service
     done
 
     WRITE_LOG $FUNCNAME $LINENO "finish install ai engine (1~4)"
