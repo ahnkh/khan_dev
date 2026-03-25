@@ -444,14 +444,14 @@ function __install_python()
     WRITE_LOG $FUNCNAME $LINENO "start install python"
 
     # python 복사, ldconfig
-    cp -rf ./extension/python-install/usr/local/bin/* /usr/local/bin/
-    cp -rf ./extension/python-install/usr/local/lib/* /usr/local/lib/
+    \cp -rf ./extension/python-install/usr/local/bin/* /usr/local/bin/
+    \cp -rf ./extension/python-install/usr/local/lib/* /usr/local/lib/
 
     #so 업데이트
     ldconfig
 
     #pip, uv로 교체
-    cp -rf ./extension/python-install/uv /usr/local/bin/
+    \cp -rf ./extension/python-install/uv /usr/local/bin/
 
     # venv 생성, 여기서 python 버전은 세부 config로 제어
     # python3.13 -m venv /home1/aivax/aivax-venv
@@ -463,6 +463,8 @@ function __install_python()
     if [ ! -d "$VENV" ]; then
         uv venv "$VENV"
     fi
+
+    # \cp -rfv ./extension/python-install/uv .. 어디로 복사해야 하는지 모호, uv부분 다시 검증.
 
     #매번 재생성은 uv venv --clear 이다.
 
