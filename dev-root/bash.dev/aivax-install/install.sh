@@ -303,7 +303,7 @@ EOF
 #     mariadb ${DB_NAME} < dump.sql
 # fi
 
-    mariadb ${DB_NAME} < dump.sql
+    mariadb ${DB_NAME} < ./data-setup/mariadb-setup/aivax_db_dump.sql
 
     #TODO: GRANT 다시 정리 필요
 mariadb <<EOF
@@ -493,8 +493,8 @@ fi
     # pycomlib 설치, 버전 주의.
     #uv pip install pycom* --force-reinstall
 
-    uv pip install pycomlib-1.1.4-py3-none-any.whl --force-reinstall
-    uv pip install pycomlibex-1.0.9-py3-none-any.whl --force-reinstall
+    uv pip install pycomlib-1.1.5-py3-none-any.whl --force-reinstall
+    uv pip install pycomlibex-1.1.1-py3-none-any.whl --force-reinstall
     uv pip install pyservice-1.0.2-py3-none-any.whl --force-reinstall
 
     # 이후 pipeline 이하 appserver 설치는 다음 스텝으로.
@@ -606,6 +606,32 @@ function __patch_sslproxy()
     systemctl start aivax-sslproxy
 
     WRITE_LOG $FUNCNAME $LINENO "finish patch sslproxy"
+}
+
+function __migrate_mariadb()
+{
+    WRITE_LOG $FUNCNAME $LINENO "start migrate mariadb"
+
+    #DB가 기동되고, aivax-management를 종료한 상태에서
+    #node,npm을 설정하고, 명령을 실행한다.
+
+    systemctl start mariadb
+    systemctl stop aivax-management
+
+    tar xvf ./extension/nodejs-install/node-v24.11.1-linux-x64.tar
+
+    cp -rfv ./extension/nodejs-install/node-v24.11.1-linux-x64 /home1/aivax/extension/nodejs
+
+    cd /home1/aivax/management/backend
+
+    #TODO: 향후에는 drop 없이 migration만 수행한다. 26.03.25 지식재산처만 backup -> drop -> migration을 수행한다.
+    /home1/aivax/extension/nodejs/bin/npm run db:backup
+    /home1/aivax/extension/nodejs/bin/npm run db:drop
+    /home1/aivax/extension/nodejs/bin/npm run migration:run
+
+    # 검증은 next
+
+    WRITE_LOG $FUNCNAME $LINENO "finish migrate mariadb"
 }
 
 ####################################### service 등록 + 실행
