@@ -529,6 +529,9 @@ function patch_aivax_source()
 
     __patch_sslproxy
 
+    # db migration 기능, management 수행후 처리
+    __migrate_mariadb
+
     WRITE_LOG $FUNCNAME $LINENO "finish patch aivax source"
 }
 
