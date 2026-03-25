@@ -624,13 +624,16 @@ function __migrate_mariadb()
     systemctl stop aivax-management
 
     # mkdir -p /home1/aivax/extension/nodejs
-    tar xvf ./extension/nodejs-install/node-v24.11.1-linux-x64.tar 
+    tar xf ./extension/nodejs-install/node-v24.11.1-linux-x64.tar 
 
     \mv node-v24.11.1-linux-x64 /home1/aivax/extension/nodejs
 
     # cp -rfv ./extension/nodejs-install/node-v24.11.1-linux-x64 /home1/aivax/extension/nodejs
 
     cd /home1/aivax/management/backend
+
+    #path, 임시로 추가
+    export PATH=/home1/aivax/extension/nodejs/bin:$PATH
 
     #TODO: 향후에는 drop 없이 migration만 수행한다. 26.03.25 지식재산처만 backup -> drop -> migration을 수행한다.
     /home1/aivax/extension/nodejs/bin/npm run db:backup
