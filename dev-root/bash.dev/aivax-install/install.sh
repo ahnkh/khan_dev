@@ -98,6 +98,15 @@ function init_default_setup()
 
     # 방화벽 확인. => 시작 단계에서
 
+    #suricata 관련
+    mkdir -p /var/log/suricata /var/run/suricata
+
+    mkdir -p /var/lib/suricata/rules
+
+    # AI 엔진 소켓 경로 권한 부여
+    chmod 777 /var/run/
+
+
     WRITE_LOG $FUNCNAME $LINENO "finish init default setup"
 }
 
@@ -169,6 +178,10 @@ function __install_rpm_repo_v2()
     \cp -f ./extension/rpm-install/extra-repo/perl/*.rpm /home1/install/extension/rpm-repo/
     \cp -f ./extension/rpm-install/extra-repo/mariadb/v11.3.2/*.rpm /home1/install/extension/rpm-repo/
 
+    # suricata
+    \cp -f ./extension/rpm-install/extra-repo/suricata/*.rpm /home1/install/extension/rpm-repo/
+
+
     #TODO: opensearch는 최종 확장 패키지로, 별도 설치.
 
     # 기본 rpm, createrepo 설치, 프로그램에서는 개별로 설치, 설치 오류 대응.
@@ -216,6 +229,15 @@ function __istall_rpm_package_v2()
     dnf install libpcap --disablerepo="*" --enablerepo="aivax-repo" -y
 
     #TODO: opensearch, mariadb는 별도 설치.
+
+    # suricata 관련
+
+    dnf install lz4 file-libs libcap-ng libbpf libxdp elfutils-libelf libnet jansson libyaml --disablerepo="*" --enablerepo="aivax-repo" -y
+
+    dnf install pcre2 zlib libpcap libzstd libibverbs libnl3 nss --disablerepo="*" --enablerepo="aivax-repo" -y
+
+    dnf install lua lua-devel lua-socket python3-pyyaml --disablerepo="*" --enablerepo="aivax-repo" -y
+
 
     WRITE_LOG $FUNCNAME $LINENO "finish install rpm package"
 }
@@ -461,7 +483,8 @@ function __install_python()
     VENV="/home1/aivax/aivax-venv"
 
     if [ ! -d "$VENV" ]; then
-        uv venv "$VENV"
+        /usr/local/bin/uv venv "$VENV"
+        \cp -rf /usr/local/bin/uv ${VENV}/bin/
     fi
 
     # \cp -rfv ./extension/python-install/uv .. 어디로 복사해야 하는지 모호, uv부분 다시 검증.
