@@ -546,7 +546,7 @@ function __patch_python_service()
 
     # 서비스 등록, 향후 프로그램으로 설치와 패치 분리
 
-    tar xzvf ./aivax-patch/pipeline.tar.gz 
+    tar xzf ./aivax-patch/pipeline.tar.gz 
 
     \mv -f pipeline /home1/aivax/
 
@@ -568,7 +568,7 @@ function __patch_management()
 
     # TODO: 빌드 스크립트에서 빌드된 manage 소스를 압축후 해제하는 정도로 마무리.
 
-    tar xzvf ./aivax-patch/management.tar.gz 
+    tar xzf ./aivax-patch/management.tar.gz 
     \mv -f management /home1/aivax/
 
     \cp -rf ./aivax-patch/systemd/management-install/aivax-management.service /etc/systemd/system/
@@ -587,7 +587,7 @@ function __patch_sslproxy()
     # libpcap 설치, 우선 작성후 프로그램에서 모듈 분리
     # dnf install libpcap -y
 
-    tar xzvf ./aivax-patch/sslproxy.tar.gz 
+    tar xzf ./aivax-patch/sslproxy.tar.gz 
     \mv -f sslproxy /home1/aivax/
 
     # 이건 테스트 하면서, 
@@ -623,9 +623,12 @@ function __migrate_mariadb()
     systemctl start mariadb
     systemctl stop aivax-management
 
-    tar xvf ./extension/nodejs-install/node-v24.11.1-linux-x64.tar
+    # mkdir -p /home1/aivax/extension/nodejs
+    tar xvf ./extension/nodejs-install/node-v24.11.1-linux-x64.tar 
 
-    cp -rfv ./extension/nodejs-install/node-v24.11.1-linux-x64 /home1/aivax/extension/nodejs
+    \mv node-v24.11.1-linux-x64 /home1/aivax/extension/nodejs
+
+    # cp -rfv ./extension/nodejs-install/node-v24.11.1-linux-x64 /home1/aivax/extension/nodejs
 
     cd /home1/aivax/management/backend
 
@@ -635,6 +638,8 @@ function __migrate_mariadb()
     /home1/aivax/extension/nodejs/bin/npm run migration:run
 
     # 검증은 next
+
+    cd -
 
     WRITE_LOG $FUNCNAME $LINENO "finish migrate mariadb"
 }
