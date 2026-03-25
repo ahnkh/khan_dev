@@ -98,14 +98,6 @@ function init_default_setup()
 
     # 방화벽 확인. => 시작 단계에서
 
-    #suricata 관련
-    mkdir -p /var/log/suricata /var/run/suricata
-
-    mkdir -p /var/lib/suricata/rules
-
-    # AI 엔진 소켓 경로 권한 부여
-    chmod 777 /var/run/
-
 
     WRITE_LOG $FUNCNAME $LINENO "finish init default setup"
 }
@@ -138,6 +130,8 @@ function install_module()
     __install_nodejs
 
     __install_opensearch
+
+    __install_suricata
 
     # __install_sslproxy_env
 
@@ -461,6 +455,81 @@ function __install_opensearch()
     WRITE_LOG $FUNCNAME $LINENO "finish install opensearch"
 }
 
+#suricata 관련 설치
+function __install_suricata()
+{
+
+    WRITE_LOG $FUNCNAME $LINENO "start install suricata"
+
+    #설치 모듈은 lib/suricata에서 가져온다.
+    #config도 같이 관리
+
+    #suricata 관련
+    mkdir -p /var/log/suricata /var/run/suricata
+
+    mkdir -p /var/lib/suricata/rules
+    
+
+    \cp -rf ./extension/lib/suricata/suricata* /usr/local/bin/
+    \cp -rf ./extension/lib/suricata/libxdp.so.1.5.0 /lib64/
+
+    chmod 755 /usr/local/bin/suricata*
+
+    ln -s /lib64/libxdp.so.1.5.0 /lib64/libxdp.so.1
+
+    # etc/config 복사
+    mkdir -p /etc/suricata
+
+    # \cp -rf ./extenstion/lib/suricata/config/classification.config /etc/suricata/
+    # \cp -rf ./extenstion/lib/suricata/config/reference.config /etc/suricata/
+    # \cp -rf ./extenstion/lib/suricata/config/suricata.yaml /etc/suricata/
+    # \cp -rf ./extenstion/lib/suricata/config/suricata_ai_mirror.lua /etc/suricata/
+    # \cp -rf ./extenstion/lib/suricata/config/threshold.config /etc/suricata/
+
+    \cp -rf ./extenstion/lib/suricata/etc/config/* /etc/suricata/
+
+    # /var/lib 복사, TODO: 향후 suricata로 확정되면, 소스 정리 필요
+    # mkdir /var/lib/suricata -p
+
+    \cp -rf ./extension/lib/suricata/var/lib/* /var/lib/
+
+    #서비스 등록
+    cp -rf ./aivax-patch/systemd/suricata-install/suricata.service /etc/systemd/system/
+
+    systemctl daemon-reload
+    systemctl enable suricata.service
+
+    WRITE_LOG $FUNCNAME $LINENO "finish install suricata"
+
+}
+
+#ai 엔진 설치
+function __patch_ai_engine()
+{
+
+    WRITE_LOG $FUNCNAME $LINENO "start install ai engine (1~4)"
+
+    tar xzf ./aivax-patch/ai_engine.tar.gz
+
+    # AI 엔진 소켓 경로 권한 부여
+    chmod 777 /var/run/
+
+    \mv ai_engine /home1/aivax/
+
+    cp -rf ./aivax-patch/systemd/ai-engine-install/ai-engine@.service /etc/systemd/system/
+
+    systemctl daemon-reload
+
+    # systemctl enable ai-engine@{1..4}.service
+
+    for i in 1 2 3 4; do
+        systemctl enable ai-engine@$i.service
+        systemctl start ai-engine@$i.service
+    done
+
+    WRITE_LOG $FUNCNAME $LINENO "finish install ai engine (1~4)"
+}
+
 function __install_python()
 {
     WRITE_LOG $FUNCNAME $LINENO "start install python"
@@ -553,6 +622,8 @@ function patch_aivax_source()
     __patch_management
 
     __patch_sslproxy
+
+    __patch_ai_engine
 
     # db migration 기능, management 수행후 처리
     __migrate_mariadb
