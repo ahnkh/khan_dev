@@ -56,7 +56,13 @@ function init_default_setup()
     TODAY=$(date +%Y%m%d)
     #기존 디렉토리, 존재하면 이동, 없으면 그냥 오류, TODO: 삭제는 하지 않는다. 위험.
     #향후 installer에서 상세 오류 점검.
-    i#rm -rf /home1/aivax.old/aivax.$TODAY
+    #rm -rf /home1/aivax.old/aivax.$TODAY
+
+    if [ -d /home1/aivax.old/aivax.$TODAY] 
+    then
+        mv /home1/aivax.old/aivax.$TODAY /home1/aivax.old/aivax.$(date +%Y%m%d%H%M)
+    fi
+
     \mv -f /home1/aivax /home1/aivax.old/aivax.$TODAY
 
     #디렉토리, 존재하면 /home1/aivax.old/aivax.[오늘날짜 경로에 백업한다.]
