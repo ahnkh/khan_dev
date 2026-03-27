@@ -54,9 +54,10 @@ function init_default_setup()
     mkdir -p /home1/aivax.old
 
     TODAY=$(date +%Y%m%d)
-    #기존 디렉토리, 존재하면 이동, 없으면 그냥 오류
-    rm -rf /home1/aivax.old/aivax.$TODAY
-    mv -f /home1/aivax /home1/aivax.old/aivax.$TODAY
+    #기존 디렉토리, 존재하면 이동, 없으면 그냥 오류, TODO: 삭제는 하지 않는다. 위험.
+    #향후 installer에서 상세 오류 점검.
+    i#rm -rf /home1/aivax.old/aivax.$TODAY
+    \mv -f /home1/aivax /home1/aivax.old/aivax.$TODAY
 
     #디렉토리, 존재하면 /home1/aivax.old/aivax.[오늘날짜 경로에 백업한다.]
 
@@ -617,7 +618,7 @@ function patch_aivax_source()
 {
     WRITE_LOG $FUNCNAME $LINENO "start patch aivax source"
 
-    __patch_python_service
+    __patch_pipeline
 
     __patch_management
 
@@ -631,7 +632,7 @@ function patch_aivax_source()
     WRITE_LOG $FUNCNAME $LINENO "finish patch aivax source"
 }
 
-function __patch_python_service()
+function __patch_pipeline()
 {
     WRITE_LOG $FUNCNAME $LINENO "start patch pipeline"
 
@@ -652,6 +653,21 @@ function __patch_python_service()
     systemctl start aivax-pipeline
 
     WRITE_LOG $FUNCNAME $LINENO "finish patch pipeline"
+}
+
+function __patch_aivax_toolkit()
+{
+    WRITE_LOG $FUNCNAME $LINENO "start aivax toolkit"
+
+    tar xzf ./aivax-patch/toolkit.tar.gz 
+
+    \mv -f toolkit /home1/aivax/
+
+    #일단 압축만 해제, 기본 서비스를 어떻게 띄울지 미결정, 명령에 의해서 띄우는 쪽으로 
+    #포트에 대한 이슈가 있을수 있다. api 호출은 필요시 기동
+
+
+    WRITE_LOG $FUNCNAME $LINENO "finish aivax toolkit"
 }
 
 function __patch_management()
@@ -743,6 +759,24 @@ function __migrate_mariadb()
 
 ####################################### service 등록 + 실행
 
+function stop_aivax()
+{
+    WRITE_LOG $FUNCNAME $LINENO "stop aivax"
+
+    systemctl stop nginx
+    systemctl stop fluent-bit
+    systemctl stop opensearch
+    
+    systemctl stop mariadb
+
+    systemctl stop aivax-management
+    systemctl stop aivax-pipeline
+    # systemctl start aivax-apiserver
+    systemctl stop aivax-sslproxy
+
+    WRITE_LOG $FUNCNAME $LINENO "finish stop aivax"
+}
+
 function start_aivax()
 {
     WRITE_LOG $FUNCNAME $LINENO "start aivax"
@@ -758,7 +792,7 @@ function start_aivax()
     # systemctl start aivax-apiserver
     systemctl start aivax-sslproxy
 
-    WRITE_LOG $FUNCNAME $LINENO "finish aivax"
+    WRITE_LOG $FUNCNAME $LINENO "finish start aivax"
 }
 
 
@@ -769,6 +803,9 @@ function main()
 
     # TODO: 경로를 생성해야 한다. 경로가 제일 먼저이다.
     init_default_setup
+
+    #패치전, 서비스를 내린다. 향후 개선
+    stop_aivax
 
     # 최초, 모듈 설치
     install_module
