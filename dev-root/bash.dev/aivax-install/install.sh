@@ -63,7 +63,7 @@ function init_default_setup()
         mv /home1/aivax.old/aivax.$TODAY /home1/aivax.old/aivax.$(date +%Y%m%d%H%M)
     fi
 
-    \mv -f /home1/aivax /home1/aivax.old/aivax.$TODAY
+    \mv /home1/aivax /home1/aivax.old/aivax.$TODAY
 
     #디렉토리, 존재하면 /home1/aivax.old/aivax.[오늘날짜 경로에 백업한다.]
 
@@ -625,6 +625,8 @@ function patch_aivax_source()
     WRITE_LOG $FUNCNAME $LINENO "start patch aivax source"
 
     __patch_pipeline
+
+    __patch_aivax_toolkit
 
     __patch_management
 
