@@ -193,7 +193,7 @@ function __install_rpm_repo_v2()
     dnf makecache
 
     #테스트, 디버그용
-    dnf repolist all
+    # dnf repolist all
 
     WRITE_LOG $FUNCNAME $LINENO "finish install rpm package"
 
@@ -481,6 +481,13 @@ function __install_opensearch()
 
     #TODO: 설치 테스트, 장애 발생시 재생성 필요
 
+    # /etc/opensearch/opensearh.yml, 경로 변경, 우선 스크립트로
+    NEW_PATH="/home1/aivax/data_resource/opensearch"
+    CONFIG_FILE="/etc/opensearch/opensearch.yml"
+
+    sudo sed -i "s|path.data:.*|path.data: $NEW_PATH/data|g" "$CONFIG_FILE"
+    # sudo sed -i "s|path.logs:.*|path.logs: $NEW_PATH/logs|g" "$CONFIG_FILE"
+
     # config 설정
 
     # opensearch의 기본 service 파일 경로, /etc/로 변경 => 위험
@@ -703,7 +710,7 @@ fi
     # TODO: aivax-requirement는, 패키지 빌드 과정에서 생성
     # cp -rf requirements.최신.txt aivax-requirement.txt
     # pip install --no-index --find-links=./offline-wheel/ -r aivax-requirement.txt
-    uv pip install --no-index --find-links=./offline-wheel/ -r aivax-requirement.txt
+    uv --quiet pip install --no-index --find-links=./offline-wheel/ -r aivax-requirement.txt
 
     # pycomlib 설치, 버전 주의.
     #uv pip install pycom* --force-reinstall
