@@ -493,7 +493,7 @@ function __install_opensearch()
     NEW_PATH="/home1/aivax/data_resource/opensearch"
     CONFIG_FILE="/etc/opensearch/opensearch.yml"
 
-    sudo sed -i "s|path.data:.*|path.data: $NEW_PATH/data|g" "$CONFIG_FILE"
+    sudo sed -i "s|path.data:.*|path.data: $NEW_PATH|g" "$CONFIG_FILE"
     # sudo sed -i "s|path.logs:.*|path.logs: $NEW_PATH/logs|g" "$CONFIG_FILE"
 
     # config 설정
