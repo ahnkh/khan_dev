@@ -183,8 +183,9 @@ function __install_rpm_repo_v2()
     #TODO: opensearch는 최종 확장 패키지로, 별도 설치.
 
     # 기본 rpm, createrepo 설치, 프로그램에서는 개별로 설치, 설치 오류 대응.
-    rpm -ivh ./extension/rpm-install/createrepo/createrepo_c-libs-0.20.1-4.el9.x86_64.rpm 
-    rpm -ivh ./extension/rpm-install/createrepo/createrepo_c-0.20.1-4.el9.x86_64.rpm
+    # TODO: 실제 installer에서는 각 설치 단계별로 로그를 상세히 남긴다.
+    rpm -ih --quiet ./extension/rpm-install/createrepo/createrepo_c-libs-0.20.1-4.el9.x86_64.rpm 
+    rpm -ih --quiet ./extension/rpm-install/createrepo/createrepo_c-0.20.1-4.el9.x86_64.rpm
 
     #repo 다시 생성
     createrepo /home1/install/extension/rpm-repo/
@@ -423,7 +424,7 @@ function __install_opensearch()
     #TODO: 여러 경로로 이동 필요, temp 경로롤 이용한다. (/home1/install/temp)
 
     # 기본 디렉토리 생성, 두번 체크
-    mkdir -p /home1/aivax/data_resource/opensearch/
+    # mkdir -p /home1/aivax/data_resource/opensearch/
 
     # 설치후, 데이터 복사, config, 권한 설정 필요
 
@@ -438,8 +439,8 @@ function __install_opensearch()
     tar xzf ./data-setup/opensearch-setup/opensearch.config.tar.gz 
 
     #과거 opensearch backup
-    cp -rf /etc/opensearch /etc/opensearch.old
-    \cp -rf opensearch /etc/
+    \cp -rf /etc/opensearch /etc/opensearch.old
+    mv opensearch /etc/
 
     chown -R opensearch:opensearch /etc/opensearch
     chmod -R 750 /etc/opensearch
@@ -454,7 +455,7 @@ function __install_opensearch()
         mv /home1/aivax/data_resource/opensearch /home1/aivax/data_resource/opensearch.$(date +%Y%m%d%H%M)
     fi
 
-    \cp -rf opensearch /home1/aivax/data_resource/
+    mv opensearch /home1/aivax/data_resource/
 
     chown -R opensearch:opensearch /home1/aivax/data_resource/opensearch
     chmod -R 750 /home1/aivax/data_resource/opensearch
@@ -540,8 +541,8 @@ Group=opensearch
 WorkingDirectory=/home1/aivax/data_resource/opensearch
 
 
-ExecStartPre=/bin/mkdir -p /home1/aivax/data_resource/opensearch/tmp
-ExecStartPre=/bin/chown opensearch:opensearch /home1/aivax/data_resource/opensearch/tmp
+#ExecStartPre=/bin/mkdir -p /home1/aivax/data_resource/opensearch/tmp
+#ExecStartPre=/bin/chown opensearch:opensearch /home1/aivax/data_resource/opensearch/tmp
 
 ExecStartPre=/bin/mkdir -p /dev/shm/performanceanalyzer
 ExecStartPre=/bin/chown opensearch:opensearch /dev/shm/performanceanalyzer
@@ -593,9 +594,6 @@ SystemCallErrorNumber=EPERM
 RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
 
 ReadWritePaths=/home1/aivax/data_resource/opensearch
-ReadWritePaths=/home1/aivax/data_resource/opensearch/data
-ReadWritePaths=/home1/aivax/data_resource/opensearch/logs
-ReadWritePaths=/home1/aivax/data_resource/opensearch/tmp
 ReadWritePaths=/dev/shm
 ReadWritePaths=-/etc/opensearch
 ReadWritePaths=-/mnt/snapshots
