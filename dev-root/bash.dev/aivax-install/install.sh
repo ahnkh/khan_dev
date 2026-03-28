@@ -446,7 +446,15 @@ function __install_opensearch()
 
     tar xzf ./data-setup/opensearch-setup/opensearch.data.tar.gz
 
-    \cp -rf opensearch_docker /home1/aivax/data_resource/opensearch
+    # 상세 수정은 installer에서.
+    mv opensearch_docker opensearch
+
+    if [ -d /home1/aivax/data_resource/opensearch ]
+    then
+        mv /home1/aivax/data_resource/opensearch /home1/aivax/data_resource/opensearch.$(date +%Y%m%d%H%M)
+    fi
+
+    \cp -rf opensearch /home1/aivax/data_resource/
 
     chown -R opensearch:opensearch /home1/aivax/data_resource/opensearch
     chmod -R 750 /home1/aivax/data_resource/opensearch
@@ -715,9 +723,9 @@ fi
     # pycomlib 설치, 버전 주의.
     #uv pip install pycom* --force-reinstall
 
-    uv pip install pycomlib-1.1.5-py3-none-any.whl --force-reinstall
-    uv pip install pycomlibex-1.1.1-py3-none-any.whl --force-reinstall
-    uv pip install pyservice-1.0.2-py3-none-any.whl --force-reinstall
+    uv --quiet pip install pycomlib-1.1.5-py3-none-any.whl --force-reinstall
+    uv --quiet pip install pycomlibex-1.1.1-py3-none-any.whl --force-reinstall
+    uv --quiet pip install pyservice-1.0.2-py3-none-any.whl --force-reinstall
 
     # 이후 pipeline 이하 appserver 설치는 다음 스텝으로.
     cd -
