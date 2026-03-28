@@ -896,8 +896,14 @@ function stop_aivax()
     # systemctl start aivax-apiserver
     systemctl stop aivax-sslproxy
 
-    for i in 1 2 3 4; do        
-        systemctl stop ai-engine@$i.service
+    for i in 1 2 3 4
+    do
+        if systemctl is-active --quiet ai-engine@$i
+        then
+            #systemctl stop myservice
+            systemctl stop ai-engine@$i.service
+        fi
+        # systemctl stop ai-engine@$i.service
     done
 
     WRITE_LOG $FUNCNAME $LINENO "finish stop aivax"
