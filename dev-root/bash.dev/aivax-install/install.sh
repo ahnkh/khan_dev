@@ -185,8 +185,10 @@ function __install_rpm_repo_v2()
 
     # 기본 rpm, createrepo 설치, 프로그램에서는 개별로 설치, 설치 오류 대응.
     # TODO: 실제 installer에서는 각 설치 단계별로 로그를 상세히 남긴다.
-    rpm -ih --quiet ./extension/rpm-install/createrepo/createrepo_c-libs-0.20.1-4.el9.x86_64.rpm > /dev/null 2&1
-    rpm -ih --quiet ./extension/rpm-install/createrepo/createrepo_c-0.20.1-4.el9.x86_64.rpm > /dev/null 2&1
+    rpm -ih --quiet ./extension/rpm-install/createrepo/createrepo_c-libs-0.20.1-4.el9.x86_64.rpm > /dev/null 2>&1
+    rpm -ih --quiet ./extension/rpm-install/createrepo/createrepo_c-0.20.1-4.el9.x86_64.rpm > /dev/null 2>&1
+
+    
 
     #repo 다시 생성
     createrepo /home1/install/extension/rpm-repo/
