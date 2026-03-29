@@ -21,12 +21,12 @@ function WRITE_LOG()
 function WRITE_ERROR()
 {
 
-    RED='\033[0;31m'    NC='\033[0m' # No Color
+    RED='\033[0;31m'    
+    NC='\033[0m' # No Color
 
     bold=$(tput bold)
     normal=$(tput sgr0)
-
-    #화면출력
+    
     echo -e "${RED}${bold}[$(date '+%Y/%m/%d %H:%M:%S')] $3 ${normal} ${NC} "
 
     #$$ = pid
@@ -73,7 +73,8 @@ function init_default_setup()
     # mkdir -p /home1/aivax/temp
 
     mkdir -p /home1/aivax/data_resource
-    mkdir -p /home1/aivax/data_resource/{attach_file,opensearch}
+    # mkdir -p /home1/aivax/data_resource/{attach_file,opensearch}
+    mkdir -p /home1/aivax/data_resource/attach_file
 
     # mkdir -p /home1/aivax/.localconfig
 
@@ -184,8 +185,8 @@ function __install_rpm_repo_v2()
 
     # 기본 rpm, createrepo 설치, 프로그램에서는 개별로 설치, 설치 오류 대응.
     # TODO: 실제 installer에서는 각 설치 단계별로 로그를 상세히 남긴다.
-    rpm -ih --quiet ./extension/rpm-install/createrepo/createrepo_c-libs-0.20.1-4.el9.x86_64.rpm 
-    rpm -ih --quiet ./extension/rpm-install/createrepo/createrepo_c-0.20.1-4.el9.x86_64.rpm
+    rpm -ih --quiet ./extension/rpm-install/createrepo/createrepo_c-libs-0.20.1-4.el9.x86_64.rpm > /dev/null 2&1
+    rpm -ih --quiet ./extension/rpm-install/createrepo/createrepo_c-0.20.1-4.el9.x86_64.rpm > /dev/null 2&1
 
     #repo 다시 생성
     createrepo /home1/install/extension/rpm-repo/
@@ -436,6 +437,8 @@ function __install_opensearch()
     # tar xzf ./data-setup/opensearch-setup/opensearch.config.tar.gz -C /home1/install/temp/opensearch/config/
     # tar xzvf ./extension/opensearch-install/opensearch.data.tar.gz -C /home1/install/temp/opensearch/data/
 
+    rm -rf /tmp/install-temp/opensearch-config
+    rm -rf /tmp/install-temp/opensearch-data
 
     mkdir -p /tmp/install-temp/opensearch-config
     tar xzf ./data-setup/opensearch-setup/opensearch.config.tar.gz  -C /tmp/install-temp/opensearch-config
@@ -901,6 +904,8 @@ function __install_python()
     WRITE_LOG $FUNCNAME $LINENO "start install python"
 
     # python 복사, ldconfig
+    tar xzf ./extension/python-install/usr.tar.gz -C ./extension/python-install/
+    
     \cp -rf ./extension/python-install/usr/local/bin/* /usr/local/bin/
     \cp -rf ./extension/python-install/usr/local/lib/* /usr/local/lib/
 
