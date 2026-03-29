@@ -178,8 +178,8 @@ function __install_rpm_repo_v2()
     \cp -f ./extension/rpm-install/extra-repo/perl/*.rpm /home1/install/extension/rpm-repo/
     \cp -f ./extension/rpm-install/extra-repo/mariadb/v11.3.2/*.rpm /home1/install/extension/rpm-repo/
 
-    # suricata
-    \cp -f ./extension/rpm-install/extra-repo/suricata/*.rpm /home1/install/extension/rpm-repo/
+    # suricata -> 제거
+    # \cp -f ./extension/rpm-install/extra-repo/suricata/*.rpm /home1/install/extension/rpm-repo/
 
     #TODO: opensearch는 최종 확장 패키지로, 별도 설치.
 
@@ -905,7 +905,7 @@ function __install_python()
 
     # python 복사, ldconfig
     tar xzf ./extension/python-install/usr.tar.gz -C ./extension/python-install/
-    
+
     \cp -rf ./extension/python-install/usr/local/bin/* /usr/local/bin/
     \cp -rf ./extension/python-install/usr/local/lib/* /usr/local/lib/
 
