@@ -1,0 +1,100 @@
+[2026-02-27 11:02:21] [DEBUG] test-case/test-main.go:28 start process
+[2026-02-27 11:02:21] [INFO] test-case/test-main.go:29 start process
+[2026-02-27 11:02:21] [DEBUG] test_module/base-example.go:18 test base example
+[2026-02-27 11:02:21] [DEBUG] test_module/base-example.go:30 test Logger
+[2026-02-27 11:02:21] [DEBUG] test_module/base-example.go:43 User test has 1 messages
+[2026-03-29 13:23:23] [DEBUG] test-case/test-main.go:28 start process
+[2026-03-29 13:23:23] [INFO] test-case/test-main.go:29 start process
+[2026-03-29 13:23:23] [DEBUG] test_module/base-example.go:18 test base example
+[2026-03-29 13:23:23] [DEBUG] test_module/base-example.go:30 test Logger
+[2026-03-29 13:23:23] [DEBUG] test_module/base-example.go:43 User test has 1 messages
+[1m[37m[2026-03-29 13:24:47][0m [ [35mDEBUG[0m ] test-case/test-main.go:28 start process
+[1m[37m[2026-03-29 13:24:47][0m [ [34mINFO[0m ] test-case/test-main.go:29 start process
+[1m[37m[2026-03-29 13:24:47][0m [ [35mDEBUG[0m ] test_module/base-example.go:18 test base example
+[1m[37m[2026-03-29 13:24:47][0m [ [35mDEBUG[0m ] test_module/base-example.go:30 test Logger
+[1m[37m[2026-03-29 13:24:47][0m [ [35mDEBUG[0m ] test_module/base-example.go:43 User test has 1 messages
+[1m[37m[2026-03-29 13:25:56][0m [ [35mDEBUG[0m ] test-case/test-main.go:28 start process
+[1m[37m[2026-03-29 13:25:56][0m [ [34mINFO[0m ] test-case/test-main.go:29 start process
+[1m[37m[2026-03-29 13:25:56][0m [ [35mDEBUG[0m ] test_module/base-example.go:18 test base example
+[1m[37m[2026-03-29 13:25:56][0m [ [35mDEBUG[0m ] test_module/base-example.go:30 test Logger
+[1m[37m[2026-03-29 13:25:56][0m [ [35mDEBUG[0m ] test_module/base-example.go:43 User test has 1 messages
+[1m[32m[2026-03-29 13:31:30][0m [1m [ [35mDEBUG[0m ] test-case/test-main.go:28 start process
+[1m[32m[2026-03-29 13:31:30][0m [1m [ [34mINFO[0m ] test-case/test-main.go:29 start process
+[1m[32m[2026-03-29 13:31:30][0m [1m [ [35mDEBUG[0m ] test_module/base-example.go:18 test base example
+[1m[32m[2026-03-29 13:31:30][0m [1m [ [35mDEBUG[0m ] test_module/base-example.go:30 test Logger
+[1m[32m[2026-03-29 13:31:30][0m [1m [ [35mDEBUG[0m ] test_module/base-example.go:43 User test has 1 messages
+[1m[32m[2026-03-29 13:31:59][0m	[1m	[	[35mDEBUG[0m	]	test-case/test-main.go:28	start process
+[1m[32m[2026-03-29 13:31:59][0m	[1m	[	[34mINFO[0m	]	test-case/test-main.go:29	start process
+[1m[32m[2026-03-29 13:31:59][0m	[1m	[	[35mDEBUG[0m	]	test_module/base-example.go:18	test base example
+[1m[32m[2026-03-29 13:31:59][0m	[1m	[	[35mDEBUG[0m	]	test_module/base-example.go:30	test Logger
+[1m[32m[2026-03-29 13:31:59][0m	[1m	[	[35mDEBUG[0m	]	test_module/base-example.go:43	User test has 1 messages
+[1m[32m[2026-03-29 13:32:28][0m [1m [ [35mDEBUG[0m ] test-case/test-main.go:28 start process
+[1m[32m[2026-03-29 13:32:28][0m [1m [ [34mINFO[0m ] test-case/test-main.go:29 start process
+[1m[32m[2026-03-29 13:32:28][0m [1m [ [35mDEBUG[0m ] test_module/base-example.go:18 test base example
+[1m[32m[2026-03-29 13:32:28][0m [1m [ [35mDEBUG[0m ] test_module/base-example.go:30 test Logger
+[1m[32m[2026-03-29 13:32:28][0m [1m [ [35mDEBUG[0m ] test_module/base-example.go:43 User test has 1 messages
+[1m[32m[2026-03-29 13:34:36][0m	[1m	[	[35mDEBUG[0m	]	test-case/test-main.go:28	start process
+[1m[32m[2026-03-29 13:34:36][0m	[1m	[	[34mINFO[0m	]	test-case/test-main.go:29	start process
+[1m[32m[2026-03-29 13:34:36][0m	[1m	[	[35mDEBUG[0m	]	test_module/base-example.go:18	test base example
+[1m[32m[2026-03-29 13:34:36][0m	[1m	[	[35mDEBUG[0m	]	test_module/base-example.go:30	test Logger
+[1m[32m[2026-03-29 13:34:36][0m	[1m	[	[35mDEBUG[0m	]	test_module/base-example.go:43	User test has 1 messages
+[1m[32m[2026-03-29 13:37:18][0m​[1m​[​[35mDEBUG[0m​]​test-case/test-main.go:28​start process
+[1m[32m[2026-03-29 13:37:18][0m​[1m​[​[34mINFO[0m​]​test-case/test-main.go:29​start process
+[1m[32m[2026-03-29 13:37:18][0m​[1m​[​[35mDEBUG[0m​]​test_module/base-example.go:18​test base example
+[1m[32m[2026-03-29 13:37:18][0m​[1m​[​[35mDEBUG[0m​]​test_module/base-example.go:30​test Logger
+[1m[32m[2026-03-29 13:37:18][0m​[1m​[​[35mDEBUG[0m​]​test_module/base-example.go:43​User test has 1 messages
+[1m[32m[2026-03-29 13:38:08][0m​[1m​[​[35mDEBUG[0m​]​test-case/test-main.go:28​start process
+[1m[32m[2026-03-29 13:38:08][0m​[1m​[​[34mINFO[0m​]​test-case/test-main.go:29​start process
+[1m[32m[2026-03-29 13:38:08][0m​[1m​[​[35mDEBUG[0m​]​test_module/base-example.go:18​test base example
+[1m[32m[2026-03-29 13:38:08][0m​[1m​[​[35mDEBUG[0m​]​test_module/base-example.go:30​test Logger
+[1m[32m[2026-03-29 13:38:08][0m​[1m​[​[35mDEBUG[0m​]​test_module/base-example.go:43​User test has 1 messages
+[1m[32m[2026-03-29 13:39:05][0m [1m [ [35mDEBUG[0m ] test-case/test-main.go:28 start process
+[1m[32m[2026-03-29 13:39:05][0m [1m [ [34mINFO[0m ] test-case/test-main.go:29 start process
+[1m[32m[2026-03-29 13:39:05][0m [1m [ [35mDEBUG[0m ] test_module/base-example.go:18 test base example
+[1m[32m[2026-03-29 13:39:05][0m [1m [ [35mDEBUG[0m ] test_module/base-example.go:30 test Logger
+[1m[32m[2026-03-29 13:39:05][0m [1m [ [35mDEBUG[0m ] test_module/base-example.go:43 User test has 1 messages
+[1m[32m[2026-03-29 13:49:47][0m [1m [ [35mDEBUG[0m ] test-case/test-main.go:28 [1m[37mstart process[0m
+[1m[32m[2026-03-29 13:49:47][0m [1m [ [34mINFO[0m ] test-case/test-main.go:29 start process
+[1m[32m[2026-03-29 13:49:47][0m [1m [ [35mDEBUG[0m ] test_module/base-example.go:18 test base example
+[1m[32m[2026-03-29 13:49:47][0m [1m [ [35mDEBUG[0m ] test_module/base-example.go:30 test Logger
+[1m[32m[2026-03-29 13:49:47][0m [1m [ [35mDEBUG[0m ] test_module/base-example.go:43 User test has 1 messages
+[1m[32m[2026-03-29 15:22:27][0m [1m [ [35mDEBUG[0m ] testcase/test_main.go:28 [1m[37mstart process[0m
+[1m[32m[2026-03-29 15:22:27][0m [1m [ [34mINFO[0m ] testcase/test_main.go:29 start process
+[1m[32m[2026-03-29 15:22:27][0m [1m [ [35mDEBUG[0m ] test_module/base-example.go:18 test base example
+[1m[32m[2026-03-29 15:22:27][0m [1m [ [35mDEBUG[0m ] test_module/base-example.go:30 test Logger
+[1m[32m[2026-03-29 15:22:27][0m [1m [ [35mDEBUG[0m ] test_module/base-example.go:43 User test has 1 messages
+[1m[32m[2026-03-29 15:33:35][0m [1m [ [35mDEBUG[0m ] [1m[37mstart process[0m
+[1m[32m[2026-03-29 15:33:35][0m [1m [ [34mINFO[0m ] start process
+[1m[32m[2026-03-29 15:33:35][0m [1m [ [35mDEBUG[0m ] test base example
+[1m[32m[2026-03-29 15:33:35][0m [1m [ [35mDEBUG[0m ] test Logger
+[1m[32m[2026-03-29 15:33:35][0m [1m [ [35mDEBUG[0m ] User test has 1 messages
+[1m[32m[2026-03-29 15:33:54][0m [1m [ [35mDEBUG[0m ] [1m[37mstart process[0m
+[1m[32m[2026-03-29 15:33:54][0m [1m [ [34mINFO[0m ] start process
+[1m[32m[2026-03-29 15:33:54][0m [1m [ [35mDEBUG[0m ] test base example
+[1m[32m[2026-03-29 15:33:54][0m [1m [ [35mDEBUG[0m ] test Logger
+[1m[32m[2026-03-29 15:33:54][0m [1m [ [35mDEBUG[0m ] User test has 1 messages
+[1m[32m[2026-03-29 15:34:49][0m [1m[37mstart process[0m
+[1m[32m[2026-03-29 15:34:49][0m start process
+[1m[32m[2026-03-29 15:34:49][0m test base example
+[1m[32m[2026-03-29 15:34:49][0m test Logger
+[1m[32m[2026-03-29 15:34:49][0m User test has 1 messages
+[1m[32m[2026-03-29 15:35:16][0m [1m[37mstart process[0m
+[1m[32m[2026-03-29 15:35:16][0m test base example
+[1m[32m[2026-03-29 15:35:16][0m test Logger
+[1m[32m[2026-03-29 15:35:16][0m User test has 1 messages
+[1m[32m[2026-03-29 15:42:26][0m [1m[37mstart process[0m
+[1m[32m[2026-03-29 15:42:26][0m test base example
+[1m[32m[2026-03-29 15:42:26][0m test Logger
+[1m[32m[2026-03-29 15:42:26][0m User test has 1 messages
+[1m[32m[2026-03-29 15:43:42][0m [1m[37mstart process[0m
+[1m[32m[2026-03-29 15:43:42][0m test base example
+[1m[32m[2026-03-29 15:43:42][0m test Logger
+[1m[32m[2026-03-29 15:43:42][0m User test has 1 messages
+[1m[32m[2026-03-29 15:44:03][0m [1m[37mstart process[0m
+[1m[32m[2026-03-29 15:44:03][0m test base example
+[1m[32m[2026-03-29 15:44:03][0m test Logger
+[1m[32m[2026-03-29 15:44:03][0m User test has 1 messages
+[1m[32m[2026-03-29 15:44:26][0m [1m[37mstart process[0m
+[1m[32m[2026-03-29 15:44:26][0m test base example
+[1m[32m[2026-03-29 15:44:26][0m test Logger
+[1m[32m[2026-03-29 15:44:26][0m User test has 1 messages

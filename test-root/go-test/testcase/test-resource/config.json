@@ -4,6 +4,13 @@
         "aivax_default_path" : "/home1/aivax"
     },
 
+    "logging":
+    {
+        "log_level" : "debug",
+        "log_file" : "trace-log/tracelog.txt",
+        "use_stdout" : true
+    },
+
     "install_enable_flag":
     {
         "desc" : "설치, 활성,비활성 설정",
