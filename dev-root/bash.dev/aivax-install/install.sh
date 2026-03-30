@@ -1035,9 +1035,14 @@ function __patch_aivax_toolkit()
 
     \mv -f toolkit /home1/aivax/
 
+    cp -rf ./aivax-patch/systemd/toolkit-install/aivax-toolkit.service /etc/systemd/system/
+
     #일단 압축만 해제, 기본 서비스를 어떻게 띄울지 미결정, 명령에 의해서 띄우는 쪽으로 
     #포트에 대한 이슈가 있을수 있다. api 호출은 필요시 기동
 
+    systemctl daemon-reload
+    systemctl enable aivax-toolkit
+    systemctl start aivax-toolkit
 
     WRITE_LOG $FUNCNAME $LINENO "finish aivax toolkit"
 }
@@ -1145,7 +1150,8 @@ function stop_aivax()
 
     systemctl stop aivax-management
     systemctl stop aivax-pipeline
-    # systemctl start aivax-apiserver
+    systemctl stop aivax-toolkit
+    
     systemctl stop aivax-sslproxy
 
     for i in 1 2 3 4
@@ -1177,12 +1183,13 @@ function start_aivax()
 
     systemctl start aivax-management
     systemctl start aivax-pipeline
-    # systemctl start aivax-apiserver
+    systemctl start aivax-toolkit
+    
     systemctl start aivax-sslproxy
 
-    # for i in 1 2 3 4; do        
-    #     systemctl start ai-engine@$i.service
-    # done
+    for i in 1 2 3 4; do        
+        systemctl start ai-engine@$i.service
+    done
 
     WRITE_LOG $FUNCNAME $LINENO "finish start aivax"
 }
