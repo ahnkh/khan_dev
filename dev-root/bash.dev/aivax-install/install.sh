@@ -885,16 +885,21 @@ function __patch_ai_engine()
 
     \mv ai_engine /home1/aivax/
 
-    cp -rf ./aivax-patch/systemd/ai-engine-install/ai-engine@.service /etc/systemd/system/
+    # cp -rf ./aivax-patch/systemd/ai-engine-install/ai-engine@.service /etc/systemd/system/
+    cp -rf ./aivax-patch/systemd/ai-engine-install/ai-engine.service /etc/systemd/system/
 
     systemctl daemon-reload
 
     # systemctl enable ai-engine@{1..4}.service
 
-    for i in 1 2 3 4; do
-        systemctl enable ai-engine@$i.service
-        # systemctl start ai-engine@$i.service
-    done
+    #ai engine 하나만 사용
+    # for i in 1 2 3 4; do
+    #     systemctl enable ai-engine@$i.service
+    #     # systemctl start ai-engine@$i.service
+    # done
+
+    systemctl enable ai-engine.service
+    systemctl start ai-engine.service
 
     WRITE_LOG $FUNCNAME $LINENO "finish install ai engine"
 }
@@ -1162,15 +1167,18 @@ function stop_aivax()
     
     systemctl stop aivax-sslproxy
 
-    for i in 1 2 3 4
-    do
-        if systemctl is-active --quiet ai-engine@$i
-        then
-            #systemctl stop myservice
-            systemctl stop ai-engine@$i.service
-        fi
-        # systemctl stop ai-engine@$i.service
-    done
+    # for i in 1 2 3 4
+    # do
+    #     if systemctl is-active --quiet ai-engine@$i
+    #     then
+    #         #systemctl stop myservice
+    #         systemctl stop ai-engine@$i.service
+    #     fi
+    #     # systemctl stop ai-engine@$i.service
+    # done
+
+    #프로세스, 1개만 기동하도록 변경
+    systemctl stop ai-engine.service
 
     WRITE_LOG $FUNCNAME $LINENO "finish stop aivax"
 }
@@ -1200,7 +1208,8 @@ function start_aivax()
     #     systemctl start ai-engine@$i.service
     # done
 
-    systemctl start ai-engine@1.service
+    # systemctl start ai-engine@1.service
+    systemctl start ai-engine.service
 
     WRITE_LOG $FUNCNAME $LINENO "finish start aivax"
 }
