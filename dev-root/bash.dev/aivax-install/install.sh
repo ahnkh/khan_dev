@@ -876,7 +876,7 @@ EOF
 function __patch_ai_engine()
 {
 
-    WRITE_LOG $FUNCNAME $LINENO "start install ai engine (1~4)"
+    WRITE_LOG $FUNCNAME $LINENO "start install ai engine"
 
     tar xzf ./aivax-patch/ai_engine.tar.gz
 
@@ -896,7 +896,7 @@ function __patch_ai_engine()
         # systemctl start ai-engine@$i.service
     done
 
-    WRITE_LOG $FUNCNAME $LINENO "finish install ai engine (1~4)"
+    WRITE_LOG $FUNCNAME $LINENO "finish install ai engine"
 }
 
 function __install_python()
@@ -1088,8 +1088,10 @@ function __patch_sslproxy()
     # network 설정
     # ip eth 정보를 알아야 한다. 프로그램으로 해결
     # 일단 경로는 설치하는데 초점
-    ETH=$( ls /sys/class/net | grep -v '^lo$' | head -n 1)
-    bash /home1/aivax/sslproxy/network.sh ${ETH}
+
+    # 지식재산처, 호출 주석 처리, 향후 installer에서 옵션화
+    # ETH=$( ls /sys/class/net | grep -v '^lo$' | head -n 1)
+    # bash /home1/aivax/sslproxy/network.sh ${ETH}
 
     cp -rf ./aivax-patch/systemd/sslproxy-install/aivax-sslproxy.service /etc/systemd/system/
 
