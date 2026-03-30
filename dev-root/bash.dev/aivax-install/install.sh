@@ -185,8 +185,8 @@ function __install_rpm_repo_v2()
 
     # 기본 rpm, createrepo 설치, 프로그램에서는 개별로 설치, 설치 오류 대응.
     # TODO: 실제 installer에서는 각 설치 단계별로 로그를 상세히 남긴다.
-    rpm -ih --quiet ./extension/rpm-install/createrepo/createrepo_c-libs-0.20.1-4.el9.x86_64.rpm > /dev/null 2>&1
-    rpm -ih --quiet ./extension/rpm-install/createrepo/createrepo_c-0.20.1-4.el9.x86_64.rpm > /dev/null 2>&1
+    rpm -ih --quiet ./extension/rpm-install/createrepo/createrepo_c-libs-0.20.1-4.el9.x86_64.rpm > /dev/null #2>&1
+    rpm -ih --quiet ./extension/rpm-install/createrepo/createrepo_c-0.20.1-4.el9.x86_64.rpm > /dev/null #2>&1
 
     #repo 다시 생성
     createrepo /home1/install/extension/rpm-repo/
@@ -1120,9 +1120,9 @@ function __migrate_mariadb()
     export NODE_ENV=production
 
     #TODO: 향후에는 drop 없이 migration만 수행한다. 26.03.25 지식재산처만 backup -> drop -> migration을 수행한다.
-    /home1/aivax/extension/nodejs/bin/npm run db:backup
-    /home1/aivax/extension/nodejs/bin/npm run db:drop
-    /home1/aivax/extension/nodejs/bin/npm run migration:run
+    /home1/aivax/extension/nodejs/bin/npm run db:backup /dev/null #2>&1
+    /home1/aivax/extension/nodejs/bin/npm run db:drop /dev/null #2>&1
+    /home1/aivax/extension/nodejs/bin/npm run migration:run > /dev/null #2&>1
 
     # 검증은 next
 
@@ -1180,9 +1180,9 @@ function start_aivax()
     # systemctl start aivax-apiserver
     systemctl start aivax-sslproxy
 
-    for i in 1 2 3 4; do        
-        systemctl start ai-engine@$i.service
-    done
+    # for i in 1 2 3 4; do        
+    #     systemctl start ai-engine@$i.service
+    # done
 
     WRITE_LOG $FUNCNAME $LINENO "finish start aivax"
 }
