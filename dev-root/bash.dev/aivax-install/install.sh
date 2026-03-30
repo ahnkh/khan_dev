@@ -1117,6 +1117,8 @@ function __migrate_mariadb()
     #path, 임시로 추가
     export PATH=/home1/aivax/extension/nodejs/bin:$PATH
 
+    export NODE_ENV=production
+
     #TODO: 향후에는 drop 없이 migration만 수행한다. 26.03.25 지식재산처만 backup -> drop -> migration을 수행한다.
     /home1/aivax/extension/nodejs/bin/npm run db:backup
     /home1/aivax/extension/nodejs/bin/npm run db:drop
