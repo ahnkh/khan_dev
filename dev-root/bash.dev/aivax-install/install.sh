@@ -188,8 +188,6 @@ function __install_rpm_repo_v2()
     rpm -ih --quiet ./extension/rpm-install/createrepo/createrepo_c-libs-0.20.1-4.el9.x86_64.rpm > /dev/null 2>&1
     rpm -ih --quiet ./extension/rpm-install/createrepo/createrepo_c-0.20.1-4.el9.x86_64.rpm > /dev/null 2>&1
 
-    
-
     #repo 다시 생성
     createrepo /home1/install/extension/rpm-repo/
 
