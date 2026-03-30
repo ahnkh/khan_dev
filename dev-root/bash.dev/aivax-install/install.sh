@@ -1117,7 +1117,7 @@ function __migrate_mariadb()
 
     # cp -rfv ./extension/nodejs-install/node-v24.11.1-linux-x64 /home1/aivax/extension/nodejs
 
-    cd /home1/aivax/management/backend
+    cd /home1/aivax/management/backend 
 
     #path, 임시로 추가
     export PATH=/home1/aivax/extension/nodejs/bin:$PATH
@@ -1131,7 +1131,7 @@ function __migrate_mariadb()
 
     # 검증은 next
 
-    cd -
+    cd - > /dev/null
 
     WRITE_LOG $FUNCNAME $LINENO "finish migrate mariadb"
 }
@@ -1151,6 +1151,12 @@ function stop_aivax()
     systemctl stop aivax-management
     systemctl stop aivax-pipeline
     systemctl stop aivax-toolkit
+
+    if systemctl is-active --quiet aivax-toolkit
+    then
+        #systemctl stop myservice
+        systemctl stop aivax-toolkit.service
+    fi
     
     systemctl stop aivax-sslproxy
 
@@ -1187,9 +1193,12 @@ function start_aivax()
     
     systemctl start aivax-sslproxy
 
-    for i in 1 2 3 4; do        
-        systemctl start ai-engine@$i.service
-    done
+    # 프로세스 1개만 기동
+    # for i in 1 2 3 4; do        
+    #     systemctl start ai-engine@$i.service
+    # done
+
+    systemctl start ai-engine@1.service
 
     WRITE_LOG $FUNCNAME $LINENO "finish start aivax"
 }
