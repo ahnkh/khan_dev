@@ -450,6 +450,7 @@ function __install_opensearch()
     fi
 
     \mv /etc/opensearch /etc/opensearch.old
+    
     \mv /tmp/install-temp/opensearch-config/opensearch /etc/
 
     chown -R opensearch:opensearch /etc/opensearch
@@ -461,15 +462,37 @@ function __install_opensearch()
     # 상세 수정은 installer에서.
     mv /tmp/install-temp/opensearch-data/opensearch_docker /tmp/install-temp/opensearch-data/opensearch
 
-    if [ -d /home1/aivax/data_resource/opensearch ]
+    #TODO: 경로 변경, 일단 스크립트에서는 수동으로 교체, installer에서 정식으로 교체
+
+    # if [ -d /home1/aivax/data_resource/opensearch ]
+    # then
+    #     mv /home1/aivax/data_resource/opensearch /home1/aivax/data_resource/opensearch.$(date +%Y%m%d%H%M)
+    # fi
+
+    # mv /tmp/install-temp/opensearch-data/opensearch /home1/aivax/data_resource/
+
+    # chown -R opensearch:opensearch /home1/aivax/data_resource/opensearch
+    # chmod -R 750 /home1/aivax/data_resource/opensearch
+
+    #TODO: 디렉토리 존재여부, 디렉토리가 존재하고, 설치 되어 있으면 skip 한다.
+    if [ -d /home1/opensearch ]
     then
-        mv /home1/aivax/data_resource/opensearch /home1/aivax/data_resource/opensearch.$(date +%Y%m%d%H%M)
+        # mv /home1/aivax/data_resource/opensearch /home1/aivax/data_resource/opensearch.$(date +%Y%m%d%H%M)
+        # TODO: 종료코드, 현재시점은 최초 설치만 고려
+        WRITE_LOG $FUNCNAME $LINENO "opensearch is already installed, stop install"
+        return
     fi
 
-    mv /tmp/install-temp/opensearch-data/opensearch /home1/aivax/data_resource/
+    # 과거 데이터 migration, 일단 임시, 상세 제어 필요
+    if [ -d /home1/aivax/data_resource/opensearch ]
+    then
+        mv /home1/aivax/data_resource/opensearch /home1/
+    else
+        mv /tmp/install-temp/opensearch-data/opensearch /home1/
+    fi
 
-    chown -R opensearch:opensearch /home1/aivax/data_resource/opensearch
-    chmod -R 750 /home1/aivax/data_resource/opensearch
+    chown -R opensearch:opensearch /home1/opensearch
+    chmod -R 750 /home1/opensearch
 
     # tar xzvf ./extension/opensearch-install/opensearch.config.tar.gz -C /home1/install/temp/opensearch/data/
     # tar xzvf ./extension/opensearch-install/opensearch.data.tar.gz -C /home1/install/temp/opensearch/data/
@@ -502,7 +525,8 @@ function __install_opensearch()
     #TODO: 설치 테스트, 장애 발생시 재생성 필요
 
     # /etc/opensearch/opensearh.yml, 경로 변경, 우선 스크립트로
-    NEW_PATH="/home1/aivax/data_resource/opensearch"
+    # NEW_PATH="/home1/aivax/data_resource/opensearch"
+    NEW_PATH="/home1/opensearch"
     CONFIG_FILE="/etc/opensearch/opensearch.yml"
 
     sudo sed -i "s|path.data:.*|path.data: $NEW_PATH|g" "$CONFIG_FILE"
@@ -549,8 +573,8 @@ EnvironmentFile=-/etc/sysconfig/opensearch
 User=opensearch
 Group=opensearch
 
-WorkingDirectory=/home1/aivax/data_resource/opensearch
-
+#WorkingDirectory=/home1/aivax/data_resource/opensearch
+WorkingDirectory=/home1/opensearch
 
 #ExecStartPre=/bin/mkdir -p /home1/aivax/data_resource/opensearch/tmp
 #ExecStartPre=/bin/chown opensearch:opensearch /home1/aivax/data_resource/opensearch/tmp
@@ -1124,6 +1148,13 @@ function __migrate_mariadb()
 
     # cp -rfv ./extension/nodejs-install/node-v24.11.1-linux-x64 /home1/aivax/extension/nodejs
 
+    cd /home1/aivax/toolkit
+
+    python aivax_toolkit.py --script /home1/aivax/toolkit/migrate_backup.json
+
+    #다시 원위치로.
+    cd ${g_path} > /dev/null
+
     cd /home1/aivax/management/backend 
 
     #path, 임시로 추가
@@ -1132,9 +1163,10 @@ function __migrate_mariadb()
     export NODE_ENV=production
 
     #TODO: 향후에는 drop 없이 migration만 수행한다. 26.03.25 지식재산처만 backup -> drop -> migration을 수행한다.
-    /home1/aivax/extension/nodejs/bin/npm run db:backup > /dev/null #2>&1
-    /home1/aivax/extension/nodejs/bin/npm run db:drop > /dev/null #2>&1
-    /home1/aivax/extension/nodejs/bin/npm run migration:run > /dev/null #2&>1
+    #잠시 제거
+    # /home1/aivax/extension/nodejs/bin/npm run db:backup > /dev/null #2>&1
+    # /home1/aivax/extension/nodejs/bin/npm run db:drop > /dev/null #2>&1
+    # /home1/aivax/extension/nodejs/bin/npm run migration:run > /dev/null #2&>1
 
     # 검증은 next
 
