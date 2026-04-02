@@ -450,7 +450,7 @@ function __install_opensearch()
     fi
 
     \mv /etc/opensearch /etc/opensearch.old
-    
+
     \mv /tmp/install-temp/opensearch-config/opensearch /etc/
 
     chown -R opensearch:opensearch /etc/opensearch
@@ -484,12 +484,14 @@ function __install_opensearch()
     fi
 
     # 과거 데이터 migration, 일단 임시, 상세 제어 필요
-    if [ -d /home1/aivax/data_resource/opensearch ]
-    then
-        mv /home1/aivax/data_resource/opensearch /home1/
-    else
-        mv /tmp/install-temp/opensearch-data/opensearch /home1/
-    fi
+    #TODO: 이미 경로가 변경되었다. 호출될 수 없는 구문 => 여기는 좀더 세밀하게 조정한다.
+    # if [ -d /home1/aivax/data_resource/opensearch ]
+    # then
+    #     WRITE_LOG $FUNCNAME $LINENO "restore opensearch data"
+    #     mv /home1/aivax/data_resource/opensearch /home1/
+    # else
+    #     mv /tmp/install-temp/opensearch-data/opensearch /home1/
+    # fi
 
     chown -R opensearch:opensearch /home1/opensearch
     chmod -R 750 /home1/opensearch
@@ -628,7 +630,7 @@ SystemCallErrorNumber=EPERM
 
 RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
 
-ReadWritePaths=/home1/aivax/data_resource/opensearch
+ReadWritePaths=/home1/opensearch
 ReadWritePaths=/dev/shm
 ReadWritePaths=-/etc/opensearch
 ReadWritePaths=-/mnt/snapshots
@@ -1150,7 +1152,7 @@ function __migrate_mariadb()
 
     cd /home1/aivax/toolkit
 
-    python aivax_toolkit.py --script /home1/aivax/toolkit/migrate_backup.json
+    # python aivax_toolkit.py --script /home1/aivax/toolkit/migrate_backup.json
 
     #다시 원위치로.
     cd ${g_path} > /dev/null
