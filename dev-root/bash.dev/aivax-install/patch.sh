@@ -2,7 +2,8 @@
 # 과거 패키지, 유지하고 향후 별도 스케쥴러에서 삭제하도록 변경
 #rm -rf aivax-install.v1.0.1.$(date +%Y%m%d).tar.gz
 
-package_date=$(date +%Y%m%d%d%H%M)
+# package_date=$(date +%Y%m%d%H%M)
+package_date=$(date +%Y%m%d)
 # today=$(date +%Y%m%d)
 
 aivax_ver=v1.0.1
