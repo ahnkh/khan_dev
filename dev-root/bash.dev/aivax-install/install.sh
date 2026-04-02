@@ -490,8 +490,11 @@ function __install_opensearch()
     #     WRITE_LOG $FUNCNAME $LINENO "restore opensearch data"
     #     mv /home1/aivax/data_resource/opensearch /home1/
     # else
-    #     mv /tmp/install-temp/opensearch-data/opensearch /home1/
+    #     
     # fi
+
+    #기본 설치 - installer에서 조금더 보강
+    mv /tmp/install-temp/opensearch-data/opensearch /home1/
 
     chown -R opensearch:opensearch /home1/opensearch
     chmod -R 750 /home1/opensearch
@@ -673,230 +676,6 @@ EOF
 
     WRITE_LOG $FUNCNAME $LINENO "finish install opensearch"
 }
-
-# function __install_opensearch()
-# {
-#     WRITE_LOG $FUNCNAME $LINENO "start install opensearch"
-
-#     # opensearch 설치, opensearch는 별도로 설치한다. 옵션화, (제거할수 있다)
-#     # 일단 작성후, 경로 또는 세부 테스트.
-#     dnf install ./extension/rpm-install/3rd-repo/opensearch/v3.3.2/opensearch-3.3.2-linux-x64.rpm -y -q
-
-#     #TODO: 여러 경로로 이동 필요, temp 경로롤 이용한다. (/home1/install/temp)
-
-#     # 기본 디렉토리 생성, 두번 체크
-#     # mkdir -p /home1/aivax/data_resource/opensearch/
-
-#     # 설치후, 데이터 복사, config, 권한 설정 필요
-
-#     # mkdir -p /home1/install/temp/opensearch
-
-#     # mkdir -p /home1/install/temp/opensearch/config
-#     # mkdir -p /home1/install/temp/opensearch/data
-
-#     # tar xzf ./data-setup/opensearch-setup/opensearch.config.tar.gz -C /home1/install/temp/opensearch/config/
-#     # tar xzvf ./extension/opensearch-install/opensearch.data.tar.gz -C /home1/install/temp/opensearch/data/
-
-#     tar xzf ./data-setup/opensearch-setup/opensearch.config.tar.gz 
-
-#     #과거 opensearch backup
-#     \cp -rf /etc/opensearch /etc/opensearch.old
-#     mv opensearch /etc/
-
-#     chown -R opensearch:opensearch /etc/opensearch
-#     chmod -R 750 /etc/opensearch
-
-#     tar xzf ./data-setup/opensearch-setup/opensearch.data.tar.gz
-
-#     # 상세 수정은 installer에서.
-#     mv opensearch_docker opensearch
-
-#     if [ -d /home1/aivax/data_resource/opensearch ]
-#     then
-#         mv /home1/aivax/data_resource/opensearch /home1/aivax/data_resource/opensearch.$(date +%Y%m%d%H%M)
-#     fi
-
-#     mv opensearch /home1/aivax/data_resource/
-
-#     chown -R opensearch:opensearch /home1/aivax/data_resource/opensearch
-#     chmod -R 750 /home1/aivax/data_resource/opensearch
-
-#     # tar xzvf ./extension/opensearch-install/opensearch.config.tar.gz -C /home1/install/temp/opensearch/data/
-#     # tar xzvf ./extension/opensearch-install/opensearch.data.tar.gz -C /home1/install/temp/opensearch/data/
-
-#     # # TODO: opensearch 경로 변경 필요 => 프로그램으로 해결 필요
-
-#     # #TODO: config 복사, 미세 조정 필요, pem 등 
-#     # cp -rf /etc/opensearch/
-
-#     # #TODO: data 복사 경로 복사 먼저 + opensearch.yml 쪽 먼저 수정 필요
-#     # # 프로그램으로 해결하거나, sed 명령으로 수정 필요
-
-#     # #TODO: 경로 확인 필요
-#     # cp -rf /home1/install/temp/opensearch/data/ /var/lib/opensearch/
-
-#     # # 권한 설정 추가, SNIPER OS는 경로가 다르다. 경로를 외부 설정으로 제어
-#     # chown -R opensearch:opensearch /home1/aivax/data_resource/opensearch/
-#     # chmod -R 750 /home1/aivax/data_resource/opensearch/
-
-#     # chown -R opensearch:opensearch /etc/opensearch
-#     # chmod -R 750 /etc/opensearch
-#     # # chown -R opensearch:opensearch /var/lib/opensearch
-
-#     # #VM size 설정
-#     # sysctl -w vm.max_map_count=262144
-#     echo "vm.max_map_count=262144" >> /etc/sysctl.conf #영구설정
-
-#     #TODO: systemd 수정
-
-#     #TODO: 설치 테스트, 장애 발생시 재생성 필요
-
-#     # /etc/opensearch/opensearh.yml, 경로 변경, 우선 스크립트로
-#     NEW_PATH="/home1/aivax/data_resource/opensearch"
-#     CONFIG_FILE="/etc/opensearch/opensearch.yml"
-
-#     sudo sed -i "s|path.data:.*|path.data: $NEW_PATH|g" "$CONFIG_FILE"
-#     # sudo sed -i "s|path.logs:.*|path.logs: $NEW_PATH/logs|g" "$CONFIG_FILE"
-
-#     # config 설정
-
-#     # opensearch의 기본 service 파일 경로, /etc/로 변경 => 위험
-# #     cat > /etc/systemd/system/opensearch.service <<EOF
-# # [Unit]
-# # Description=OpenSearch
-# # After=network.target
-
-# # [Service]
-# # Type=simple
-# # User=opensearch
-# # Group=opensearch
-
-# # Environment=OPENSEARCH_HOME=/data/opensearch
-# # Environment=OPENSEARCH_PATH_CONF=/data/opensearch/config
-
-# # ExecStart=/data/opensearch/bin/opensearch
-
-# # Restart=always
-# # LimitNOFILE=65535
-
-# # [Install]
-# # WantedBy=multi-user.target
-# # EOF
-
-#     cat > /etc/systemd/system/opensearch.service <<'EOF'
-# [Unit]
-# Description=OpenSearch
-# Documentation=https://opensearch.org/
-# Wants=network-online.target
-# After=network-online.target
-
-# [Service]
-# Type=notify
-# RuntimeDirectory=opensearch
-# PrivateTmp=true
-# EnvironmentFile=-/etc/default/opensearch
-# EnvironmentFile=-/etc/sysconfig/opensearch
-# User=opensearch
-# Group=opensearch
-
-# WorkingDirectory=/home1/aivax/data_resource/opensearch
-
-
-# #ExecStartPre=/bin/mkdir -p /home1/aivax/data_resource/opensearch/tmp
-# #ExecStartPre=/bin/chown opensearch:opensearch /home1/aivax/data_resource/opensearch/tmp
-
-# ExecStartPre=/bin/mkdir -p /dev/shm/performanceanalyzer
-# ExecStartPre=/bin/chown opensearch:opensearch /dev/shm/performanceanalyzer
-
-# ExecStart=/usr/share/opensearch/bin/systemd-entrypoint -p ${PID_DIR}/opensearch.pid --quiet
-
-# StandardOutput=journal
-# StandardError=inherit
-# SyslogIdentifier=opensearch
-
-# LimitNOFILE=65535
-# LimitNPROC=4096
-# LimitAS=infinity
-# LimitFSIZE=infinity
-
-# TimeoutStopSec=0
-# KillSignal=SIGTERM
-# KillMode=process
-# SendSIGKILL=no
-# SuccessExitStatus=143
-
-# TimeoutStartSec=75
-
-# PrivateTmp=true
-# ProtectSystem=full
-# ProtectKernelTunables=true
-# ProtectKernelModules=true
-# ProtectControlGroups=true
-# ProtectProc=invisible
-# RestrictNamespaces=true
-# LockPersonality=true
-# NoNewPrivileges=true
-# RestrictSUIDSGID=true
-# RestrictRealtime=true
-# ProtectHostname=true
-# ProtectKernelLogs=true
-# ProtectClock=true
-
-# CapabilityBoundingSet=~CAP_SYS_ADMIN ~CAP_SYS_PTRACE ~CAP_NET_ADMIN ~CAP_BLOCK_SUSPEND ~CAP_LEASE ~CAP_SYS_PACCT ~CAP_SYS_TTY_CONFIG
-
-# SystemCallArchitectures=native
-# SystemCallFilter=seccomp mincore
-# SystemCallFilter=madvise mlock mlock2 munlock get_mempolicy sched_getaffinity sched_setaffinity fcntl
-# SystemCallFilter=@system-service
-# SystemCallFilter=~@reboot
-# SystemCallFilter=~@swap
-# SystemCallErrorNumber=EPERM
-
-# RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
-
-# ReadWritePaths=/home1/aivax/data_resource/opensearch
-# ReadWritePaths=/dev/shm
-# ReadWritePaths=-/etc/opensearch
-# ReadWritePaths=-/mnt/snapshots
-
-# #ReadOnlyPaths=-/etc/os-release -/usr/lib/os-release -/etc/system-release
-# #ReadOnlyPaths=/proc/self/mountinfo /proc/diskstats
-# #ReadOnlyPaths=/proc/self/cgroup
-# #ReadOnlyPaths=/sys/fs/cgroup
-
-# ReadOnlyPaths=/proc/self/cgroup /sys/fs/cgroup/cpu /sys/fs/cgroup/cpu/-
-# ReadOnlyPaths=/sys/fs/cgroup/cpuacct /sys/fs/cgroup/cpuacct/- /sys/fs/cgroup/memory /sys/fs/cgroup/memory/-
-# ReadOnlyPaths=/sys/fs/cgroup/system.slice/-
-
-# RestrictNamespaces=true
-
-# NoNewPrivileges=true
-
-# # Memory and execution protection
-
-# # Allow only native system calls
-# SystemCallArchitectures=native
-# # Service does not share key material with other services
-# KeyringMode=private
-# # Prevent changing ABI personality
-# LockPersonality=true
-# # Prevent creating SUID/SGID files
-# RestrictSUIDSGID=true
-# # Prevent acquiring realtime scheduling
-# RestrictRealtime=true
-# # Prevent changes to system hostname
-# ProtectHostname=true
-# # Prevent reading/writing kernel logs
-# ProtectKernelLogs=true
-# # Prevent tampering with the system clock
-# ProtectClock=true
-
-# [Install]
-# WantedBy=multi-user.target
-# EOF
-
-#     WRITE_LOG $FUNCNAME $LINENO "finish install opensearch"
-# }
 
 #ai 엔진 설치
 function __patch_ai_engine()
@@ -1150,12 +929,12 @@ function __migrate_mariadb()
 
     # cp -rfv ./extension/nodejs-install/node-v24.11.1-linux-x64 /home1/aivax/extension/nodejs
 
-    cd /home1/aivax/toolkit
+    # cd /home1/aivax/toolkit
 
-    # python aivax_toolkit.py --script /home1/aivax/toolkit/migrate_backup.json
+    # # python aivax_toolkit.py --script /home1/aivax/toolkit/migrate_backup.json
 
-    #다시 원위치로.
-    cd ${g_path} > /dev/null
+    # #다시 원위치로.
+    # cd ${g_path} > /dev/null
 
     cd /home1/aivax/management/backend 
 
@@ -1164,11 +943,10 @@ function __migrate_mariadb()
 
     export NODE_ENV=production
 
-    #TODO: 향후에는 drop 없이 migration만 수행한다. 26.03.25 지식재산처만 backup -> drop -> migration을 수행한다.
-    #잠시 제거
-    # /home1/aivax/extension/nodejs/bin/npm run db:backup > /dev/null #2>&1
-    # /home1/aivax/extension/nodejs/bin/npm run db:drop > /dev/null #2>&1
-    # /home1/aivax/extension/nodejs/bin/npm run migration:run > /dev/null #2&>1
+    #TODO: 향후에는 drop 없이 migration만 수행한다. 26.03.25 지식재산처만 backup -> drop -> migration을 수행한다.    
+    /home1/aivax/extension/nodejs/bin/npm run db:backup > /dev/null #2>&1
+    /home1/aivax/extension/nodejs/bin/npm run db:drop > /dev/null #2>&1
+    /home1/aivax/extension/nodejs/bin/npm run migration:run > /dev/null #2&>1
 
     # 검증은 next
 
@@ -1466,4 +1244,228 @@ main $@
 
 #     WRITE_LOG $FUNCNAME $LINENO "finish install suricata"
 
+# }
+
+# function __install_opensearch()
+# {
+#     WRITE_LOG $FUNCNAME $LINENO "start install opensearch"
+
+#     # opensearch 설치, opensearch는 별도로 설치한다. 옵션화, (제거할수 있다)
+#     # 일단 작성후, 경로 또는 세부 테스트.
+#     dnf install ./extension/rpm-install/3rd-repo/opensearch/v3.3.2/opensearch-3.3.2-linux-x64.rpm -y -q
+
+#     #TODO: 여러 경로로 이동 필요, temp 경로롤 이용한다. (/home1/install/temp)
+
+#     # 기본 디렉토리 생성, 두번 체크
+#     # mkdir -p /home1/aivax/data_resource/opensearch/
+
+#     # 설치후, 데이터 복사, config, 권한 설정 필요
+
+#     # mkdir -p /home1/install/temp/opensearch
+
+#     # mkdir -p /home1/install/temp/opensearch/config
+#     # mkdir -p /home1/install/temp/opensearch/data
+
+#     # tar xzf ./data-setup/opensearch-setup/opensearch.config.tar.gz -C /home1/install/temp/opensearch/config/
+#     # tar xzvf ./extension/opensearch-install/opensearch.data.tar.gz -C /home1/install/temp/opensearch/data/
+
+#     tar xzf ./data-setup/opensearch-setup/opensearch.config.tar.gz 
+
+#     #과거 opensearch backup
+#     \cp -rf /etc/opensearch /etc/opensearch.old
+#     mv opensearch /etc/
+
+#     chown -R opensearch:opensearch /etc/opensearch
+#     chmod -R 750 /etc/opensearch
+
+#     tar xzf ./data-setup/opensearch-setup/opensearch.data.tar.gz
+
+#     # 상세 수정은 installer에서.
+#     mv opensearch_docker opensearch
+
+#     if [ -d /home1/aivax/data_resource/opensearch ]
+#     then
+#         mv /home1/aivax/data_resource/opensearch /home1/aivax/data_resource/opensearch.$(date +%Y%m%d%H%M)
+#     fi
+
+#     mv opensearch /home1/aivax/data_resource/
+
+#     chown -R opensearch:opensearch /home1/aivax/data_resource/opensearch
+#     chmod -R 750 /home1/aivax/data_resource/opensearch
+
+#     # tar xzvf ./extension/opensearch-install/opensearch.config.tar.gz -C /home1/install/temp/opensearch/data/
+#     # tar xzvf ./extension/opensearch-install/opensearch.data.tar.gz -C /home1/install/temp/opensearch/data/
+
+#     # # TODO: opensearch 경로 변경 필요 => 프로그램으로 해결 필요
+
+#     # #TODO: config 복사, 미세 조정 필요, pem 등 
+#     # cp -rf /etc/opensearch/
+
+#     # #TODO: data 복사 경로 복사 먼저 + opensearch.yml 쪽 먼저 수정 필요
+#     # # 프로그램으로 해결하거나, sed 명령으로 수정 필요
+
+#     # #TODO: 경로 확인 필요
+#     # cp -rf /home1/install/temp/opensearch/data/ /var/lib/opensearch/
+
+#     # # 권한 설정 추가, SNIPER OS는 경로가 다르다. 경로를 외부 설정으로 제어
+#     # chown -R opensearch:opensearch /home1/aivax/data_resource/opensearch/
+#     # chmod -R 750 /home1/aivax/data_resource/opensearch/
+
+#     # chown -R opensearch:opensearch /etc/opensearch
+#     # chmod -R 750 /etc/opensearch
+#     # # chown -R opensearch:opensearch /var/lib/opensearch
+
+#     # #VM size 설정
+#     # sysctl -w vm.max_map_count=262144
+#     echo "vm.max_map_count=262144" >> /etc/sysctl.conf #영구설정
+
+#     #TODO: systemd 수정
+
+#     #TODO: 설치 테스트, 장애 발생시 재생성 필요
+
+#     # /etc/opensearch/opensearh.yml, 경로 변경, 우선 스크립트로
+#     NEW_PATH="/home1/aivax/data_resource/opensearch"
+#     CONFIG_FILE="/etc/opensearch/opensearch.yml"
+
+#     sudo sed -i "s|path.data:.*|path.data: $NEW_PATH|g" "$CONFIG_FILE"
+#     # sudo sed -i "s|path.logs:.*|path.logs: $NEW_PATH/logs|g" "$CONFIG_FILE"
+
+#     # config 설정
+
+#     # opensearch의 기본 service 파일 경로, /etc/로 변경 => 위험
+# #     cat > /etc/systemd/system/opensearch.service <<EOF
+# # [Unit]
+# # Description=OpenSearch
+# # After=network.target
+
+# # [Service]
+# # Type=simple
+# # User=opensearch
+# # Group=opensearch
+
+# # Environment=OPENSEARCH_HOME=/data/opensearch
+# # Environment=OPENSEARCH_PATH_CONF=/data/opensearch/config
+
+# # ExecStart=/data/opensearch/bin/opensearch
+
+# # Restart=always
+# # LimitNOFILE=65535
+
+# # [Install]
+# # WantedBy=multi-user.target
+# # EOF
+
+#     cat > /etc/systemd/system/opensearch.service <<'EOF'
+# [Unit]
+# Description=OpenSearch
+# Documentation=https://opensearch.org/
+# Wants=network-online.target
+# After=network-online.target
+
+# [Service]
+# Type=notify
+# RuntimeDirectory=opensearch
+# PrivateTmp=true
+# EnvironmentFile=-/etc/default/opensearch
+# EnvironmentFile=-/etc/sysconfig/opensearch
+# User=opensearch
+# Group=opensearch
+
+# WorkingDirectory=/home1/aivax/data_resource/opensearch
+
+
+# #ExecStartPre=/bin/mkdir -p /home1/aivax/data_resource/opensearch/tmp
+# #ExecStartPre=/bin/chown opensearch:opensearch /home1/aivax/data_resource/opensearch/tmp
+
+# ExecStartPre=/bin/mkdir -p /dev/shm/performanceanalyzer
+# ExecStartPre=/bin/chown opensearch:opensearch /dev/shm/performanceanalyzer
+
+# ExecStart=/usr/share/opensearch/bin/systemd-entrypoint -p ${PID_DIR}/opensearch.pid --quiet
+
+# StandardOutput=journal
+# StandardError=inherit
+# SyslogIdentifier=opensearch
+
+# LimitNOFILE=65535
+# LimitNPROC=4096
+# LimitAS=infinity
+# LimitFSIZE=infinity
+
+# TimeoutStopSec=0
+# KillSignal=SIGTERM
+# KillMode=process
+# SendSIGKILL=no
+# SuccessExitStatus=143
+
+# TimeoutStartSec=75
+
+# PrivateTmp=true
+# ProtectSystem=full
+# ProtectKernelTunables=true
+# ProtectKernelModules=true
+# ProtectControlGroups=true
+# ProtectProc=invisible
+# RestrictNamespaces=true
+# LockPersonality=true
+# NoNewPrivileges=true
+# RestrictSUIDSGID=true
+# RestrictRealtime=true
+# ProtectHostname=true
+# ProtectKernelLogs=true
+# ProtectClock=true
+
+# CapabilityBoundingSet=~CAP_SYS_ADMIN ~CAP_SYS_PTRACE ~CAP_NET_ADMIN ~CAP_BLOCK_SUSPEND ~CAP_LEASE ~CAP_SYS_PACCT ~CAP_SYS_TTY_CONFIG
+
+# SystemCallArchitectures=native
+# SystemCallFilter=seccomp mincore
+# SystemCallFilter=madvise mlock mlock2 munlock get_mempolicy sched_getaffinity sched_setaffinity fcntl
+# SystemCallFilter=@system-service
+# SystemCallFilter=~@reboot
+# SystemCallFilter=~@swap
+# SystemCallErrorNumber=EPERM
+
+# RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+
+# ReadWritePaths=/home1/aivax/data_resource/opensearch
+# ReadWritePaths=/dev/shm
+# ReadWritePaths=-/etc/opensearch
+# ReadWritePaths=-/mnt/snapshots
+
+# #ReadOnlyPaths=-/etc/os-release -/usr/lib/os-release -/etc/system-release
+# #ReadOnlyPaths=/proc/self/mountinfo /proc/diskstats
+# #ReadOnlyPaths=/proc/self/cgroup
+# #ReadOnlyPaths=/sys/fs/cgroup
+
+# ReadOnlyPaths=/proc/self/cgroup /sys/fs/cgroup/cpu /sys/fs/cgroup/cpu/-
+# ReadOnlyPaths=/sys/fs/cgroup/cpuacct /sys/fs/cgroup/cpuacct/- /sys/fs/cgroup/memory /sys/fs/cgroup/memory/-
+# ReadOnlyPaths=/sys/fs/cgroup/system.slice/-
+
+# RestrictNamespaces=true
+
+# NoNewPrivileges=true
+
+# # Memory and execution protection
+
+# # Allow only native system calls
+# SystemCallArchitectures=native
+# # Service does not share key material with other services
+# KeyringMode=private
+# # Prevent changing ABI personality
+# LockPersonality=true
+# # Prevent creating SUID/SGID files
+# RestrictSUIDSGID=true
+# # Prevent acquiring realtime scheduling
+# RestrictRealtime=true
+# # Prevent changes to system hostname
+# ProtectHostname=true
+# # Prevent reading/writing kernel logs
+# ProtectKernelLogs=true
+# # Prevent tampering with the system clock
+# ProtectClock=true
+
+# [Install]
+# WantedBy=multi-user.target
+# EOF
+
+#     WRITE_LOG $FUNCNAME $LINENO "finish install opensearch"
 # }
