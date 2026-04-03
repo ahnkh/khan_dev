@@ -931,7 +931,7 @@ function __migrate_mariadb()
 
     cd /home1/aivax/toolkit
 
-    python aivax_toolkit.py --script_file /home1/aivax/toolkit/install_resource/script_config/aivax/rdb_backup.json
+    python aivax_toolkit.py --script_file /home1/aivax/toolkit/local_resource/script_config/aivax/rdb_backup.json
 
     # #다시 원위치로.
     cd ${g_path} > /dev/null
@@ -953,7 +953,7 @@ function __migrate_mariadb()
     # 다시 복구 -> installer에서 제대로 개선
     cd /home1/aivax/toolkit
 
-    python aivax_toolkit.py --script_file /home1/aivax/toolkit/install_resource/script_config/aivax/rdb_restore.json
+    python aivax_toolkit.py --script_file /home1/aivax/toolkit/local_resource/script_config/aivax/rdb_restore.json
 
     cd - > /dev/null
 
@@ -966,23 +966,47 @@ function stop_aivax()
 {
     WRITE_LOG $FUNCNAME $LINENO "stop aivax"
 
-    systemctl stop nginx
-    systemctl stop fluent-bit
-    systemctl stop opensearch
-    
-    systemctl stop mariadb
+    # 재사용, 코드 정리는 installer에서 진행
+    if systemctl is-active --quiet nginx
+        systemctl stop nginx
 
-    systemctl stop aivax-management
-    systemctl stop aivax-pipeline
-    systemctl stop aivax-toolkit
+    if systemctl is-active --quiet fluent-bit
+        systemctl stop fluent-bit
 
-    if systemctl is-active --quiet aivax-toolkit
-    then
-        #systemctl stop myservice
-        systemctl stop aivax-toolkit.service
-    fi
+    if systemctl is-active --quiet opensearch
+        systemctl stop opensearch
+
+    if systemctl is-active --quiet mariadb
+        systemctl stop mariadb
+
+    if systemctl is-active --quiet aivax-management
+        systemctl stop aivax-management
+
+    if systemctl is-active --quiet aivax-pipeline
+        systemctl stop aivax-pipeline
+
+    if systemctl is-active --quiet aivax-sslproxy
+        systemctl stop aivax-sslproxy
+
+    if systemctl is-active --quiet ai-engine.service
+        systemctl stop ai-engine.service
+
+    # systemctl stop fluent-bit
+    # systemctl stop opensearch
     
-    systemctl stop aivax-sslproxy
+    # systemctl stop mariadb
+
+    # systemctl stop aivax-management
+    # systemctl stop aivax-pipeline
+    # systemctl stop aivax-toolkit
+
+    # if systemctl is-active --quiet aivax-toolkit
+    # then
+    #     #systemctl stop myservice
+    #     systemctl stop aivax-toolkit.service
+    # fi
+    
+    # systemctl stop aivax-sslproxy
 
     # for i in 1 2 3 4
     # do
@@ -995,7 +1019,7 @@ function stop_aivax()
     # done
 
     #프로세스, 1개만 기동하도록 변경
-    systemctl stop ai-engine.service
+    # systemctl stop ai-engine.service
 
     WRITE_LOG $FUNCNAME $LINENO "finish stop aivax"
 }
