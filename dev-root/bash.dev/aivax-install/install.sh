@@ -931,7 +931,7 @@ function __migrate_mariadb()
 
     cd /home1/aivax/toolkit
 
-    python aivax_toolkit.py --script /home1/aivax/toolkit/install_resource/script_config/aivax/rdb_backup.json
+    python aivax_toolkit.py --script_file /home1/aivax/toolkit/install_resource/script_config/aivax/rdb_backup.json
 
     # #다시 원위치로.
     cd ${g_path} > /dev/null
@@ -953,7 +953,7 @@ function __migrate_mariadb()
     # 다시 복구 -> installer에서 제대로 개선
     cd /home1/aivax/toolkit
 
-    python aivax_toolkit.py --script /home1/aivax/toolkit/install_resource/script_config/aivax/rdb_restore.json
+    python aivax_toolkit.py --script_file /home1/aivax/toolkit/install_resource/script_config/aivax/rdb_restore.json
 
     cd - > /dev/null
 

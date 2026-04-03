@@ -6,7 +6,7 @@
 package_date=$(date +%Y%m%d)
 # today=$(date +%Y%m%d)
 
-aivax_ver=v1.0.1
+aivax_ver=v1.0.1.0
 
 #임시 방편, 우선 현재 파일의 hash를 구분할수 있도록 설정한다.
 #aivax의 패치 형상을 기준으로 hash를 만든다.
