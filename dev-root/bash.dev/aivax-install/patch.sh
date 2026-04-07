@@ -11,7 +11,13 @@ aivax_ver=v1.0.1.0
 #임시 방편, 우선 현재 파일의 hash를 구분할수 있도록 설정한다.
 #aivax의 패치 형상을 기준으로 hash를 만든다.
 
+#install.sh가 변경시에도 hash를 만들도록 임시 추가, 향후 git의 hash로 처리되어야 한다.
+cp -rfv aivax-install/install.sh aivax-install/aivax-patch/install-temp
+
 hash=$(tar -cf - aivax-install/aivax-patch/ | sha256sum | awk '{print $1}' | cut -c1-6)
+
+#패키지를 만들기전, 임시파일 삭제
+rm -rf aivax-install/aivax-patch/install-temp
 
 cp -rfv aivax-install aivax-install.${aivax_ver}.$package_date.${hash}
 
