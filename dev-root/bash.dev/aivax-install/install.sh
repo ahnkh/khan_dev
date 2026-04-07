@@ -968,28 +968,44 @@ function stop_aivax()
 
     # 재사용, 코드 정리는 installer에서 진행
     if systemctl is-active --quiet nginx
+    then
         systemctl stop nginx
+    fi
 
     if systemctl is-active --quiet fluent-bit
+    then
         systemctl stop fluent-bit
+    fi
 
     if systemctl is-active --quiet opensearch
+    then
         systemctl stop opensearch
+    fi
 
     if systemctl is-active --quiet mariadb
+    then
         systemctl stop mariadb
+    fi
 
     if systemctl is-active --quiet aivax-management
+    then
         systemctl stop aivax-management
+    fi
 
     if systemctl is-active --quiet aivax-pipeline
+    then
         systemctl stop aivax-pipeline
+    fi
 
     if systemctl is-active --quiet aivax-sslproxy
+    then
         systemctl stop aivax-sslproxy
+    fi
 
     if systemctl is-active --quiet ai-engine.service
+    then
         systemctl stop ai-engine.service
+    fi
 
     # systemctl stop fluent-bit
     # systemctl stop opensearch
