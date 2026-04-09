@@ -422,6 +422,15 @@ function __install_opensearch()
     # 일단 작성후, 경로 또는 세부 테스트.
     dnf install ./extension/rpm-install/3rd-repo/opensearch/v3.3.2/opensearch-3.3.2-linux-x64.rpm -y -q
 
+    #TODO: 디렉토리 존재여부, 디렉토리가 존재하고, 설치 되어 있으면 skip 한다.
+    if [ -d /home1/opensearch ]
+    then
+        # mv /home1/aivax/data_resource/opensearch /home1/aivax/data_resource/opensearch.$(date +%Y%m%d%H%M)
+        # TODO: 종료코드, 현재시점은 최초 설치만 고려
+        WRITE_LOG $FUNCNAME $LINENO "opensearch is already installed, stop install"
+        return
+    fi
+
     #TODO: 여러 경로로 이동 필요, temp 경로롤 이용한다. (/home1/install/temp)
 
     # 기본 디렉토리 생성, 두번 체크
@@ -444,9 +453,10 @@ function __install_opensearch()
     tar xzf ./data-setup/opensearch-setup/opensearch.config.tar.gz  -C /tmp/install-temp/opensearch-config
 
     #과거 opensearch backup
+    # 임시, 삭제가 되어서는 안된다.
     if [ -d /etc/opensearch.old ]
     then
-        rm -rf /etc/opensearch.old
+        mv /etc/opensearch.old /etc/opensearch.old.$(date +%Y%m%d%H%M)
     fi
 
     \mv /etc/opensearch /etc/opensearch.old
@@ -473,15 +483,6 @@ function __install_opensearch()
 
     # chown -R opensearch:opensearch /home1/aivax/data_resource/opensearch
     # chmod -R 750 /home1/aivax/data_resource/opensearch
-
-    #TODO: 디렉토리 존재여부, 디렉토리가 존재하고, 설치 되어 있으면 skip 한다.
-    if [ -d /home1/opensearch ]
-    then
-        # mv /home1/aivax/data_resource/opensearch /home1/aivax/data_resource/opensearch.$(date +%Y%m%d%H%M)
-        # TODO: 종료코드, 현재시점은 최초 설치만 고려
-        WRITE_LOG $FUNCNAME $LINENO "opensearch is already installed, stop install"
-        return
-    fi
 
     # 과거 데이터 migration, 일단 임시, 상세 제어 필요
     #TODO: 이미 경로가 변경되었다. 호출될 수 없는 구문 => 여기는 좀더 세밀하게 조정한다.
