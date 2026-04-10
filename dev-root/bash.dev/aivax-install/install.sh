@@ -210,7 +210,7 @@ function __istall_rpm_package_v2()
 
     # dnf install tree --disablerepo="*" --enablerepo="aivax-repo" -y -q
 
-    dnf install sqlite --disablerepo="*" --enablerepo="aivax-repo" -y -q
+    # dnf install sqlite --disablerepo="*" --enablerepo="aivax-repo" -y -q
 
     # file 추출, OCR 관련
     dnf install libreoffice-headless --disablerepo="*" --enablerepo="aivax-repo" -y -q
