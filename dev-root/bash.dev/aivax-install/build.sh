@@ -109,4 +109,4 @@ function main()
     WRITE_LOG $FUNCNAME $LINENO "finish aivax build"
 }
 
-function main $@
+main $@
