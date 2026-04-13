@@ -930,12 +930,12 @@ function __migrate_mariadb()
 
     # cp -rfv ./extension/nodejs-install/node-v24.11.1-linux-x64 /home1/aivax/extension/nodejs
 
-    cd /home1/aivax/toolkit
+    # cd /home1/aivax/toolkit
 
-    python aivax_toolkit.py --script_file /home1/aivax/toolkit/local_resource/script_config/aivax/rdb_backup.json
+    # python aivax_toolkit.py --script_file /home1/aivax/toolkit/local_resource/script_config/aivax/rdb_backup.json
 
-    # #다시 원위치로.
-    cd ${g_path} > /dev/null
+    # # #다시 원위치로.
+    # cd ${g_path} > /dev/null
 
     cd /home1/aivax/management/backend 
 
@@ -952,11 +952,11 @@ function __migrate_mariadb()
     cd - > /dev/null
 
     # 다시 복구 -> installer에서 제대로 개선
-    cd /home1/aivax/toolkit
+    # cd /home1/aivax/toolkit
 
     # python aivax_toolkit.py --script_file /home1/aivax/toolkit/local_resource/script_config/aivax/rdb_restore.json
 
-    cd - > /dev/null
+    # cd - > /dev/null
 
     WRITE_LOG $FUNCNAME $LINENO "finish migrate mariadb"
 }
