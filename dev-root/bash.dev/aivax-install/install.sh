@@ -103,6 +103,11 @@ function init_default_setup()
 
     # 방화벽 확인. => 시작 단계에서
 
+    # sniperos - dnf에 대한 예외처리
+    # dnf 위치는 기본 /usr/bin/dnf
+
+    chmod 755 /usr/bin/dnf
+
 
     WRITE_LOG $FUNCNAME $LINENO "finish init default setup"
 }
