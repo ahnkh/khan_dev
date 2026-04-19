@@ -103,6 +103,8 @@ function init_default_setup()
 
     # 방화벽 확인. => 시작 단계에서
 
+    # dnf 이슈, 이건 installer에서.
+
 
     WRITE_LOG $FUNCNAME $LINENO "finish init default setup"
 }
