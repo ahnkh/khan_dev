@@ -105,9 +105,9 @@ function init_default_setup()
 
     # sniperos - dnf에 대한 예외처리
     # dnf 위치는 기본 /usr/bin/dnf
+    # dnf 이슈, 상세 처리는 installer에서.
 
     chmod 755 /usr/bin/dnf
-
 
     WRITE_LOG $FUNCNAME $LINENO "finish init default setup"
 }

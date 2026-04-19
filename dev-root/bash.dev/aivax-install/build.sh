@@ -1,7 +1,12 @@
 
 g_path=$( cd "$(dirname "$0")" ; pwd )
 
+source ${g_path}/patch.sh
+
 TRACE_LOG="./trace-log"
+
+git_root=/data/git-root
+package_root=/data/data-root/aivax-install-root/aivax-install
 
 function WRITE_LOG()
 {
@@ -25,7 +30,9 @@ function build_management()
 {
     WRITE_LOG $FUNCNAME $LINENO "start build management"
 
-    cd /data/git-root/aivax/apps/management
+    cd ${git_root}/aivax/apps/management
+
+    git checkout frontend/package-lock.json
 
     git pull
 
@@ -39,11 +46,11 @@ function build_management()
     npm run build
     npm install
 
-    cd /data/git-root/aivax/apps
+    cd ${git_root}/aivax/apps
 
     tar -czf management.tar.gz --exclude='.git' --exclude='.gitignore' management/
 
-    mv management.tar.gz /data/data-root/aivax-install-root/aivax-install/aivax-patch/
+    mv management.tar.gz ${package_root}/aivax-patch/
     cd ${g_path}
 
     WRITE_LOG $FUNCNAME $LINENO "finish build management"
@@ -53,15 +60,15 @@ function build_pipeline()
 {
     WRITE_LOG $FUNCNAME $LINENO "start build pipeline"
 
-    cd /data/git-root/pipeline
+    cd ${git_root}/pipeline
 
     git pull
 
-    cd /data/git-root/
+    cd ${git_root}
 
     tar -czf pipeline.tar.gz --exclude='.git' --exclude='.gitignore' pipeline/
 
-    mv pipeline.tar.gz /data/data-root/aivax-install-root/aivax-install/aivax-patch/
+    mv pipeline.tar.gz ${package_root}/aivax-patch/
 
     cd ${g_path}
 
@@ -72,24 +79,24 @@ function build_toolkit()
 {
     WRITE_LOG $FUNCNAME $LINENO "start build toolkit"
 
-    cd /data/git-root/toolkit
+    cd ${git_root}/toolkit
 
     git pull
 
-    cd /data/git-root/
+    cd ${git_root}
 
     tar -czf toolkit.tar.gz --exclude='.git' --exclude='.gitignore' toolkit/
 
-    mv toolkit.tar.gz /data/data-root/aivax-install-root/aivax-install/aivax-patch/
+    mv toolkit.tar.gz ${package_root}/aivax-patch/
 
     WRITE_LOG $FUNCNAME $LINENO "finish build toolkit"
 }
 
 function update_install_script()
 {
-    cd /data/git-root/khan_dev/dev-root/bash.dev/aivax-install
+    cd ${git_root}/khan_dev/dev-root/bash.dev/aivax-install
 
-    cp -rfv install.sh /data/data-root/aivax-install-root/aivax-install/
+    cp -rfv install.sh ${package_root}/
 }
 
 
@@ -104,6 +111,9 @@ function main()
     build_toolkit
 
     update_install_script
+
+    #patch.sh
+    patch
 
 
     WRITE_LOG $FUNCNAME $LINENO "finish aivax build"
