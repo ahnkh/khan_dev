@@ -1,7 +1,7 @@
 
 g_path=$( cd "$(dirname "$0")" ; pwd )
 
-source ${g_path}/package.sh
+source ${g_path}/patch.sh
 
 TRACE_LOG="./trace-log"
 
