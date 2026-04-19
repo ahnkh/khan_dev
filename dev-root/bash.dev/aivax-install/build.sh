@@ -32,6 +32,8 @@ function build_management()
 
     cd ${git_root}/aivax/apps/management
 
+    git checkout frontend/package-lock.json
+
     git pull
 
     cd backend
