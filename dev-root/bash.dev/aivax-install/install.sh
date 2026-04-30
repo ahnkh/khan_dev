@@ -335,7 +335,7 @@ EOF
 #     mariadb ${DB_NAME} < dump.sql
 # fi
 
-    mariadb ${DB_NAME} < ./data-setup/mariadb-setup/aivax_db_dump.sql
+    #mariadb ${DB_NAME} < ./data-setup/mariadb-setup/aivax_db_dump.sql
 
     #TODO: GRANT 다시 정리 필요
 mariadb <<EOF
