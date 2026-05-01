@@ -324,10 +324,10 @@ EOF
     # mariadb -u root < ./data-setup/mariadb-setup/aivax_db_dump.sql
 
 #TODO: drop이 되어야 한다.
-mariadb <<EOF
-DROP DATABASE IF EXISTS ${DB_NAME};
-CREATE DATABASE ${DB_NAME};
-EOF
+# mariadb <<EOF
+# DROP DATABASE IF EXISTS ${DB_NAME};
+# CREATE DATABASE ${DB_NAME};
+# EOF
     
 # if mariadb -e "USE ${DB_NAME}" 2>/dev/null; then    
 #     WRITE_ERROR $FUNCNAME $LINENO "DB already exists. Skip import."
@@ -335,6 +335,7 @@ EOF
 #     mariadb ${DB_NAME} < dump.sql
 # fi
 
+    #26.05.01 dump 기능 제거, npm 의 migration으로 대체 (create까지 된다는 가정으로 진행)
     #mariadb ${DB_NAME} < ./data-setup/mariadb-setup/aivax_db_dump.sql
 
     #TODO: GRANT 다시 정리 필요
@@ -774,7 +775,7 @@ fi
     # pycomlib 설치, 버전 주의.
     #uv pip install pycom* --force-reinstall
 
-    uv --quiet pip install pycomlib-1.1.5-py3-none-any.whl --force-reinstall
+    uv --quiet pip install pycomlib-1.1.6-py3-none-any.whl --force-reinstall
     uv --quiet pip install pycomlibex-1.1.1-py3-none-any.whl --force-reinstall
     uv --quiet pip install pyservice-1.0.2-py3-none-any.whl --force-reinstall
 
