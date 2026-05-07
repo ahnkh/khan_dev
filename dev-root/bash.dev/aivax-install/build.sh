@@ -9,13 +9,13 @@ git_root=/data/git-root
 package_root=/data/data-root/aivax-install-root/aivax-install
 
 # 버전정보, git의 tag에서 가져온다.
-GIT_TAG=$(git describe --tags --abbrev=0)
+# GIT_TAG=$(git describe --tags --abbrev=0)
 
-DISPLAY_VERSION=${GIT_TAG//_/ }
+# DISPLAY_VERSION=${GIT_TAG//_/ }
 
-echo "$DISPLAY_VERSION"
+# echo "$DISPLAY_VERSION"
 
-AIVAX_VERSION="SNIPER AIVAX V1.0.0.0"
+# AIVAX_VERSION="SNIPER AIVAX V1.0.0.0"
 
 function WRITE_LOG()
 {
