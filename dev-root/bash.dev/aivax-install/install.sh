@@ -723,6 +723,19 @@ function __patch_ai_engine()
     WRITE_LOG $FUNCNAME $LINENO "finish install ai engine"
 }
 
+# 별도 부가 유틸 추가
+function __patch_etc_util()
+{
+
+    #license 파일 복사
+    chmod 755 ./data-setup/license/multi_licenses_crypt
+    chmod 755 ./data-setup/license/license_key_v2
+
+    \cp -rfv ./data-setup/license/multi_licenses_crypt /usr/local/bin/
+    \cp -rfv ./data-setup/license/license_key_v2 /usr/local/bin/
+
+}
+
 function __install_python()
 {
     WRITE_LOG $FUNCNAME $LINENO "start install python"
@@ -821,6 +834,8 @@ function patch_aivax_source()
     __patch_sslproxy
 
     __patch_ai_engine
+
+    __patch_etc_util
 
     # db migration 기능, management 수행후 처리
     __migrate_mariadb
