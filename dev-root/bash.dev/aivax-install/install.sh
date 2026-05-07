@@ -731,9 +731,8 @@ function __patch_etc_util()
     chmod 755 ./data-setup/license/multi_licenses_crypt
     chmod 755 ./data-setup/license/license_key_v2
 
-    \cp -rfv ./data-setup/license/multi_licenses_crypt /usr/local/bin/
-    \cp -rfv ./data-setup/license/license_key_v2 /usr/local/bin/
-
+    \cp -rf ./data-setup/license/multi_licenses_crypt /usr/local/bin/
+    \cp -rf ./data-setup/license/license_key_v2 /usr/local/bin/
 
     # 버전 파일 실행, system python으로 수행되어야 한다.
     # license 정보, 우선 경로 파일을 읽거나, 기본값으로 할당한다.
@@ -768,7 +767,7 @@ function __install_python()
     VENV="/home1/aivax/aivax-venv"
 
     if [ ! -d "$VENV" ]; then
-        /usr/local/bin/uv --python /usr/local/bin/python3.13 venv "$VENV"
+        /usr/local/bin/uv venv --python /usr/local/bin/python3.13 "$VENV"
         \cp -rf /usr/local/bin/uv ${VENV}/bin/
     fi
 
