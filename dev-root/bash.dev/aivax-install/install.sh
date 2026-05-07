@@ -183,6 +183,9 @@ function __install_rpm_repo_v2()
     \cp -f ./extension/rpm-install/extra-repo/perl/*.rpm /home1/install/extension/rpm-repo/
     \cp -f ./extension/rpm-install/extra-repo/mariadb/v11.3.2/*.rpm /home1/install/extension/rpm-repo/
 
+    # zip
+    \cp -f ./extension/rpm-install/extra-repo/zip/*.rpm /home1/install/extension/rpm-repo/
+
     # suricata -> 제거
     # \cp -f ./extension/rpm-install/extra-repo/suricata/*.rpm /home1/install/extension/rpm-repo/
 
@@ -238,6 +241,10 @@ function __istall_rpm_package_v2()
 
     # nginx
     dnf install --disablerepo="*" --enablerepo="aivax-repo" nginx -y -q
+
+    # zip, unzip
+    dnf install --disablerepo="*" --enablerepo="aivax-repo" zip -y -q
+    dnf install --disablerepo="*" --enablerepo="aivax-repo" unzip -y -q
 
     #TODO: opensearch, mariadb는 별도 설치.
 
@@ -740,7 +747,7 @@ function __install_python()
     VENV="/home1/aivax/aivax-venv"
 
     if [ ! -d "$VENV" ]; then
-        /usr/local/bin/uv venv "$VENV"
+        /usr/local/bin/uv --python /usr/local/bin/python3.13 venv "$VENV"
         \cp -rf /usr/local/bin/uv ${VENV}/bin/
     fi
 
