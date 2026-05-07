@@ -8,6 +8,15 @@ TRACE_LOG="./trace-log"
 git_root=/data/git-root
 package_root=/data/data-root/aivax-install-root/aivax-install
 
+# 버전정보, git의 tag에서 가져온다.
+GIT_TAG=$(git describe --tags --abbrev=0)
+
+DISPLAY_VERSION=${GIT_TAG//_/ }
+
+echo "$DISPLAY_VERSION"
+
+AIVAX_VERSION="SNIPER AIVAX V1.0.0.0"
+
 function WRITE_LOG()
 {
 
@@ -33,6 +42,7 @@ function build_management()
     cd ${git_root}/aivax/apps/management
 
     git checkout frontend/package-lock.json
+    git checkout backend/package-lock.json
 
     git pull
 
@@ -99,6 +109,48 @@ function update_install_script()
     cp -rfv install.sh ${package_root}/
 }
 
+#version 파일 생성
+function make_version_text_file()
+{
+
+    WRITE_LOG $FUNCNAME $LINENO "start make version text file"
+
+    AIVAX_DIR="${git_root}/aivax"
+    PIPELINE_DIR="${git_root}/pipeline"
+
+    AIVAX_TAG=$(git -C ${git_root}/aivax describe --tags --abbrev=0 2>/dev/null)
+    AIVAX_HASH=$(git -C ${git_root}/aivax rev-parse --short HEAD 2>/dev/null)
+
+    #AIVAX VERSION
+    AIVAX_TITLE_VERSION=${AIVAX_TAG//_/ }
+
+    # PIPELINE_TAG=$(git -C "$PIPELINE_DIR" describe --tags --abbrev=0 2>/dev/null)
+    PIPELINE_HASH=$(git -C "$PIPELINE_DIR" rev-parse --short HEAD 2>/dev/null)
+
+    WRITE_LOG $FUNCNAME $LINENO "TITLE VERSION = ${AIVAX_TITLE_VERSION}"
+
+    WRITE_LOG $FUNCNAME $LINENO "AIVAX HASH = ${AIVAX_HASH}"
+    WRITE_LOG $FUNCNAME $LINENO "ENGINE HASH = ${PIPELINE_HASH}"
+
+    # echo "AIVAX    : ${AIVAX_TAG} ${AIVAX_HASH}"
+    # echo "PIPELINE : ${PIPELINE_TAG}-${PIPELINE_HASH}"
+
+# SNIPER AIVAX V1.0.0.0
+# 1b852b76
+# 6144c68
+
+    VERSION_FILE="${package_root}/.version"
+
+    # version.txt 생성
+cat > "$VERSION_FILE" <<EOF
+${AIVAX_TITLE_VERSION}
+${AIVAX_HASH}
+${PIPELINE_HASH}
+EOF
+
+    WRITE_LOG $FUNCNAME $LINENO "finish make version text file"
+}
+
 
 function main()
 {
@@ -112,9 +164,16 @@ function main()
 
     update_install_script
 
+    #버전 파일 생성
+    make_version_text_file
+
+    #패치 실행
     #patch.sh
     patch
 
+    #자동업로드 기능 추가
+    cd /data/data-root/aivax-install-root/
+    bash auto-install.sh
 
     WRITE_LOG $FUNCNAME $LINENO "finish aivax build"
 }
