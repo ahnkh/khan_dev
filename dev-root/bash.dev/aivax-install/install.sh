@@ -736,7 +736,11 @@ function __patch_etc_util()
 
 
     # 버전 파일 실행, system python으로 수행되어야 한다.
-    python version.py
+    # license 정보, 우선 경로 파일을 읽거나, 기본값으로 할당한다.
+    SERIAL_KEY="SKRX4CWIS241299"
+    LICENSE_KEY="af38d40897b5c174"
+    SERIAL_FILE="./SKRX4CWIS241299.crt"
+    python version.py ${SERIAL_KEY} ${LICENSE_KEY} ${SERIAL_FILE}
 
 }
 

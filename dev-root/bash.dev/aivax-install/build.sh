@@ -3,7 +3,7 @@ g_path=$( cd "$(dirname "$0")" ; pwd )
 
 source ${g_path}/patch.sh
 
-TRACE_LOG="./trace-log"
+TRACE_LOG="./tracelog.txt"
 
 git_root=/data/git-root
 package_root=/data/data-root/aivax-install-root/aivax-install
