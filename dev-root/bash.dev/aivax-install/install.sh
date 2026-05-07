@@ -734,6 +734,10 @@ function __patch_etc_util()
     \cp -rfv ./data-setup/license/multi_licenses_crypt /usr/local/bin/
     \cp -rfv ./data-setup/license/license_key_v2 /usr/local/bin/
 
+
+    # 버전 파일 실행, system python으로 수행되어야 한다.
+    python version.py
+
 }
 
 function __install_python()
