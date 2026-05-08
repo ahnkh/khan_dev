@@ -76,12 +76,18 @@ function init_default_setup()
     # mkdir -p /home1/aivax/data_resource/{attach_file,opensearch}
     mkdir -p /home1/aivax/data_resource/attach_file
 
+    mkdir -p /home1/aivax/data_resource/policy_signal
+
     # mkdir -p /home1/aivax/.localconfig
 
     # mkdir -p /home1/install/temp
     # mkdir -p /home1/install/extension
 
     mkdir -p /home1/install/extension/rpm-repo/
+
+    # 기본 파일 복사
+    \cp -rf ./data-setup/etc-resource/aivax_policy.json /home1/aivax/data_resource/policy_signal/
+    \cp -rf ./data-setup/etc-resource/block.html /home1/aivax/data_resource/
 
     #TODO: opensearch data, 파티션 변경 필요 
     #/home1 => app, 또는 root, symbolic link
@@ -767,7 +773,7 @@ function __install_python()
     VENV="/home1/aivax/aivax-venv"
 
     if [ ! -d "$VENV" ]; then
-        /usr/local/bin/uv venv --python /usr/local/bin/python3.13 "$VENV"
+        /usr/local/bin/uv venv --python /usr/local/bin/python3.13 --seed "$VENV"
         \cp -rf /usr/local/bin/uv ${VENV}/bin/
     fi
 
