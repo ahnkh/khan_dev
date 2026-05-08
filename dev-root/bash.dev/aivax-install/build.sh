@@ -225,7 +225,7 @@ function main()
 
     #패치 실행
     #patch.sh => 하나로 통합
-    patch
+    release_package
 
     #자동업로드 기능 추가
     cd /data/data-root/aivax-install-root/
