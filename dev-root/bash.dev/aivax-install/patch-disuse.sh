@@ -12,7 +12,7 @@ function patch()
     package_date=$(date +%Y%m%d)
     # today=$(date +%Y%m%d)
 
-    aivax_ver=v1.0.1.0
+    aivax_ver=v1.0.0.0
 
     aivax_package_root="/data/data-root/aivax-install-root"
 
