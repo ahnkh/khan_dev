@@ -450,6 +450,8 @@ function __install_opensearch()
         return
     fi
 
+    
+
     #TODO: 여러 경로로 이동 필요, temp 경로롤 이용한다. (/home1/install/temp)
 
     # 기본 디렉토리 생성, 두번 체크
@@ -1089,14 +1091,27 @@ function start_aivax()
     # systemctl daemon-reexec
     systemctl daemon-reload
 
+    # systemctl is-enabled nginx 로 미리 점검, installer에서 변경
+
+    systemctl enable nginx
     systemctl start nginx
 
+    systemctl enable fluent-bit
     systemctl start fluent-bit    
+
+    systemctl enable opensearch
     systemctl start opensearch
 
+    systemctl enable mariadb
     systemctl start mariadb
 
-    systemctl start aivax-management
+    systemctl enable aivax-management
+    systemctl enable aivax-pipeline
+    systemctl enable aivax-toolkit
+    systemctl enable aivax-sslproxy
+    systemctl enable ai-engine.service
+
+    systemctl start aivax-management    
     systemctl start aivax-pipeline
     systemctl start aivax-toolkit
     
@@ -1111,6 +1126,24 @@ function start_aivax()
     systemctl start ai-engine.service
 
     WRITE_LOG $FUNCNAME $LINENO "finish start aivax"
+}
+
+# 설치 완료후 설정 작업
+function configure_after_install()
+{
+    WRITE_LOG $FUNCNAME $LINENO "start configure after install"
+
+    #opensearch, 부가 index의 삭제, 초기화
+    # 향후 계정, 포트 등 접속 정보는 installer에서 제거
+    curl -u admin:'Sniper123!@#' -sk -XDELETE "https://127.0.0.1:9200/top_queries-*"     
+    curl -u admin:'Sniper123!@#' -sk -XDELETE "https://127.0.0.1:9200/security-auditlog-*" 
+
+    # template의 삭제 
+    curl -u admin:'Sniper123!@#' -sk -XDELETE "https://127.0.0.1:9200/_index_template/query_insights_top_queries_template" 
+
+
+    WRITE_LOG $FUNCNAME $LINENO "finish configure after install"
+
 }
 
 ####################################### main, 실행
@@ -1135,6 +1168,10 @@ function main()
 
     # 프로세스 기동
     start_aivax
+
+    # 시작후 부가작업 (opensearch 외)
+    configure_after_install
+
 }
 
 main $@
