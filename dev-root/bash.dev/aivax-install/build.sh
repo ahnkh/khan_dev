@@ -54,11 +54,13 @@ function build_management()
 
     cd backend
 
+    npm i #신규 모듈이 추가되면 인터넷 다운로드
     npm run build
     npm install
 
     cd ../frontend
 
+    npm i #신규 모듈이 추가되면 인터넷 다운로드
     npm run build
     npm install
 

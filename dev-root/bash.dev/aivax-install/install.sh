@@ -1141,6 +1141,8 @@ function configure_after_install()
     # template의 삭제 
     curl -u admin:'Sniper123!@#' -sk -XDELETE "https://127.0.0.1:9200/_index_template/query_insights_top_queries_template" 
 
+    # index 목록의 조회
+    curl -u admin:'Sniper123!@#' -sk https://127.0.0.1:9200/_cat/indices?v
 
     WRITE_LOG $FUNCNAME $LINENO "finish configure after install"
 
