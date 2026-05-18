@@ -1133,6 +1133,15 @@ function configure_after_install()
 {
     WRITE_LOG $FUNCNAME $LINENO "start configure after install"
 
+    # opensearch, 기동시까지 대기한다.
+    # 무한루프를 돌면 안되기 때문에, 5번만 loop => 수정 필요
+    # until curl -u admin:'Sniper123!@#' -sk https://127.0.0.1:9200/_cluster/health| grep -q '"status"'; do
+    #     sleep 2
+    # done
+
+    #TODO: 상세한 예외처리는 installer에서
+    wait_ready_opensearch
+
     #opensearch, 부가 index의 삭제, 초기화
     # 향후 계정, 포트 등 접속 정보는 installer에서 제거
     curl -u admin:'Sniper123!@#' -sk -XDELETE "https://127.0.0.1:9200/top_queries-*"     
@@ -1146,6 +1155,41 @@ function configure_after_install()
 
     WRITE_LOG $FUNCNAME $LINENO "finish configure after install"
 
+}
+
+function wait_ready_opensearch()
+{
+
+    WRITE_LOG $FUNCNAME $LINENO "wait ready opensearch"
+
+    local RETRY=5
+    local COUNT=0
+
+    # echo "waiting for opensearch..."
+
+    while [ $COUNT -lt $RETRY ]
+    do
+        # cluster health 확인
+        RESPONSE=$(curl -sk -u admin:'Sniper123!@#' https://127.0.0.1:9200/_cluster/health)
+
+        # 정상 응답 여부 확인
+        echo "$RESPONSE" | grep -q '"status"'
+
+        if [ $? -eq 0 ]; then
+            # echo "opensearch ready"            
+            return 0
+        fi
+
+        COUNT=$((COUNT+1))
+
+        echo "not ready yet... retry ${COUNT}/${RETRY}"
+        WRITE_LOG $FUNCNAME $LINENO "wait start opensearch (${COUNT}/${RETRY})"
+
+        sleep 2
+    done
+
+    # echo "opensearch ready timeout"
+    return 1
 }
 
 ####################################### main, 실행
