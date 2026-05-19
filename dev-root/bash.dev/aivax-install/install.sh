@@ -754,7 +754,7 @@ function __patch_etc_util()
 
     if [ -f "$SERIAL_FILE" ]; then
         cp -rf ${SERIAL_FILE} /tmp
-        curl -fsSk -X POST 'https://127.0.0.1:4000/v1/internal/settings/license/upload' -H 'Content-Type: application/json' -d '{"licenseFilePath":"/tmp/SKRX4CWIS241299.crt"}' -o ./response.json"
+        curl -fsSk -X POST 'https://127.0.0.1:4000/v1/internal/settings/license/upload' -H 'Content-Type: application/json' -d '{"licenseFilePath":"/tmp/SKRX4CWIS241299.crt"}' -o ./response.json
     fi
     
 
@@ -1155,6 +1155,8 @@ function configure_after_install()
     # 향후 계정, 포트 등 접속 정보는 installer에서 제거
     curl -u admin:'Sniper123!@#' -sk -XDELETE "https://127.0.0.1:9200/top_queries-*"     
     curl -u admin:'Sniper123!@#' -sk -XDELETE "https://127.0.0.1:9200/security-auditlog-*" 
+
+    curl -u admin:'Sniper123!@#' -sk -XDELETE "https://127.0.0.1:9200/aivax_log_reindexed_*"
 
     # template의 삭제 
     curl -u admin:'Sniper123!@#' -sk -XDELETE "https://127.0.0.1:9200/_index_template/query_insights_top_queries_template" 
