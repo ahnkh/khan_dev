@@ -754,7 +754,7 @@ function __patch_etc_util()
 
     if [ -f "$SERIAL_FILE" ]; then
         cp -rf ${SERIAL_FILE} /tmp
-        curl -fsSk -X POST 'https://127.0.0.1:4000/v1/internal/settings/license/upload' -H 'Content-Type: application/json' -d "{\"licenseFilePath\":\"/tmp/${SERIAL_FILE}\"} -o ./response.json"
+        curl -fsSk -X POST 'https://127.0.0.1:4000/v1/internal/settings/license/upload' -H 'Content-Type: application/json' -d '{"licenseFilePath":"/tmp/SKRX4CWIS241299.crt"}' -o ./response.json"
     fi
     
 
