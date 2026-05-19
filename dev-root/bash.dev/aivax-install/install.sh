@@ -742,6 +742,15 @@ function __patch_ai_engine()
 function __patch_etc_util()
 {
 
+    WRITE_LOG $FUNCNAME $LINENO "start patch etc util"
+
+    #nginx, management, 혹시 모르니 시작시킨다.
+    systemctl start nginx
+    systemctl start aivax-management
+
+    # 1초 대기
+    sleep 1
+
     #license 파일 복사
     chmod 755 ./data-setup/license/multi_licenses_crypt
     chmod 755 ./data-setup/license/license_key_v2
@@ -763,6 +772,8 @@ function __patch_etc_util()
     #     cp -rf ${SERIAL_FILE} /tmp
     #     curl -fsSk -X POST 'https://127.0.0.1:4000/v1/internal/settings/license/upload' -H 'Content-Type: application/json' -d '{"licenseFilePath":"/tmp/SKRX4CWIS241299.crt"}' -o ./response.json 2>/dev/null
     # fi
+
+    WRITE_LOG $FUNCNAME $LINENO "finish patch etc util"
 
 }
 
