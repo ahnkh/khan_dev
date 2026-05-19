@@ -206,6 +206,11 @@ function release_package()
     #마지막, 임시파일 삭제
     rm -rf ${aivax_package_file}
 
+    #패키지, 임시 경로로 이동
+    mv ${aivax_package_file}.tar.gz temp-release/
+
+    find temp-release/ -maxdepth 1 -type f -printf '%T@ %p\n' | sort -nr | tail -n +6 | cut -d' ' -f2- | xargs -r rm -f
+
     WRITE_LOG $FUNCNAME $LINENO "finish release package"
 }
 
