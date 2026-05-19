@@ -192,6 +192,10 @@ function __install_rpm_repo_v2()
     # zip
     \cp -f ./extension/rpm-install/extra-repo/zip/*.rpm /home1/install/extension/rpm-repo/
 
+    # squid proxy
+    \cp -f ./extension/rpm-install/extra-repo/squid_proxy/*.rpm /home1/install/extension/rpm-repo/
+
+
     # suricata -> 제거
     # \cp -f ./extension/rpm-install/extra-repo/suricata/*.rpm /home1/install/extension/rpm-repo/
 
@@ -251,6 +255,9 @@ function __istall_rpm_package_v2()
     # zip, unzip
     dnf install --disablerepo="*" --enablerepo="aivax-repo" zip -y -q
     dnf install --disablerepo="*" --enablerepo="aivax-repo" unzip -y -q
+
+    # squid proxy
+    dnf install --disablerepo="*" --enablerepo="aivax-repo" squid -y -q
 
     #TODO: opensearch, mariadb는 별도 설치.
 
@@ -1113,6 +1120,9 @@ function start_aivax()
 
     systemctl enable mariadb
     systemctl start mariadb
+
+    systemctl enable squid
+    systemctl start squid
 
     systemctl enable aivax-management
     systemctl enable aivax-pipeline
