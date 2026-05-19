@@ -751,9 +751,12 @@ function __patch_etc_util()
 
     # 라이선스 업로드 명령, management UI에 요청한다.
     # .ctr 파일, 복사 기능 필요, 일단 /tmp로 복사한다.
-    cp -rf ${SERIAL_FILE} /tmp
 
-    curl -sk -X POST 'https://127.0.0.1:4000/v1/internal/settings/license/upload' -H 'Content-Type: application/json' -d "{\"licenseFilePath\":\"/tmp/${SERIAL_FILE}\"}"
+    if [ -f "$SERIAL_FILE" ]; then
+        cp -rf ${SERIAL_FILE} /tmp
+        curl -fsSk -X POST 'https://127.0.0.1:4000/v1/internal/settings/license/upload' -H 'Content-Type: application/json' -d "{\"licenseFilePath\":\"/tmp/${SERIAL_FILE}\"} -o ./response.json"
+    fi
+    
 
 }
 
