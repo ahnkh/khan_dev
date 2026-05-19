@@ -1077,6 +1077,11 @@ function stop_aivax()
         systemctl stop ai-engine.service
     fi
 
+    if systemctl is-active --quiet squid
+    then
+        systemctl stop squid
+    fi
+
     # systemctl stop fluent-bit
     # systemctl stop opensearch
     
