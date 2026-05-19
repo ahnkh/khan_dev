@@ -753,7 +753,7 @@ function __patch_etc_util()
     # .ctr 파일, 복사 기능 필요, 일단 /tmp로 복사한다.
     cp -rf ${SERIAL_FILE} /tmp
 
-    curl -X POST 'https://127.0.0.1:4000/v1/internal/settings/license/upload' -H 'Content-Type: application/json' -d "{\"licenseFilePath\":\"/tmp/${SERIAL_FILE}\"}"
+    curl -sk -X POST 'https://127.0.0.1:4000/v1/internal/settings/license/upload' -H 'Content-Type: application/json' -d "{\"licenseFilePath\":\"/tmp/${SERIAL_FILE}\"}"
 
 }
 
