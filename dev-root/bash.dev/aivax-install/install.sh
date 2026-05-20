@@ -742,8 +742,8 @@ function __patch_ai_engine()
     WRITE_LOG $FUNCNAME $LINENO "finish install ai engine"
 }
 
-# 별도 부가 유틸 추가
-function __patch_etc_util()
+# serial license 업데이트, TODO: installer는 상세 처리
+function __update_serial_license()
 {
 
     WRITE_LOG $FUNCNAME $LINENO "start patch etc util"
@@ -883,7 +883,8 @@ function patch_aivax_source()
     # db migration 기능, management 수행후 처리
     __migrate_mariadb
 
-    __patch_etc_util
+    # 순서 이동, 제일 밑으로
+    # __patch_etc_util
 
     WRITE_LOG $FUNCNAME $LINENO "finish patch aivax source"
 }
@@ -1192,6 +1193,9 @@ function configure_after_install()
 
     # index 목록의 조회
     curl -u admin:'Sniper123!@#' -sk https://127.0.0.1:9200/_cat/indices?v
+
+    # 라이선스 업데이트, 제일 밑으로
+    __update_serial_license
 
     WRITE_LOG $FUNCNAME $LINENO "finish configure after install"
 
