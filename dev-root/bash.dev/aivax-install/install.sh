@@ -86,6 +86,7 @@ function init_default_setup()
     mkdir -p /home1/install/extension/rpm-repo/
 
     # 기본 파일 복사
+    # TODO: 파일 존재 여부 체크, 없을때만 복사해야 한다.
     \cp -rf ./data-setup/etc-resource/aivax_policy.json /home1/aivax/data_resource/policy_signal/
     \cp -rf ./data-setup/etc-resource/block.html /home1/aivax/data_resource/
 
@@ -879,10 +880,10 @@ function patch_aivax_source()
 
     __patch_ai_engine
 
-    __patch_etc_util
-
     # db migration 기능, management 수행후 처리
     __migrate_mariadb
+
+    __patch_etc_util
 
     WRITE_LOG $FUNCNAME $LINENO "finish patch aivax source"
 }
