@@ -54,19 +54,36 @@ function clear_mariadb()
     WRITE_LOG $FUNCNAME $LINENO "clear aivax policy db"
 
     #DB, 다시 기동
-    systemctl start mariadb
+    # systemctl start mariadb
 
-    export PATH=/home1/aivax/extension/nodejs/bin:$PATH
-    export NODE_ENV=production
+    # export PATH=/home1/aivax/extension/nodejs/bin:$PATH
+    # export NODE_ENV=production
 
-    if [ -f "/home1/aivax/extension/nodejs/bin/npm" ] 
-    then
-        cd /home1/aivax/management/backend 
-        /home1/aivax/extension/nodejs/bin/npm run db:backup > /dev/null #2>&1
-        cd - > /dev/null
-    fi
+    # if [ -f "/home1/aivax/extension/nodejs/bin/npm" ] 
+    # then
+    #     cd /home1/aivax/management/backend 
+    #     /home1/aivax/extension/nodejs/bin/npm run db:backup > /dev/null #2>&1
+    #     cd - > /dev/null
+    # fi
+
+    # systemctl stop mariadb
+
 
     systemctl stop mariadb
+
+    rm -rf /var/lib/mysql
+
+    rm -rf /var/log/mariadb*
+    rm -rf /var/log/mysql*
+
+    #mariadb 설치형상은 유지
+    dnf remove -y mariadb mariadb-server  --disablerepo='*'
+    #dnf autoremove -y
+
+
+
+
+
 
     sleep 1
 }
@@ -205,7 +222,7 @@ function main()
 
     #경로, 제일 마지막에 삭제
     clear_aivax_patch
-    
+
     clear_rpm
 
     # clear_os_env

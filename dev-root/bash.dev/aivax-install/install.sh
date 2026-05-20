@@ -487,7 +487,10 @@ function __install_opensearch()
         mv /etc/opensearch.old /etc/opensearch.old.$(date +%Y%m%d%H%M)
     fi
 
-    \mv /etc/opensearch /etc/opensearch.old
+    if [ -d /etc/opensearch ]
+    then
+        \mv /etc/opensearch /etc/opensearch.old
+    fi
 
     \mv /tmp/install-temp/opensearch-config/opensearch /etc/
 
