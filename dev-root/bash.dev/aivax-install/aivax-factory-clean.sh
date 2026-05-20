@@ -276,6 +276,8 @@ function main()
 
     clear_os_env
 
+    print_log_status
+
     WRITE_LOG $FUNCNAME $LINENO "finish clear aivax"
 }
 
