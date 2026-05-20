@@ -207,6 +207,51 @@ function stop_aivax_service()
     sleep 1
 }
 
+# 설치후 확인 절차
+function print_log_status()
+{
+    WRITE_LOG $FUNCNAME $LINENO "print log status"
+
+    # 서비스 상태 출력
+
+    SERVICES=(
+        nginx
+        fluent-bit
+        opensearch
+        mariadb
+        squid
+        
+        aivax-management
+        aivax-pipeline
+        aivax-sslproxy
+        ai-engine
+        aivax-toolkit
+    )
+
+    WRITE_LOG $FUNCNAME $LINENO "+++ aivax system status"
+
+    for svc in "${SERVICES[@]}"; do
+        systemctl status "$svc" 
+        # rm -f "/etc/systemd/system/${svc}.service"
+    done
+
+    WRITE_LOG $FUNCNAME $LINENO "+++ python version"
+
+    # python 버전 
+    python -V
+    which python
+
+    # dnf 정보
+    WRITE_LOG $FUNCNAME $LINENO "+++ dnf repolist"
+    dnf repolist all
+
+    # aivax 디렉토리
+    WRITE_LOG $FUNCNAME $LINENO "+++ aivax directory info"
+    ls -al /home1/aivax
+
+    
+}
+
 
 function main()
 {
