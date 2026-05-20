@@ -805,7 +805,8 @@ function __install_python()
     VENV="/home1/aivax/aivax-venv"
 
     if [ ! -d "$VENV" ]; then
-        /usr/local/bin/uv venv --python /usr/local/bin/python3.13 --seed "$VENV"
+        # /usr/local/bin/uv venv --python /usr/local/bin/python3.13 --seed "$VENV"
+        /usr/local/bin/uv venv --python /usr/local/bin/python3.13 "$VENV"
         \cp -rf /usr/local/bin/uv ${VENV}/bin/
     fi
 
@@ -815,6 +816,9 @@ function __install_python()
 
     # bash 추가, sed
     source /home1/aivax/aivax-venv/bin/activate
+
+    #seed 대신 사용
+    python -m ensurepip --default-pip
 
     #개선 필요
     # echo "source /home1/aivax/aivax-venv/bin/activate" >> /root/.bash_profile
