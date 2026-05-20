@@ -77,7 +77,7 @@ function clear_mariadb()
     rm -rf /var/log/mysql*
 
     #mariadb 설치형상은 유지
-    dnf remove -y mariadb mariadb-server  --disablerepo='*'
+    dnf remove -y -q mariadb mariadb-server  --disablerepo='*'
     #dnf autoremove -y
 
 
