@@ -80,11 +80,6 @@ function clear_mariadb()
     dnf remove -y -q mariadb mariadb-server  --disablerepo='*'
     #dnf autoremove -y
 
-
-
-
-
-
     sleep 1
 }
 
@@ -93,8 +88,11 @@ function clear_python()
 
     WRITE_LOG $FUNCNAME $LINENO "clear python"
 
-    source /home1/aivax-venv/bin/activate
-    deactivate
+    if [ -f /home1/aivax-venv/bin/activate ]
+    then
+        source /home1/aivax-venv/bin/activate
+        deactivate
+    fi
 
     rm -rf /home1/aivax-venv
 
@@ -171,10 +169,29 @@ function clear_service()
     sleep 1
 }
 
-# function clear_os_env()
-# {
+function clear_os_env()
+{
 
-# }
+    # bash profile 제거
+    PROFILE="/root/.bash_profile"
+
+    if [ ! -f "$PROFILE" ]; then
+        echo "bash_profile not found"
+        # exit 1
+        return
+    fi
+
+    \cp "$PROFILE" "${PROFILE}.bak"
+
+    sed -i '\|^source /home1/aivax/aivax-venv/bin/activate$|d' "$PROFILE"
+
+    sed -i '/# >>> AIVAX VENV >>>/,/# <<< AIVAX VENV <<</d' "$PROFILE"
+
+    # echo "AIVAX venv entries removed."
+    # echo "Backup: ${PROFILE}.bak"
+
+
+}
 
 function stop_aivax_service()
 {
@@ -225,7 +242,7 @@ function main()
 
     clear_rpm
 
-    # clear_os_env
+    clear_os_env
 
     WRITE_LOG $FUNCNAME $LINENO "finish clear aivax"
 }
