@@ -37,6 +37,14 @@ function WRITE_ERROR()
 
 ####################################### 기본 모듈 설치
 
+# 최초 기본 rpm 모듈 설치
+function install_default_rpm()
+{
+    WRITE_LOG $FUNCNAME $LINENO "install default rpm"
+
+    rpm -ih --quiet ./extension/rpm-install/extra-repo/dialog/dialog-1.3-32.20210117.el9.0.1.x86_64.rpm > /dev/null
+}
+
 # 기본 설정 추가
 function init_default_setup()
 {
@@ -1244,6 +1252,8 @@ function wait_ready_opensearch()
 
 function main()
 {
+
+    install_default_rpm
 
     # TODO: 경로를 생성해야 한다. 경로가 제일 먼저이다.
     init_default_setup
