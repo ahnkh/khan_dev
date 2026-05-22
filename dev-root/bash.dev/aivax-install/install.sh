@@ -60,7 +60,7 @@ function init_default_setup()
     #향후 installer에서 상세 오류 점검.
     #rm -rf /home1/aivax.old/aivax.$TODAY
 
-    if [ -d /home1/aivax.old/aivax.$TODAY ] 
+    if [ -d /home1/aivax.old/aivax.$TODAY ]
     then
         mv /home1/aivax.old/aivax.$TODAY /home1/aivax.old/aivax.$(date +%Y%m%d%H%M)
     fi

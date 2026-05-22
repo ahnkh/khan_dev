@@ -1,7 +1,7 @@
 
 g_path=$( cd "$(dirname "$0")" ; pwd )
 
-TRACE_LOG="./trace-log"
+# TRACE_LOG="./trace-log"
 
 function WRITE_LOG()
 {
@@ -16,5 +16,5 @@ function WRITE_LOG()
         
     echo -e "${GREEN}[$(date '+%Y/%m/%d %H:%M:%S')]${NC}${bold} $3 ${normal}"
     
-    echo $string &>> ${g_path}/${TRACE_LOG}
+    # echo $string &>> ${g_path}/${TRACE_LOG}
 }

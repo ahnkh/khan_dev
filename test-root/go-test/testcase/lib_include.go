@@ -4,12 +4,11 @@
  */
 package main
 
-import (
-	// "fmt"
-	// "os"
+// import (
+// 	// "fmt"
+// 	// "os"
 
-	"testcase/test_module"
-)
+// )
 
 //패키지 시작시 자동으로 호출된다.
 //순서 init 실행, 이후 main 실행.
@@ -83,23 +82,6 @@ func init() {
 // 	},
 // }
 
-//선언+ 초기화를 한번에 수행하고, 타입을 명시한다.
-//전역에서 정상동작 되어야 한다.
-var slTestModules = []TestModule {
-	//이 문법은 구조체 이다.
-	{
-		Use:  true, 
-		Desc: "기본 테스트",
-		//Run:  func() { (&test_module.JsonExample{}).Test() },
-		T: &test_module.BaseExample{},
-	},
-
-	{
-		Use:  false, 
-		Desc: "json 테스트",
-		T: &test_module.JsonExample{},
-	},
-}
 
 
 //색상 정의 - 향후 전역 define으로 이동
