@@ -904,23 +904,24 @@ function __setup_pip_venv_for_install()
 
     python -m ensurepip --default-pip
 
-    # cd ./extension/python-install
+    cd ./extension/python-install
 
     # offlinewheel
     # TODO: aivax-requirement는, 패키지 빌드 과정에서 생성
     # cp -rf requirements.최신.txt aivax-requirement.txt
-    pip install --no-index --find-links=./offline-wheel/ -r aivax-requirement.txt
+    # pip install --no-index --find-links=./offline-wheel/ -r aivax-requirement.txt
     # uv --quiet pip install --no-index --find-links=./extension/python-install/offline-wheel/ -r ./extension/python-install/aivax-requirement.txt
+    uv --quiet pip install --no-index --find-links=./offline-wheel/ -r aivax-requirement.txt
 
     # pycomlib 설치, 버전 주의.
     #uv pip install pycom* --force-reinstall
 
     #TODO: 가급적 사용하지 않는 코드로 작성
-    uv --quiet pip install ./extension/python-install/pycomlib-1.1.7-py3-none-any.whl --force-reinstall
-    uv --quiet pip install ./extension/python-install/pycomlibex-1.1.2-py3-none-any.whl --force-reinstall
-    uv --quiet pip install ./extension/python-install/pyservice-1.0.3-py3-none-any.whl --force-reinstall
+    uv --quiet pip install pycomlib-1.1.7-py3-none-any.whl --force-reinstall
+    uv --quiet pip install pycomlibex-1.1.2-py3-none-any.whl --force-reinstall
+    uv --quiet pip install pyservice-1.0.3-py3-none-any.whl --force-reinstall
     
-    # cd - > /dev/null 2>&1
+    cd - > /dev/null 2>&1
 }
 
 function __install_python()
@@ -1103,7 +1104,7 @@ function __patch_sslproxy()
     #aivx_pro.sh를 실행해 본다. TODO: 경로, 향후 변경되어야 한다.
     cd /home1/aivax/sslproxy/etc_resource
     chmod 755 aivx_pro.sh
-    echo 1 | ./aivax_pro.xh
+    echo 1 | ./aivx_pro.sh
     cd - > /dev/null
 
     WRITE_LOG $FUNCNAME $LINENO "finish patch sslproxy"
