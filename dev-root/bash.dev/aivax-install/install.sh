@@ -390,6 +390,11 @@ EOF
 
     #TODO: GRANT 다시 정리 필요
 mariadb <<EOF
+
+CREATE DATABASE IF NOT EXISTS \`${DB_NAME}\`
+    CHARACTER SET utf8mb4
+    COLLATE utf8mb4_unicode_ci;
+    
 DROP USER IF EXISTS '${DB_USER}'@'%';
 DROP USER IF EXISTS '${DB_USER}'@'localhost';
 CREATE USER IF NOT EXISTS '${DB_USER}'@'%' IDENTIFIED BY '${DB_PASS}';
