@@ -38,11 +38,26 @@ function WRITE_ERROR()
 ####################################### 기본 모듈 설치
 
 # 최초 기본 rpm 모듈 설치
-function install_default_rpm()
+function install_default_modules()
 {
     WRITE_LOG $FUNCNAME $LINENO "install default rpm"
 
     rpm -ih --quiet ./extension/rpm-install/extra-repo/dialog/dialog-1.3-32.20210117.el9.0.1.x86_64.rpm > /dev/null
+
+    #시작부터 python 설치
+    __install_python
+
+}
+
+function ui_interface()
+{
+    # 현재경로, 설치용 venv를 만들어 보자. 모듈 최소화
+    __setup_pip_venv_for_install
+
+    #dialog, python
+
+    #venv 종료
+    deactivate
 }
 
 # 기본 설정 추가
@@ -80,7 +95,8 @@ function init_default_setup()
     mkdir -p /home1/aivax/extension
     # mkdir -p /home1/aivax/temp
 
-    mkdir -p /home1/aivax/data_resource
+    #불필요 경로, 삭제        
+    mkdir -p /home1/aivax/data_resource && rm -rf /home1/aivax/data_resources
     # mkdir -p /home1/aivax/data_resource/{attach_file,opensearch}
     mkdir -p /home1/aivax/data_resource/attach_file
 
@@ -136,15 +152,15 @@ function install_module()
 
     # TODO: sniper_network, 확인 필요, 향후 자동화.
 
-    # rpm 부터 설치, repo + rpm
-    # __install_rpm_repo
-    __install_rpm_repo_v2
+    # rpm 부터 설치, repo + rpm    
+    __install_rpm_repo
 
     # rpm 설치
     # __install_rpm_modules
-    __istall_rpm_package_v2
+    __istall_rpm_package
 
-    __install_python
+    # python, 제일 먼저 설치하도록 변경
+    # __install_python
 
     __install_fluentbit
 
@@ -153,6 +169,8 @@ function install_module()
     __install_nginx
 
     __install_nodejs
+
+    __install_squid
 
     __install_opensearch
 
@@ -165,7 +183,7 @@ function install_module()
 }
 
 # rpm 저장, 변경된 구조, pseudo 코드
-function __install_rpm_repo_v2()
+function __install_rpm_repo()
 {
     WRITE_LOG $FUNCNAME $LINENO "start install rpm repo"
 
@@ -192,7 +210,10 @@ function __install_rpm_repo_v2()
     \cp -f ./extension/rpm-install/extra-repo/tesseract/*.rpm /home1/install/extension/rpm-repo/
 
     # nginx
-    \cp -f ./extension/rpm-install/extra-repo/nginx/*.rpm /home1/install/extension/rpm-repo/
+
+    # nginx 1.30으로 교체
+    # \cp -f ./extension/rpm-install/extra-repo/nginx/*.rpm /home1/install/extension/rpm-repo/
+    \cp -f ./extension/rpm-install/extra-repo/nginx/v1.30/*.rpm /home1/install/extension/rpm-repo/
 
     # mariadb
     \cp -f ./extension/rpm-install/extra-repo/perl/*.rpm /home1/install/extension/rpm-repo/
@@ -229,7 +250,7 @@ function __install_rpm_repo_v2()
 }
 
 #rpm, 한번에 설치하도록 변경, rpm은 한군데에서 최초 설치.
-function __istall_rpm_package_v2()
+function __istall_rpm_package()
 {
     WRITE_LOG $FUNCNAME $LINENO "start install rpm package"
 
@@ -249,16 +270,16 @@ function __istall_rpm_package_v2()
     #maridb 설치
     dnf install MariaDB-server MariaDB-client --disablerepo="*" --enablerepo="aivax-repo" -y -q
 
-    dnf install nginx --disablerepo="*" --enablerepo="aivax-repo" -y -q
-
     #TODO: C/C++ 개발 환경
-
     dnf install libpcap --disablerepo="*" --enablerepo="aivax-repo" -y -q
 
     # DB 설치 관련
     dnf install --disablerepo="*" --enablerepo="aivax-repo" MariaDB-server MariaDB-client -y -q 
 
     # nginx
+    #TODO: 1.20 -> 1.30 업그레이드
+    dnf remove nginx nginx-core nginx-filesystem -y -q
+
     dnf install --disablerepo="*" --enablerepo="aivax-repo" nginx -y -q
 
     # zip, unzip
@@ -400,9 +421,7 @@ EOF
 function __install_nginx()
 {
     WRITE_LOG $FUNCNAME $LINENO "start install nginx"
-
-    # yum이 설정되어, dnf로 설치한다.
-
+    
     dnf install --disablerepo="*" --enablerepo="aivax-repo" nginx -y -q
 
     # nginx config를 복사한다. TODO: 패키지의 압축을 해제하면, 필요한 몇을 제외하고는 압축되지 않는다.
@@ -430,6 +449,20 @@ function __install_nginx()
     WRITE_LOG $FUNCNAME $LINENO "finish install nginx"
 }
 
+#squid proxy, config 교체
+function __install_squid()
+{
+    WRITE_LOG $FUNCNAME $LINENO "start install squid"
+
+    cp -rf ./data-setup/squid-setup/squid.conf /etc/squid/
+
+    systemctl enable squid
+    systemctl stop squid
+    systemctl start squid #시간이 소요될수 있다.
+
+    WRITE_LOG $FUNCNAME $LINENO "finish install squid"
+}
+
 function __install_nodejs()
 {
     WRITE_LOG $FUNCNAME $LINENO "start install nodejs"
@@ -448,6 +481,7 @@ function __install_nodejs()
 
     WRITE_LOG $FUNCNAME $LINENO "finish install nodejs"
 }
+
 
 function __install_opensearch()
 {
@@ -789,21 +823,13 @@ function __update_serial_license()
 
 }
 
-function __install_python()
+function __setup_aivax_venv()
 {
-    WRITE_LOG $FUNCNAME $LINENO "start install python"
 
-    # python 복사, ldconfig
-    tar xzf ./extension/python-install/usr.tar.gz -C ./extension/python-install/
+    WRITE_LOG $FUNCNAME $LINENO "start setup aivax venv"
 
-    \cp -rf ./extension/python-install/usr/local/bin/* /usr/local/bin/
-    \cp -rf ./extension/python-install/usr/local/lib/* /usr/local/lib/
-
-    #so 업데이트
-    ldconfig
-
-    #pip, uv로 교체
-    \cp -rf ./extension/python-install/uv /usr/local/bin/
+    #TODO: python 경로는 고정으로.
+    mkdir -p /home1/aivax
 
     # venv 생성, 여기서 python 버전은 세부 config로 제어
     # python3.13 -m venv /home1/aivax/aivax-venv
@@ -852,12 +878,86 @@ fi
     # pycomlib 설치, 버전 주의.
     #uv pip install pycom* --force-reinstall
 
-    uv --quiet pip install pycomlib-1.1.6-py3-none-any.whl --force-reinstall
-    uv --quiet pip install pycomlibex-1.1.1-py3-none-any.whl --force-reinstall
-    uv --quiet pip install pyservice-1.0.2-py3-none-any.whl --force-reinstall
+    uv --quiet pip install pycomlib-1.1.7-py3-none-any.whl --force-reinstall
+    uv --quiet pip install pycomlibex-1.1.2-py3-none-any.whl --force-reinstall
+    uv --quiet pip install pyservice-1.0.3-py3-none-any.whl --force-reinstall
 
     # 이후 pipeline 이하 appserver 설치는 다음 스텝으로.
     cd - > /dev/null 2>&1
+
+    WRITE_LOG $FUNCNAME $LINENO "finish setup aivax venv"
+}
+
+# 설치용 venv 생성, pip 사전 테스트 겸용.
+function __setup_pip_venv_for_install()
+{
+    #TODO: 중복 코드는 installer에서 개선.
+    VENV="./venv"
+
+    if [ ! -d "$VENV" ]; then
+        # /usr/local/bin/uv venv --python /usr/local/bin/python3.13 --seed "$VENV"
+        /usr/local/bin/uv venv --python /usr/local/bin/python3.13 "$VENV"
+        \cp -rf /usr/local/bin/uv ${VENV}/bin/
+    fi
+
+    source ./venv/bin/activate
+
+    python -m ensurepip --default-pip
+
+    # cd ./extension/python-install
+
+    # offlinewheel
+    # TODO: aivax-requirement는, 패키지 빌드 과정에서 생성
+    # cp -rf requirements.최신.txt aivax-requirement.txt
+    # pip install --no-index --find-links=./offline-wheel/ -r aivax-requirement.txt
+    uv --quiet pip install --no-index --find-links=./offline-wheel/ -r ./extension/python-install/aivax-requirement.txt
+
+    # pycomlib 설치, 버전 주의.
+    #uv pip install pycom* --force-reinstall
+
+    #TODO: 가급적 사용하지 않는 코드로 작성
+    uv --quiet pip install ./extension/python-install/pycomlib-1.1.7-py3-none-any.whl --force-reinstall
+    uv --quiet pip install ./extension/python-install/pycomlibex-1.1.2-py3-none-any.whl --force-reinstall
+    uv --quiet pip install ./extension/python-install/pyservice-1.0.3-py3-none-any.whl --force-reinstall
+    
+    # cd - > /dev/null 2>&1
+}
+
+function __install_python()
+{
+    WRITE_LOG $FUNCNAME $LINENO "start install python"
+
+    # python 복사, ldconfig
+    # 실행 최소화
+
+    PYTHON_BIN="/usr/local/bin/python3.13"
+    PYTHON_VERSION="3.13"
+
+    # python 존재 + 버전 체크
+    if [ -x "$PYTHON_BIN" ] && "$PYTHON_BIN" --version 2>&1 | grep -q "Python ${PYTHON_VERSION}"
+    then
+        WRITE_LOG $FUNCNAME $LINENO "python ${PYTHON_VERSION} already installed"
+
+    else
+        
+        tar xzf ./extension/python-install/usr.tar.gz -C ./extension/python-install/
+
+        \cp -rf ./extension/python-install/usr/local/bin/* /usr/local/bin/
+        \cp -rf ./extension/python-install/usr/local/lib/* /usr/local/lib/
+
+        ldconfig
+    fi
+
+    # tar xzf ./extension/python-install/usr.tar.gz -C ./extension/python-install/
+
+    # \cp -rf ./extension/python-install/usr/local/bin/* /usr/local/bin/
+    # \cp -rf ./extension/python-install/usr/local/lib/* /usr/local/lib/
+
+    # #so 업데이트
+    # ldconfig
+
+    #pip, uv로 교체
+    \cp -rf ./extension/python-install/uv /usr/local/bin/
 
     WRITE_LOG $FUNCNAME $LINENO "finish install python"
 }
@@ -881,6 +981,9 @@ function build_install_slm()
 function patch_aivax_source()
 {
     WRITE_LOG $FUNCNAME $LINENO "start patch aivax source"
+
+    #pip, venv 설정
+    __setup_aivax_venv
 
     __patch_pipeline
 
@@ -995,6 +1098,13 @@ function __patch_sslproxy()
     systemctl daemon-reload
     systemctl enable aivax-sslproxy.service
     systemctl start aivax-sslproxy
+
+
+    #aivx_pro.sh를 실행해 본다. TODO: 경로, 향후 변경되어야 한다.
+    cd /home1/aivax/sslproxy/etc_resource
+    chmod 755 aivx_pro.sh
+    echo 1 | ./aivax_pro.xh
+    cd - > /dev/null
 
     WRITE_LOG $FUNCNAME $LINENO "finish patch sslproxy"
 }
@@ -1253,7 +1363,9 @@ function wait_ready_opensearch()
 function main()
 {
 
-    install_default_rpm
+    install_default_modules
+
+    ui_interface
 
     # TODO: 경로를 생성해야 한다. 경로가 제일 먼저이다.
     init_default_setup

@@ -14,6 +14,9 @@ aivax_ver=v1.0.0.0
 
 aivax_package_release_root="/data/data-root/aivax-install-root"
 
+#TODO: 환경변수로.
+git_branch="develop"
+
 # 버전정보, git의 tag에서 가져온다.
 # GIT_TAG=$(git describe --tags --abbrev=0)
 
@@ -45,19 +48,26 @@ function build_management()
 {
     WRITE_LOG $FUNCNAME $LINENO "start build management"
 
+    #TOOD: 경로, 지정된 경로.
     cd ${git_root}/aivax/apps/management
 
+    # branch 선택, 나머지는 같다.
+    git switch ${git_branch}
+
+    #불필요 파일, checkout
     git checkout frontend/package-lock.json
     git checkout backend/package-lock.json
 
     git pull
 
+    #back end
     cd backend
 
     npm i #신규 모듈이 추가되면 인터넷 다운로드
     npm run build
     npm install
 
+    # frontend
     cd ../frontend
 
     npm i #신규 모듈이 추가되면 인터넷 다운로드
@@ -66,7 +76,7 @@ function build_management()
 
     cd ${git_root}/aivax/apps
 
-    tar -czf management.tar.gz --exclude='.git' --exclude='.gitignore' management/
+    tar -czf management.tar.gz --exclude='.git' --exclude='.gitignore' --exclude='.vscode' --exclude='.cursor' management/
 
     mv management.tar.gz ${package_root}/aivax-patch/
     cd ${g_path}
@@ -78,13 +88,17 @@ function build_pipeline()
 {
     WRITE_LOG $FUNCNAME $LINENO "start build pipeline"
 
-    cd ${git_root}/pipeline
+    # cd ${git_root}/pipeline
+    cd ${git_root}/aivax/pipeline
+
+    # branch 선택, 독립적, 한번 더 수행.
+    git switch ${git_branch}
 
     git pull
 
-    cd ${git_root}
+    cd ${git_root}/aivax
 
-    tar -czf pipeline.tar.gz --exclude='.git' --exclude='.gitignore' pipeline/
+    tar -czf pipeline.tar.gz --exclude='.git' --exclude='.gitignore' --exclude='.vscode' pipeline/
 
     mv pipeline.tar.gz ${package_root}/aivax-patch/
 
@@ -110,6 +124,57 @@ function build_toolkit()
     WRITE_LOG $FUNCNAME $LINENO "finish build toolkit"
 }
 
+#sslproxy, 자동 다운로드 및 git commit
+function git_patch_sslproxy()
+{
+    WRITE_LOG $FUNCNAME $LINENO "start patch sslproxy"
+
+    scp -P222 -r root@10.0.240.150:/backup/repository
+
+#     /backup/repository ~$ tree
+# .
+# ├── ai_engine
+# │   ├── account_lookup.py
+# │   ├── adapter_registry.py
+# │   ├── adapters
+# │   │   ├── __init__.py
+# │   │   ├── adapter_template.py
+# │   │   ├── chatgpt_engine.py
+# │   │   ├── claude_engine.py
+# │   │   ├── gemini_engine.py
+# │   │   ├── grok_engine.py
+# │   │   ├── notion_engine.py
+# │   │   ├── perplexity_engine.py
+# │   │   └── wrks_engine.py
+# │   ├── ai_policy_engine.md
+# │   ├── ai_policy_engine.py
+# │   ├── ai_service_codes.py
+# │   ├── file_upload_manager.py
+# │   └── run_engine.sh
+# └── sslproxy
+
+    #이걸 어떻게 반영할지는 검토후 결정
+
+    WRITE_LOG $FUNCNAME $LINENO "finish patch sslproxy"
+}
+
+#sslproxy도 별도 git으로 관리
+function build_sslproxy()
+{
+    WRITE_LOG $FUNCNAME $LINENO "start build sslproxy"
+
+    cd ${git_root}/aivax_public/aivax-package/
+
+    git pull
+
+    tar -czf sslproxy.tar.gz --exclude='.git' --exclude='.gitignore' sslproxy/
+
+    mv sslproxy.tar.gz ${package_root}/aivax-patch/
+
+    WRITE_LOG $FUNCNAME $LINENO "start build sslproxy"
+    
+}
+
 function update_install_script()
 {
     cd ${git_root}/khan_dev/dev-root/bash.dev/aivax-install
@@ -124,21 +189,30 @@ function make_version_text_file()
     WRITE_LOG $FUNCNAME $LINENO "start make version text file"
 
     AIVAX_DIR="${git_root}/aivax"
-    PIPELINE_DIR="${git_root}/pipeline"
+
+    #TODO: engine 버전은 실제 sslproxy 데몬의 hash로.
+    # PIPELINE_DIR="${git_root}/sslproxy"
 
     AIVAX_TAG=$(git -C ${git_root}/aivax describe --tags --abbrev=0 2>/dev/null)
     AIVAX_HASH=$(git -C ${git_root}/aivax rev-parse --short HEAD 2>/dev/null)
+
+    #sslproxy hash
+    ENGINE_FILE="${git_root}/aivax_public/aivax-package/sslproxy/sslproxy"
+
+    FILE_HASH=$(sha256sum "$ENGINE_FILE" | awk '{print $1}')
+    ENGINE_HASH_SHORT=${FILE_HASH:0:7}
 
     #AIVAX VERSION
     AIVAX_TITLE_VERSION=${AIVAX_TAG//_/ }
 
     # PIPELINE_TAG=$(git -C "$PIPELINE_DIR" describe --tags --abbrev=0 2>/dev/null)
-    PIPELINE_HASH=$(git -C "$PIPELINE_DIR" rev-parse --short HEAD 2>/dev/null)
+    # PIPELINE_HASH=$(git -C "$PIPELINE_DIR" rev-parse --short HEAD 2>/dev/null)
 
     WRITE_LOG $FUNCNAME $LINENO "TITLE VERSION = ${AIVAX_TITLE_VERSION}"
 
     WRITE_LOG $FUNCNAME $LINENO "AIVAX HASH = ${AIVAX_HASH}"
-    WRITE_LOG $FUNCNAME $LINENO "ENGINE HASH = ${PIPELINE_HASH}"
+    # WRITE_LOG $FUNCNAME $LINENO "ENGINE HASH = ${PIPELINE_HASH}"
+    WRITE_LOG $FUNCNAME $LINENO "ENGINE HASH = ${ENGINE_HASH_SHORT}"
 
     # echo "AIVAX    : ${AIVAX_TAG} ${AIVAX_HASH}"
     # echo "PIPELINE : ${PIPELINE_TAG}-${PIPELINE_HASH}"
@@ -153,7 +227,7 @@ function make_version_text_file()
 cat > "$VERSION_FILE" <<EOF
 ${AIVAX_TITLE_VERSION}
 ${AIVAX_HASH}
-${PIPELINE_HASH}
+${ENGINE_HASH_SHORT}
 EOF
 
     WRITE_LOG $FUNCNAME $LINENO "finish make version text file"
@@ -225,6 +299,10 @@ function main()
 
     build_toolkit
 
+    git_patch_sslproxy
+    build_sslproxy
+
+    # 설치 스크립트, 향후 변경
     update_install_script
 
     #버전 파일 생성
