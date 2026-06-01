@@ -133,6 +133,17 @@ function git_patch_sslproxy()
 
     scp -P222 -r root@10.0.240.150:/backup/repository ${git_root}/aivax_public/aivax-package/sslproxy_temp_repo/
 
+    cp -rfv ${git_root}/aivax_public/aivax-package/sslproxy_temp_repo/repository/* ${git_root}/aivax_public/aivax-package/sslproxy/
+
+    cd ${git_root}/aivax_public/aivax-package/sslproxy/
+    git add ${git_root}/aivax_public/aivax-package/sslproxy/
+
+    git commit -m "sslproxy git update $(date +%Y-%m-%d)"
+
+    git push 
+
+    cd -
+
 #     /backup/repository ~$ tree
 # .
 # ├── ai_engine
