@@ -138,7 +138,7 @@ function git_patch_sslproxy()
     cd ${git_root}/aivax_public/aivax-package/sslproxy/
     git add ${git_root}/aivax_public/aivax-package/sslproxy/
 
-    git commit -m "sslproxy git update $(date +%Y-%m-%d)"
+    git commit -m "sslproxy git update $(date '+%Y-%m-%d %H:%M:%S')"
 
     git push 
 
