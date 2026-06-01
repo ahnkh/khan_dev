@@ -129,7 +129,9 @@ function git_patch_sslproxy()
 {
     WRITE_LOG $FUNCNAME $LINENO "start patch sslproxy"
 
-    scp -P222 -r root@10.0.240.150:/backup/repository
+    mkdir -p ${git_root}/aivax_public/aivax-package/sslproxy_temp_repo
+
+    scp -P222 -r root@10.0.240.150:/backup/repository ${git_root}/aivax_public/aivax-package/sslproxy_temp_repo/
 
 #     /backup/repository ~$ tree
 # .
