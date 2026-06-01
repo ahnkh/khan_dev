@@ -909,8 +909,8 @@ function __setup_pip_venv_for_install()
     # offlinewheel
     # TODO: aivax-requirement는, 패키지 빌드 과정에서 생성
     # cp -rf requirements.최신.txt aivax-requirement.txt
-    # pip install --no-index --find-links=./offline-wheel/ -r aivax-requirement.txt
-    uv --quiet pip install --no-index --find-links=./offline-wheel/ -r ./extension/python-install/aivax-requirement.txt
+    pip install --no-index --find-links=./offline-wheel/ -r aivax-requirement.txt
+    # uv --quiet pip install --no-index --find-links=./extension/python-install/offline-wheel/ -r ./extension/python-install/aivax-requirement.txt
 
     # pycomlib 설치, 버전 주의.
     #uv pip install pycom* --force-reinstall
