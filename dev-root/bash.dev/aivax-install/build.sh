@@ -133,12 +133,19 @@ function git_patch_sslproxy()
 
     scp -P222 -r root@10.0.240.150:/backup/repository ${git_root}/aivax_public/aivax-package/sslproxy_temp_repo/
 
-    cp -rfv ${git_root}/aivax_public/aivax-package/sslproxy_temp_repo/repository/* ${git_root}/aivax_public/aivax-package/sslproxy/
+    #TODO: 하나씩 이동, sslproxy
+    # cp -rfv ${git_root}/aivax_public/aivax-package/sslproxy_temp_repo/repository/* ${git_root}/aivax_public/aivax-package/sslproxy/
+    cp -rfv ${git_root}/aivax_public/aivax-package/sslproxy_temp_repo/repository/sslproxy ${git_root}/aivax_public/aivax-package/sslproxy/
 
-    cd ${git_root}/aivax_public/aivax-package/sslproxy/
+    # python 모듈 이동, ai_engine
+    cp -rfv ${git_root}/aivax_public/aivax-package/sslproxy_temp_repo/repository/ai_engine/* ${git_root}/aivax_public/aivax-package/ai_engine/
+
+    cd ${git_root}/aivax_public/
     git add ${git_root}/aivax_public/aivax-package/sslproxy/
+    git commit -m "sslproxy update $(date '+%Y-%m-%d %H:%M:%S')"
 
-    git commit -m "sslproxy git update $(date '+%Y-%m-%d %H:%M:%S')"
+    git add ${git_root}/aivax_public/aivax-package/ai_engine/
+    git commit -m "ai_engine update $(date '+%Y-%m-%d %H:%M:%S')"
 
     git push 
 
@@ -184,8 +191,21 @@ function build_sslproxy()
 
     mv sslproxy.tar.gz ${package_root}/aivax-patch/
 
-    WRITE_LOG $FUNCNAME $LINENO "start build sslproxy"
+    WRITE_LOG $FUNCNAME $LINENO "finish build sslproxy"
     
+}
+
+function build_ai_engine()
+{
+    WRITE_LOG $FUNCNAME $LINENO "start build ai_engine"
+
+    git pull
+
+    tar -czf ai_engine.tar.gz --exclude='.git' --exclude='.gitignore' ai_engine/
+
+    mv ai_engine.tar.gz ${package_root}/aivax-patch/
+
+    WRITE_LOG $FUNCNAME $LINENO "finish build ai_engine"
 }
 
 function update_install_script()
@@ -313,7 +333,9 @@ function main()
     build_toolkit
 
     git_patch_sslproxy
+
     build_sslproxy
+    build_ai_engine
 
     # 설치 스크립트, 향후 변경
     update_install_script
