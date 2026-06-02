@@ -42,7 +42,7 @@ function install_default_modules()
 {
     WRITE_LOG $FUNCNAME $LINENO "install default rpm"
 
-    rpm -ih --quiet ./extension/rpm-install/extra-repo/dialog/dialog-1.3-32.20210117.el9.0.1.x86_64.rpm > /dev/null
+    rpm -ih --quiet ./extension/rpm-install/extra-repo/dialog/dialog-1.3-32.20210117.el9.0.1.x86_64.rpm > /dev/null 2>&1
 
     #시작부터 python 설치
     __install_python
@@ -204,7 +204,8 @@ function __install_rpm_repo()
     \cp -f ./extension/rpm-install/base-repo/*.rpm /home1/install/extension/rpm-repo/
 
     # libreoffice
-    \cp -f ./extension/rpm-install/extra-repo/libreoffice-headless/*.rpm /home1/install/extension/rpm-repo/
+    # \cp -f ./extension/rpm-install/extra-repo/libreoffice-headless/*.rpm /home1/install/extension/rpm-repo/
+    \cp -f ./extension/rpm-install/extra-repo/libreoffice-full/*.rpm /home1/install/extension/rpm-repo/
 
     # tesseract, ocr
     \cp -f ./extension/rpm-install/extra-repo/tesseract/*.rpm /home1/install/extension/rpm-repo/
@@ -261,7 +262,8 @@ function __istall_rpm_package()
     # dnf install sqlite --disablerepo="*" --enablerepo="aivax-repo" -y -q
 
     # file 추출, OCR 관련
-    dnf install libreoffice-headless --disablerepo="*" --enablerepo="aivax-repo" -y -q
+    # dnf install libreoffice-headless --disablerepo="*" --enablerepo="aivax-repo" -y -q
+    dnf install libreoffice --disablerepo="*" --enablerepo="aivax-repo" -y -q
 
     dnf install tesseract --disablerepo="*" --enablerepo="aivax-repo" -y -q 
 
@@ -394,7 +396,7 @@ mariadb <<EOF
 CREATE DATABASE IF NOT EXISTS \`${DB_NAME}\`
     CHARACTER SET utf8mb4
     COLLATE utf8mb4_unicode_ci;
-    
+
 DROP USER IF EXISTS '${DB_USER}'@'%';
 DROP USER IF EXISTS '${DB_USER}'@'localhost';
 CREATE USER IF NOT EXISTS '${DB_USER}'@'%' IDENTIFIED BY '${DB_PASS}';
@@ -901,13 +903,13 @@ function __setup_pip_venv_for_install()
 
     if [ ! -d "$VENV" ]; then
         # /usr/local/bin/uv venv --python /usr/local/bin/python3.13 --seed "$VENV"
-        /usr/local/bin/uv venv --python /usr/local/bin/python3.13 "$VENV"
+        /usr/local/bin/uv -qq venv --python /usr/local/bin/python3.13 "$VENV" > /dev/null 2>&1
         \cp -rf /usr/local/bin/uv ${VENV}/bin/
     fi
 
     source ./venv/bin/activate
 
-    python -m ensurepip --default-pip
+    python -m ensurepip --default-pip > /dev/null 2>&1
 
     cd ./extension/python-install
 
@@ -1107,10 +1109,12 @@ function __patch_sslproxy()
 
 
     #aivx_pro.sh를 실행해 본다. TODO: 경로, 향후 변경되어야 한다.
-    cd /home1/aivax/sslproxy/etc_resource
-    chmod 755 aivx_pro.sh
-    echo 1 | ./aivx_pro.sh
-    cd - > /dev/null
+    # 잠시 주석 처리
+    # cd /home1/aivax/sslproxy/etc_resource
+    # chmod 755 aivx_pro.sh
+    # echo 1 | ./aivx_pro.sh
+
+    # cd - > /dev/null
 
     WRITE_LOG $FUNCNAME $LINENO "finish patch sslproxy"
 }
