@@ -40,7 +40,7 @@ function WRITE_ERROR()
 # 최초 기본 rpm 모듈 설치
 function install_default_modules()
 {
-    WRITE_LOG $FUNCNAME $LINENO "install default rpm"
+    # WRITE_LOG $FUNCNAME $LINENO "install default rpm"
 
     rpm -ih --quiet ./extension/rpm-install/extra-repo/dialog/dialog-1.3-32.20210117.el9.0.1.x86_64.rpm > /dev/null 2>&1
 
@@ -903,6 +903,7 @@ fi
     uv --quiet pip install pycomlib-1.1.7-py3-none-any.whl --force-reinstall
     uv --quiet pip install pycomlibex-1.1.2-py3-none-any.whl --force-reinstall
     uv --quiet pip install pyservice-1.0.3-py3-none-any.whl --force-reinstall
+    uv --quiet pip install pytoolkit-1.0.0-py3-none-any.whl --force-reinstall
 
     # 이후 pipeline 이하 appserver 설치는 다음 스텝으로.
     cd - > /dev/null 2>&1
@@ -942,6 +943,7 @@ function __setup_pip_venv_for_install()
     uv --quiet pip install pycomlib-1.1.7-py3-none-any.whl --force-reinstall
     uv --quiet pip install pycomlibex-1.1.2-py3-none-any.whl --force-reinstall
     uv --quiet pip install pyservice-1.0.3-py3-none-any.whl --force-reinstall
+    uv --quiet pip install pytoolkit-1.0.0-py3-none-any.whl --force-reinstall
     
     cd - > /dev/null 2>&1
 }
