@@ -56,6 +56,15 @@ function ui_interface()
 
     #dialog, python, service module wrapper
 
+    rm -rf .pyinstall
+    mkdir -p .pyinstall
+    tar xzf ./aivax-patch/toolkit.tar.gz -C .pyinstall
+
+    cd .pyinstall/toolkit
+
+    # 테스트.
+    python aivax_toolkit.py --debug --printlog --dummy
+
     #venv 종료
     deactivate
 }
@@ -948,8 +957,8 @@ function __install_python()
     # python 존재 + 버전 체크
     if [ -x "$PYTHON_BIN" ] && "$PYTHON_BIN" --version 2>&1 | grep -q "Python ${PYTHON_VERSION}"
     then
+        #로그 미출력 => 향후 로그로 남긴다.
         WRITE_LOG $FUNCNAME $LINENO "python ${PYTHON_VERSION} already installed"
-
     else
         
         tar xzf ./extension/python-install/usr.tar.gz -C ./extension/python-install/

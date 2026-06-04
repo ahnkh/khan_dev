@@ -15,15 +15,13 @@ aivax_ver=v1.0.0.0
 aivax_package_release_root="/data/data-root/aivax-install-root"
 
 #TODO: 환경변수로.
-git_branch="develop"
+# git_branch="develop"
+git_branch="qa_release"
 
 # 버전정보, git의 tag에서 가져온다.
 # GIT_TAG=$(git describe --tags --abbrev=0)
-
 # DISPLAY_VERSION=${GIT_TAG//_/ }
-
 # echo "$DISPLAY_VERSION"
-
 # AIVAX_VERSION="SNIPER AIVAX V1.0.0.0"
 
 function WRITE_LOG()
