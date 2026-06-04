@@ -63,7 +63,9 @@ function ui_interface()
     cd .pyinstall/toolkit
 
     # 테스트.
-    python aivax_toolkit.py --debug --printlog --dummy
+    # python aivax_toolkit.py --debug --printlog --dummy
+
+    cd - > /dev/null 2>&1
 
     #venv 종료
     deactivate
