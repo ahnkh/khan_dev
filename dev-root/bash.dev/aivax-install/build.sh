@@ -138,6 +138,8 @@ function git_patch_sslproxy()
     cp -rfv ${git_root}/aivax_public/aivax-package/sslproxy_temp_repo/repository/sslproxy ${git_root}/aivax_public/aivax-package/sslproxy/
 
     # python 모듈 이동, ai_engine
+    # __pycache__는 지워야 한다.
+    find ${git_root}/aivax_public/aivax-package/sslproxy_temp_repo/repository/ai_engine | grep __pycache__ | xargs -i rm -rf {}
     cp -rfv ${git_root}/aivax_public/aivax-package/sslproxy_temp_repo/repository/ai_engine/* ${git_root}/aivax_public/aivax-package/ai_engine/
 
     cd ${git_root}/aivax_public/
