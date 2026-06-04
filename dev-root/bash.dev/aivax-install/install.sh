@@ -54,7 +54,7 @@ function ui_interface()
     # 현재경로, 설치용 venv를 만들어 보자. 모듈 최소화
     __setup_pip_venv_for_install
 
-    #dialog, python
+    #dialog, python, service module wrapper
 
     #venv 종료
     deactivate
@@ -138,7 +138,11 @@ function init_default_setup()
     # dnf 위치는 기본 /usr/bin/dnf
     # dnf 이슈, 상세 처리는 installer에서.
 
+    # dnf설정, 향후 installer에서 옵션화
     chmod 755 /usr/bin/dnf
+
+    # timezone 설정, 향후 installer에서 옵션화
+    sudo ln -sf /usr/share/zoneinfo/Asia/Seoul /etc/localtime
 
     WRITE_LOG $FUNCNAME $LINENO "finish init default setup"
 }
