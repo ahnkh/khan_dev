@@ -40,6 +40,26 @@ function WRITE_LOG()
     echo $string &>> ${g_path}/${TRACE_LOG}
 }
 
+#git merge, 이건 보면서 하자.
+function merge_git()
+{
+    WRITE_LOG $FUNCNAME $LINENO "start merge git"
+
+    cd ${git_root}/aivax/apps/
+
+    git switch ${git_branch}
+
+    git pull
+
+    git merge origin/develop
+
+    git push
+
+    cd ${g_path}
+
+    WRITE_LOG $FUNCNAME $LINENO "finish merge git"
+}
+
 # management build, 이동
 # TODO: 경로등에 대해서는 installer, aivax-builder에서 개선
 function build_management()
@@ -351,6 +371,8 @@ function release_package()
 function main()
 {
     WRITE_LOG $FUNCNAME $LINENO "start aivax build"
+
+    merge_git
 
     build_management
 

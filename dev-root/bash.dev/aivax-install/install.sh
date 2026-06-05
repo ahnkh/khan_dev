@@ -67,6 +67,8 @@ function ui_interface()
 
     cd - > /dev/null 2>&1
 
+    rm -rf .pyinstall
+
     #venv 종료
     deactivate
 }
