@@ -900,10 +900,10 @@ fi
     # pycomlib 설치, 버전 주의.
     #uv pip install pycom* --force-reinstall
 
-    uv --quiet pip install pycomlib-1.1.7-py3-none-any.whl --force-reinstall
-    uv --quiet pip install pycomlibex-1.1.2-py3-none-any.whl --force-reinstall
-    uv --quiet pip install pyservice-1.0.3-py3-none-any.whl --force-reinstall
-    uv --quiet pip install pytoolkit-1.0.0-py3-none-any.whl --force-reinstall
+    uv --quiet pip install ./offline-wheel/pycomlib-1.1.7-py3-none-any.whl --force-reinstall
+    uv --quiet pip install ./offline-wheel/pycomlibex-1.1.2-py3-none-any.whl --force-reinstall
+    uv --quiet pip install ./offline-wheel/pyservice-1.0.3-py3-none-any.whl --force-reinstall
+    uv --quiet pip install ./offline-wheel/pytoolkit-1.0.0-py3-none-any.whl --force-reinstall
 
     # 이후 pipeline 이하 appserver 설치는 다음 스텝으로.
     cd - > /dev/null 2>&1
@@ -940,10 +940,10 @@ function __setup_pip_venv_for_install()
     #uv pip install pycom* --force-reinstall
 
     #TODO: 가급적 사용하지 않는 코드로 작성
-    uv --quiet pip install pycomlib-1.1.7-py3-none-any.whl --force-reinstall
-    uv --quiet pip install pycomlibex-1.1.2-py3-none-any.whl --force-reinstall
-    uv --quiet pip install pyservice-1.0.3-py3-none-any.whl --force-reinstall
-    uv --quiet pip install pytoolkit-1.0.0-py3-none-any.whl --force-reinstall
+    uv --quiet pip install ./offline-wheel/pycomlib-1.1.7-py3-none-any.whl --force-reinstall
+    uv --quiet pip install ./offline-wheel/pycomlibex-1.1.2-py3-none-any.whl --force-reinstall
+    uv --quiet pip install ./offline-wheel/pyservice-1.0.3-py3-none-any.whl --force-reinstall
+    uv --quiet pip install ./offline-wheel/pytoolkit-1.0.0-py3-none-any.whl --force-reinstall
     
     cd - > /dev/null 2>&1
 }

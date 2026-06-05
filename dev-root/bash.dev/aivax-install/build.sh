@@ -210,9 +210,35 @@ function build_ai_engine()
 
 function update_install_script()
 {
+    WRITE_LOG $FUNCNAME $LINENO "start update install script"
+
     cd ${git_root}/khan_dev/dev-root/bash.dev/aivax-install
 
     cp -rfv install.sh ${package_root}/
+
+    WRITE_LOG $FUNCNAME $LINENO "finish update install script"
+}
+
+function update_pycomlib()
+{
+
+    WRITE_LOG $FUNCNAME $LINENO "start update pycom lib"
+
+    # git_root=/data/git-root
+    # package_root=/data/data-root/aivax-install-root/aivax-install
+
+    cd ${git_root}/khan.pythonscript/
+    svn update --username khan --password '1111' --non-interactive
+
+    cp -rfv ${git_root}/khan.pythonscript/python-build-tempdir/build_ouput/pycomlib-1.1.7-py3-none-any.whl ${package_root}/extension/python-install/offline-wheel/
+    cp -rfv ${git_root}/khan.pythonscript/python-build-tempdir/build_ouput/pycomlibex-1.1.2-py3-none-any.whl ${package_root}/extension/python-install/offline-wheel/
+
+    cp -rfv ${git_root}/khan.pythonscript/python-build-tempdir/build_ouput/pyservice-1.0.3-py3-none-any.whl ${package_root}/extension/python-install/offline-wheel/
+    cp -rfv ${git_root}/khan.pythonscript/python-build-tempdir/build_ouput/pytoolkit-1.0.0-py3-none-any.whl ${package_root}/extension/python-install/offline-wheel/
+
+    cd -
+
+    WRITE_LOG $FUNCNAME $LINENO "finish update pycom lib"
 }
 
 #version 파일 생성
@@ -339,6 +365,9 @@ function main()
 
     # 설치 스크립트, 향후 변경
     update_install_script
+
+    #pycomlib 업데이트
+    update_pycomlib
 
     #버전 파일 생성
     make_version_text_file
