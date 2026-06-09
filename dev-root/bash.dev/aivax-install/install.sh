@@ -291,7 +291,7 @@ function __istall_rpm_package()
 
     # file 추출, OCR 관련
     # dnf install libreoffice-headless --disablerepo="*" --enablerepo="aivax-repo" -y -q
-    dnf install libreoffice --disablerepo="*" --enablerepo="aivax-repo" -y -q
+    dnf install libreoffice* --disablerepo="*" --enablerepo="aivax-repo" -y -q
 
     dnf install tesseract --disablerepo="*" --enablerepo="aivax-repo" -y -q 
 
