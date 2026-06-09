@@ -51,6 +51,7 @@ function merge_git()
 
     git pull
 
+    # git merge origin/develop --no-edit
     git merge origin/develop
 
     git push
@@ -153,12 +154,13 @@ function git_patch_sslproxy()
 
     #TODO: 하나씩 이동, sslproxy
     # cp -rfv ${git_root}/aivax_public/aivax-package/sslproxy_temp_repo/repository/* ${git_root}/aivax_public/aivax-package/sslproxy/
-    cp -rfv ${git_root}/aivax_public/aivax-package/sslproxy_temp_repo/repository/sslproxy ${git_root}/aivax_public/aivax-package/sslproxy/
+    \cp -rfv ${git_root}/aivax_public/aivax-package/sslproxy_temp_repo/repository/sslproxy ${git_root}/aivax_public/aivax-package/sslproxy/
+    \cp -rfv ${git_root}/aivax_public/aivax-package/sslproxy_temp_repo/repository/Note.md ${git_root}/aivax_public/aivax-package/sslproxy/.note.md
 
     # python 모듈 이동, ai_engine
     # __pycache__는 지워야 한다.
     find ${git_root}/aivax_public/aivax-package/sslproxy_temp_repo/repository/ai_engine | grep __pycache__ | xargs -i rm -rf {}
-    cp -rfv ${git_root}/aivax_public/aivax-package/sslproxy_temp_repo/repository/ai_engine/* ${git_root}/aivax_public/aivax-package/ai_engine/
+    \cp -rfv ${git_root}/aivax_public/aivax-package/sslproxy_temp_repo/repository/ai_engine/* ${git_root}/aivax_public/aivax-package/ai_engine/
 
     cd ${git_root}/aivax_public/
     git add ${git_root}/aivax_public/aivax-package/sslproxy/

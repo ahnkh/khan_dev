@@ -208,6 +208,17 @@ function __install_rpm_repo()
 
     # aivax.repo, 비활성화된 rpm
 
+    #repos.d에서 파일을 삭제한다.
+    # if [ -d /etc/yum.repos.d_bak ]
+    # then
+    #     rm -rf /etc/yum.repos.d_bak
+    # fi
+    rm -rf /etc/yum.repos.d_bak
+    \cp -rf /etc/yum.repos.d /etc/yum.repos.d_bak
+
+    # 오프라인 환경 대비, aivax외 repo는 삭제한다.
+    rm -rf /etc/yum.repos.d/rocky*.repo
+
     #TODO: repo 경로는 고정이다. /home1/install
     \cp -f ./extension/rpm-install/aivax.repo /etc/yum.repos.d/
 
