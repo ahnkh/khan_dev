@@ -215,7 +215,9 @@ function __install_rpm_repo()
     # fi
     # rm -rf /etc/yum.repos.d_bak
     mkdir -p /etc/yum.repos.d_bak
-    \cp -rf /etc/yum.repos.d/* /etc/yum.repos.d_bak
+    mkdir -p /etc/yum.repos.d
+    
+    \cp -rf /etc/yum.repos.d/* /etc/yum.repos.d_bak/
 
     # 오프라인 환경 대비, aivax외 repo는 삭제한다.
     rm -rf /etc/yum.repos.d/*.repo
