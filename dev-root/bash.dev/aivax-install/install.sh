@@ -67,11 +67,8 @@ function ui_interface()
 
     cd - > /dev/null 2>&1
 
-    rm -rf .pyinstall
-
-    #venv 종료
-    deactivate
 }
+
 
 # 기본 설정 추가
 function init_default_setup()
@@ -849,9 +846,55 @@ function __update_serial_license()
     SERIAL_FILE="./SKRX4CWIS241299.crt"
 
     VERSION_DEFAULT_PATH=$(realpath "${g_path}/.version")
-    SERIAL_FILE_PATH=$(realpath "${g_path}/./SKRX4CWIS241299.crt")
+    SERIAL_FILE_PATH=$(realpath "${g_path}/.SKRX4CWIS241299.crt")
 
-    python version.py ${SERIAL_KEY} ${LICENSE_KEY} ${SERIAL_FILE}
+    json=$(jq -n \
+        --argjson method "$method" \
+        --arg ext_module "$ext_module" \
+        --arg cmd_category "$cmd_category" \
+        --arg command "$command" \
+        --arg detail_cmd "$detail_cmd" \
+        --arg serial_key "$SERIAL_KEY" \
+        --arg license_key "$LICENSE_KEY" \
+        --arg serial_file "$SERIAL_FILE_PATH" \
+        --arg version_default_file "$VERSION_DEFAULT_PATH" \
+        '{
+            method:$method, 
+            ext_module:$ext_module,
+            cmd_category: $cmd_category,
+            command: $command,
+            detail_cmd: $detail_cmd,
+            serial_key: $SERIAL_KEY,
+            license_key: $LICENSE_KEY,
+            serial_file: $SERIAL_FILE_PATH,
+            version_default_file: $VERSION_DEFAULT_PATH
+        }')
+
+    # cd .pyinstall/toolkit
+
+    # json=$(jq -n \
+    # --argjson  method "[\"manage_wins_modules\"]" \
+    # --arg ext_module "manage_aivax_install" \
+    # --arg cmd_category "aivax_install" \
+    # --arg command "aivax_install_util_module" \
+    # --arg detail_cmd "generate_version" \
+
+    # --arg detail_cmd "generate_version" \
+    # --arg detail_cmd "generate_version" \
+    # --arg detail_cmd "generate_version" \
+    # --arg detail_cmd "generate_version" \
+
+    # --argjson port "$PORT" \
+    # '{method:$name, ext_module:$port, cmd_category:}')
+
+    # # 테스트.
+    python aivax_toolkit.py --printlog --script_config "${json}"
+
+    # python version.py ${SERIAL_KEY} ${LICENSE_KEY} ${SERIAL_FILE}
+
+    cd - > /dev/null 2>&1
+
+    # rm -rf .pyinstall
 
     # 라이선스 업로드 명령, management UI에 요청한다.
     # .ctr 파일, 복사 기능 필요, 일단 /tmp로 복사한다.
@@ -954,6 +997,8 @@ function __setup_pip_venv_for_install()
     # cp -rf requirements.최신.txt aivax-requirement.txt
     # pip install --no-index --find-links=./offline-wheel/ -r aivax-requirement.txt
     # uv --quiet pip install --no-index --find-links=./extension/python-install/offline-wheel/ -r ./extension/python-install/aivax-requirement.txt
+
+    uv cache clean -q
     uv --quiet pip install --no-index --find-links=./offline-wheel/ -r aivax-requirement.txt
 
     # pycomlib 설치, 버전 주의.
@@ -1405,6 +1450,16 @@ function wait_ready_opensearch()
     return 1
 }
 
+function clear_install_resource()
+{
+
+    # cd .pyinstall/toolkit
+    rm -rf .pyinstall
+
+    #venv 종료
+    deactivate
+}
+
 ####################################### main, 실행
 
 function main()
@@ -1434,6 +1489,11 @@ function main()
 
     # 시작후 부가작업 (opensearch 외)
     configure_after_install
+
+    # 최종 자원 정리
+    clear_install_resource
+
+    
 
 }
 
