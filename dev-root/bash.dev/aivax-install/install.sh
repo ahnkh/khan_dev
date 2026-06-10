@@ -839,14 +839,21 @@ function __update_serial_license()
     \cp -rf ./data-setup/license/multi_licenses_crypt /usr/local/bin/
     \cp -rf ./data-setup/license/license_key_v2 /usr/local/bin/
 
+
+    method='["manage_wins_modules"]'
+    ext_module="manage_aivax_install"
+    cmd_category="aivax_install"
+    command="aivax_install_util_module"
+    detail_cmd="generate_version"
+
     # 버전 파일 실행, system python으로 수행되어야 한다.
     # license 정보, 우선 경로 파일을 읽거나, 기본값으로 할당한다.
-    SERIAL_KEY="SKRX4CWIS241299"
-    LICENSE_KEY="af38d40897b5c174"
-    SERIAL_FILE="./SKRX4CWIS241299.crt"
+    serial_key="SKRX4CWIS241299"
+    license_key="af38d40897b5c174"
+    # SERIAL_FILE="./SKRX4CWIS241299.crt"
 
-    VERSION_DEFAULT_PATH=$(realpath "${g_path}/.version")
-    SERIAL_FILE_PATH=$(realpath "${g_path}/.SKRX4CWIS241299.crt")
+    version_default_file=$(realpath "${g_path}/.version")
+    serial_file=$(realpath "${g_path}/.SKRX4CWIS241299.crt")
 
     json=$(jq -n \
         --argjson method "$method" \
@@ -854,23 +861,23 @@ function __update_serial_license()
         --arg cmd_category "$cmd_category" \
         --arg command "$command" \
         --arg detail_cmd "$detail_cmd" \
-        --arg serial_key "$SERIAL_KEY" \
-        --arg license_key "$LICENSE_KEY" \
-        --arg serial_file "$SERIAL_FILE_PATH" \
-        --arg version_default_file "$VERSION_DEFAULT_PATH" \
+        --arg serial_key "$serial_key" \
+        --arg license_key "$license_key" \
+        --arg serial_file "$serial_file" \
+        --arg version_default_file "$version_default_file" \
         '{
             method:$method, 
             ext_module:$ext_module,
             cmd_category: $cmd_category,
             command: $command,
             detail_cmd: $detail_cmd,
-            serial_key: $SERIAL_KEY,
-            license_key: $LICENSE_KEY,
-            serial_file: $SERIAL_FILE_PATH,
-            version_default_file: $VERSION_DEFAULT_PATH
+            serial_key: $serial_key,
+            license_key: $license_key,
+            serial_file: $serial_file,
+            version_default_file: $version_default_file
         }')
 
-    # cd .pyinstall/toolkit
+    
 
     # json=$(jq -n \
     # --argjson  method "[\"manage_wins_modules\"]" \
@@ -887,6 +894,7 @@ function __update_serial_license()
     # --argjson port "$PORT" \
     # '{method:$name, ext_module:$port, cmd_category:}')
 
+    cd .pyinstall/toolkit
     # # 테스트.
     python aivax_toolkit.py --printlog --script_config "${json}"
 
@@ -1490,10 +1498,8 @@ function main()
     # 시작후 부가작업 (opensearch 외)
     configure_after_install
 
-    # 최종 자원 정리
-    clear_install_resource
-
-    
+    # 최종 자원 정리, 우선 제외
+    # clear_install_resource
 
 }
 
