@@ -216,7 +216,7 @@ function __install_rpm_repo()
     # rm -rf /etc/yum.repos.d_bak
     mkdir -p /etc/yum.repos.d_bak
     mkdir -p /etc/yum.repos.d
-    
+
     \cp -rf /etc/yum.repos.d/* /etc/yum.repos.d_bak/
 
     # 오프라인 환경 대비, aivax외 repo는 삭제한다.
@@ -847,6 +847,10 @@ function __update_serial_license()
     SERIAL_KEY="SKRX4CWIS241299"
     LICENSE_KEY="af38d40897b5c174"
     SERIAL_FILE="./SKRX4CWIS241299.crt"
+
+    VERSION_DEFAULT_PATH=$(realpath "${g_path}/.version")
+    SERIAL_FILE_PATH=$(realpath "${g_path}/./SKRX4CWIS241299.crt")
+
     python version.py ${SERIAL_KEY} ${LICENSE_KEY} ${SERIAL_FILE}
 
     # 라이선스 업로드 명령, management UI에 요청한다.
