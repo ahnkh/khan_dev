@@ -839,7 +839,6 @@ function __update_serial_license()
     \cp -rf ./data-setup/license/multi_licenses_crypt /usr/local/bin/
     \cp -rf ./data-setup/license/license_key_v2 /usr/local/bin/
 
-
     method='["manage_wins_modules"]'
     ext_module="manage_aivax_install"
     cmd_category="aivax_install"
@@ -850,7 +849,7 @@ function __update_serial_license()
     # license 정보, 우선 경로 파일을 읽거나, 기본값으로 할당한다.
     serial_key="SKRX4CWIS241299"
     license_key="af38d40897b5c174"
-    SERIAL_FILE="./SKRX4CWIS241299.crt"
+    # SERIAL_FILE="./SKRX4CWIS241299.crt"
 
     version_default_file=$(realpath "${g_path}/.version")
     serial_file=$(realpath "${g_path}/SKRX4CWIS241299.crt")
@@ -877,28 +876,13 @@ function __update_serial_license()
             version_default_file: $version_default_file
         }')
 
-    # json=$(jq -n \
-    # --argjson  method "[\"manage_wins_modules\"]" \
-    # --arg ext_module "manage_aivax_install" \
-    # --arg cmd_category "aivax_install" \
-    # --arg command "aivax_install_util_module" \
-    # --arg detail_cmd "generate_version" \
-
-    # --arg detail_cmd "generate_version" \
-    # --arg detail_cmd "generate_version" \
-    # --arg detail_cmd "generate_version" \
-    # --arg detail_cmd "generate_version" \
-
-    # --argjson port "$PORT" \
-    # '{method:$name, ext_module:$port, cmd_category:}')
-
     # echo "${json}"
 
-    # cd .pyinstall/toolkit    
-    # python aivax_toolkit.py --debug --printlog --script_config "${json}"
-    # cd - > /dev/null 2>&1
+    cd .pyinstall/toolkit    
+    python aivax_toolkit.py --debug --printlog --script_config "${json}"
+    cd - > /dev/null 2>&1
 
-    python version.py ${serial_key} ${license_key} ${SERIAL_FILE}
+    # python version.py ${serial_key} ${license_key} ${SERIAL_FILE}
 
     # rm -rf .pyinstall
 
