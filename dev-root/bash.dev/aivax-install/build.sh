@@ -236,6 +236,12 @@ function update_toolkit_whl_module()
 
     # ${git_root}/khan.pythonscript/python-build-tempdir/build_ouput/
 
+    # svn 업데이트, svn commit 보다는 신규 생성쪽으로
+    mkdir -p ${git_root}/khan.pythonscript/python-build-tempdir/toolkit_build/
+
+    cd ${git_root}/khan.pythonscript/python-build-tempdir/toolkit_build/
+    svn update --username khan --password '1111' --non-interactive
+
     # python temp dir 경로의 whl 정리
     rm -rfv ${git_root}/khan.pythonscript/python-build-tempdir/toolkit_build/util_modules/operation_util_manage_modules
     rm -rfv ${git_root}/khan.pythonscript/python-build-tempdir/toolkit_build/util_modules/wins_manage_modules
@@ -243,14 +249,16 @@ function update_toolkit_whl_module()
     rm -rfv ${git_root}/khan.pythonscript/python-build-tempdir/toolkit_build/dist/*
 
     # toolkit 소스 업데이트, 복사
-    cp -rfv ${git_root}/khan.pythonscript/khan-shell-interface/util_modules/operation_util_manage_modules ${git_root}/khan.pythonscript/python-build-tempdir/toolkit_build/
-    cp -rfv ${git_root}/khan.pythonscript/khan-shell-interface/util_modules/wins_manage_modules ${git_root}/khan.pythonscript/python-build-tempdir/toolkit_build/
+    cp -rfv ${git_root}/khan.pythonscript/khan-shell-interface/util_modules/operation_util_manage_modules ${git_root}/khan.pythonscript/python-build-tempdir/toolkit_build/util_modules/
+    cp -rfv ${git_root}/khan.pythonscript/khan-shell-interface/util_modules/wins_manage_modules ${git_root}/khan.pythonscript/python-build-tempdir/toolkit_build/util_modules/
 
     # python build
-    cd ${git_root}/khan.pythonscript/python-build-tempdir/toolkit_build/
+    # cd ${git_root}/khan.pythonscript/python-build-tempdir/toolkit_build/
 
     #ubuntu는 python3
     python3 -m build
+
+    unzip -l dist/pytoolkit-1.0.0-py3-none-any.whl | head -100
 
     # cd -
     cd ${g_path}
