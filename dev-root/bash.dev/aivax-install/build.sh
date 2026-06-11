@@ -230,6 +230,42 @@ function build_ai_engine()
     WRITE_LOG $FUNCNAME $LINENO "finish build ai_engine"
 }
 
+function update_toolkit_whl_module()
+{
+    WRITE_LOG $FUNCNAME $LINENO "start update toolkit whl module"
+
+    # ${git_root}/khan.pythonscript/python-build-tempdir/build_ouput/
+
+    # python temp dir 경로의 whl 정리
+    rm -rfv ${git_root}/khan.pythonscript/python-build-tempdir/toolkit_build/util_modules/operation_util_manage_modules
+    rm -rfv ${git_root}/khan.pythonscript/python-build-tempdir/toolkit_build/util_modules/wins_manage_modules
+
+    rm -rfv ${git_root}/khan.pythonscript/python-build-tempdir/toolkit_build/dist/*
+
+    # toolkit 소스 업데이트, 복사
+    cp -rfv ${git_root}/khan.pythonscript/khan-shell-interface/util_modules/operation_util_manage_modules ${git_root}/khan.pythonscript/python-build-tempdir/toolkit_build/
+    cp -rfv ${git_root}/khan.pythonscript/khan-shell-interface/util_modules/wins_manage_modules ${git_root}/khan.pythonscript/python-build-tempdir/toolkit_build/
+
+    # python build
+    cd ${git_root}/khan.pythonscript/python-build-tempdir/toolkit_build/
+
+    #ubuntu는 python3
+    python3 -m build
+
+    # cd -
+    cd ${g_path}
+
+    # build 결과물 업데이트 및 소스 commit
+    # TODO: 오타가 있다. build_ouput -> build_output 점진적으로 고치자.
+    cp -rfv ${git_root}/khan.pythonscript/python-build-tempdir/toolkit_build/dist/pytoolkit-1.0.0-py3-none-any.whl ${git_root}/khan.pythonscript/python-build-tempdir/build_ouput/
+
+
+    cd ${git_root}/khan.pythonscript/python-build-tempdir/build_ouput/
+    svn commit -m "pytoolkit update" --username khan --password '1111' --non-interactive
+
+    WRITE_LOG $FUNCNAME $LINENO "finish update install script"
+}
+
 function update_install_script()
 {
     WRITE_LOG $FUNCNAME $LINENO "start update install script"
@@ -389,6 +425,9 @@ function main()
 
     # 설치 스크립트, 향후 변경
     update_install_script
+
+    #toolkit whl 업데이트
+    update_toolkit_whl_module
 
     #pycomlib 업데이트
     update_pycomlib

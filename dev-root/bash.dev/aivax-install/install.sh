@@ -853,7 +853,7 @@ function __update_serial_license()
     SERIAL_FILE="./SKRX4CWIS241299.crt"
 
     version_default_file=$(realpath "${g_path}/.version")
-    serial_file=$(realpath "${g_path}/.SKRX4CWIS241299.crt")
+    serial_file=$(realpath "${g_path}/SKRX4CWIS241299.crt")
 
     json=$(jq -n \
         --argjson method "$method" \
@@ -892,13 +892,13 @@ function __update_serial_license()
     # --argjson port "$PORT" \
     # '{method:$name, ext_module:$port, cmd_category:}')
 
-    cd .pyinstall/toolkit
-    # # 테스트.
-    # python aivax_toolkit.py --script_config "${json}"
+    echo "${json}"
 
-    python version.py ${serial_key} ${license_key} ${SERIAL_FILE}
-
+    cd .pyinstall/toolkit    
+    python aivax_toolkit.py --debug --printlog --script_config "${json}"
     cd - > /dev/null 2>&1
+
+    # python version.py ${serial_key} ${license_key} ${SERIAL_FILE}
 
     # rm -rf .pyinstall
 
