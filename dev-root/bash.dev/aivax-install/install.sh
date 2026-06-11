@@ -892,13 +892,13 @@ function __update_serial_license()
     # --argjson port "$PORT" \
     # '{method:$name, ext_module:$port, cmd_category:}')
 
-    echo "${json}"
+    # echo "${json}"
 
-    cd .pyinstall/toolkit    
-    python aivax_toolkit.py --debug --printlog --script_config "${json}"
-    cd - > /dev/null 2>&1
+    # cd .pyinstall/toolkit    
+    # python aivax_toolkit.py --debug --printlog --script_config "${json}"
+    # cd - > /dev/null 2>&1
 
-    # python version.py ${serial_key} ${license_key} ${SERIAL_FILE}
+    python version.py ${serial_key} ${license_key} ${SERIAL_FILE}
 
     # rm -rf .pyinstall
 
