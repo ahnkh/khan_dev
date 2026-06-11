@@ -75,3 +75,5 @@ function main()
 
     WRITE_LOG $FUNCNAME $LINENO "finish build whl module"
 }
+
+main $@
