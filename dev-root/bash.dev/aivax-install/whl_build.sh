@@ -57,6 +57,7 @@ function update_toolkit_whl_module()
     cp -rfv ${git_root}/khan.pythonscript/python-build-tempdir/toolkit_build/dist/pytoolkit-1.0.0-py3-none-any.whl ${git_root}/khan.pythonscript/python-build-tempdir/build_ouput/
 
     cd ${git_root}/khan.pythonscript/python-build-tempdir/build_ouput/
+    svn update --username khan --password '1111' --non-interactive
     svn commit -m "pytoolkit update" --username khan --password '1111' --non-interactive
 
     # cd -
