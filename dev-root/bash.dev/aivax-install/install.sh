@@ -879,7 +879,8 @@ function __update_serial_license()
     # echo "${json}"
 
     cd .pyinstall/toolkit    
-    python aivax_toolkit.py --debug --printlog --script_config "${json}"
+    # python aivax_toolkit.py --debug --printlog --script_config "${json}"
+    python aivax_toolkit.py --script_config "${json}"
     cd - > /dev/null 2>&1
 
     # python version.py ${serial_key} ${license_key} ${SERIAL_FILE}

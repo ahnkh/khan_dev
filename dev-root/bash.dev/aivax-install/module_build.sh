@@ -115,6 +115,9 @@ function build_toolkit_whl_module()
     svn update --username khan --password '1111' --non-interactive
     svn commit -m "pytoolkit update" --username khan --password '1111' --non-interactive
 
+    # commit후, 설치된 모듈을 지운다.
+    uv pip uninstall pytoolkit
+
     # cd -
     cd ${g_path}
 
@@ -161,6 +164,9 @@ function build_service_whl_module()
     svn commit -m "pyservice update" --username khan --password '1111' --non-interactive
     svn status
 
+    # commit후, 설치된 모듈을 지운다.
+    uv pip uninstall pyservice
+
     # cd -
     cd ${g_path}
 
@@ -203,6 +209,8 @@ function build_pycomlibex_whl_module()
     svn status
     svn commit -m "pycomlibex update" --username khan --password '1111' --non-interactive
     svn status
+
+    uv pip uninstall pycomlibex
 
     # cd -
     cd ${g_path}
