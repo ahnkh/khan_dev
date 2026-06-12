@@ -140,7 +140,7 @@ function build_service_whl_module()
 
     rm -rf ${git_root}/khan.pythonscript/python-build-tempdir/service_module_build/dist/*
 
-    \cp -rfv ${git_root}/khan.pythonscript/khan-shell-interface/service_modules ${git_root}/khan.pythonscript/python-build-tempdir/service_module_build/
+    \cp -rf ${git_root}/khan.pythonscript/khan-shell-interface/service_modules ${git_root}/khan.pythonscript/python-build-tempdir/service_module_build/
 
     #ubuntu는 python3
     python -m build > /dev/null
