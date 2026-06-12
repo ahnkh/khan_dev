@@ -87,20 +87,20 @@ function build_toolkit_whl_module()
     svn update --username khan --password '1111' --non-interactive
 
     # python temp dir 경로의 whl 정리
-    rm -rfv ${git_root}/khan.pythonscript/python-build-tempdir/toolkit_build/util_modules/operation_util_manage_modules
-    rm -rfv ${git_root}/khan.pythonscript/python-build-tempdir/toolkit_build/util_modules/wins_manage_modules
+    rm -rf ${git_root}/khan.pythonscript/python-build-tempdir/toolkit_build/util_modules/operation_util_manage_modules
+    rm -rf ${git_root}/khan.pythonscript/python-build-tempdir/toolkit_build/util_modules/wins_manage_modules
 
     rm -rfv ${git_root}/khan.pythonscript/python-build-tempdir/toolkit_build/dist/*
 
     # toolkit 소스 업데이트, 복사
-    cp -rfv ${git_root}/khan.pythonscript/khan-shell-interface/util_modules/operation_util_manage_modules ${git_root}/khan.pythonscript/python-build-tempdir/toolkit_build/util_modules/
-    cp -rfv ${git_root}/khan.pythonscript/khan-shell-interface/util_modules/wins_manage_modules ${git_root}/khan.pythonscript/python-build-tempdir/toolkit_build/util_modules/
+    cp -rf ${git_root}/khan.pythonscript/khan-shell-interface/util_modules/operation_util_manage_modules ${git_root}/khan.pythonscript/python-build-tempdir/toolkit_build/util_modules/
+    cp -rf ${git_root}/khan.pythonscript/khan-shell-interface/util_modules/wins_manage_modules ${git_root}/khan.pythonscript/python-build-tempdir/toolkit_build/util_modules/
 
     # python build
     # cd ${git_root}/khan.pythonscript/python-build-tempdir/toolkit_build/
 
     #ubuntu는 python3
-    python -m build
+    python -m build > /dev/null #TODO: 오류, 로그는 향후 정리
 
     unzip -l dist/pytoolkit-1.0.0-py3-none-any.whl | head -100
 
@@ -136,14 +136,14 @@ function build_service_whl_module()
     svn update --username khan --password '1111' --non-interactive
 
     # python temp dir 경로의 whl 정리
-    rm -rfv ${git_root}/khan.pythonscript/python-build-tempdir/service_module_build/service_modules
+    rm -rf ${git_root}/khan.pythonscript/python-build-tempdir/service_module_build/service_modules
 
-    rm -rfv ${git_root}/khan.pythonscript/python-build-tempdir/service_module_build/dist/*
+    rm -rf ${git_root}/khan.pythonscript/python-build-tempdir/service_module_build/dist/*
 
     \cp -rfv ${git_root}/khan.pythonscript/khan-shell-interface/service_modules ${git_root}/khan.pythonscript/python-build-tempdir/service_module_build/
 
     #ubuntu는 python3
-    python -m build
+    python -m build > /dev/null
 
     unzip -l dist/pyservice-1.0.3-py3-none-any.whl | head -100
 
@@ -179,14 +179,14 @@ function build_pycomlibex_whl_module()
     svn update --username khan --password '1111' --non-interactive
 
     # python temp dir 경로의 whl 정리
-    rm -rfv ${git_root}/khan.pythonscript/python-build-tempdir/common_module_build/common_modules
+    rm -rf ${git_root}/khan.pythonscript/python-build-tempdir/common_module_build/common_modules
 
-    rm -rfv ${git_root}/khan.pythonscript/python-build-tempdir/common_module_build/dist/*
+    rm -rf ${git_root}/khan.pythonscript/python-build-tempdir/common_module_build/dist/*
 
-    \cp -rfv ${git_root}/khan.pythonscript/khan-shell-interface/common_modules ${git_root}/khan.pythonscript/python-build-tempdir/common_module_build/
+    \cp -rf ${git_root}/khan.pythonscript/khan-shell-interface/common_modules ${git_root}/khan.pythonscript/python-build-tempdir/common_module_build/
 
     #ubuntu는 python3
-    python -m build
+    python -m build > /dev/null
 
     unzip -l dist/pycomlibex-1.1.2-py3-none-any.whl | head -100
 
