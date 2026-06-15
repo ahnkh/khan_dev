@@ -842,7 +842,7 @@ function __update_serial_license()
     method='["manage_wins_modules"]'
     ext_module="manage_aivax_install"
     cmd_category="aivax_install"
-    command="aivax_install_util_module"
+    command="aivax_install_util"
     detail_cmd="generate_version"
 
     # 버전 파일 실행, system python으로 수행되어야 한다.
