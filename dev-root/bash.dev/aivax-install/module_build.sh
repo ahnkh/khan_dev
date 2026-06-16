@@ -31,8 +31,8 @@ function update_toolkit_config_and_source()
     git pull
 
     # resource, 하나씩 추가
-    \cp -rfv ${git_root}/khan.pythonscript/khan-shell-interface/local_resource/config/subconfig/ext_config_util.json ${git_root}/aivax_toolkit/local_resource/config/subconfig
-    \cp -rfv ${git_root}/khan.pythonscript/khan-shell-interface/local_resource/config/subconfig/ext_config_wins.json ${git_root}/aivax_toolkit/local_resource/config/subconfig
+    \cp -rfv ${git_root}/khan.pythonscript/khan-shell-interface/local_resource/config/subconfig/ext_config_util.json ${git_root}/aivax_toolkit/local_resource/config/subconfig/
+    \cp -rfv ${git_root}/khan.pythonscript/khan-shell-interface/local_resource/config/subconfig/ext_config_wins.json ${git_root}/aivax_toolkit/local_resource/config/subconfig/
 
     \cp -rfv ${git_root}/khan.pythonscript/khan-shell-interface/local_resource/config/wins-config.json ${git_root}/aivax_toolkit/local_resource/config/
     \cp -rfv ${git_root}/khan.pythonscript/khan-shell-interface/local_resource/config/wins_resource.json ${git_root}/aivax_toolkit/local_resource/config/
@@ -49,6 +49,8 @@ function update_toolkit_config_and_source()
     #TODO: 나머지 소스는 실제 수정이 필요하면 직접 commit
 
     git add ${git_root}/aivax_toolkit/
+
+    git status
 
     git commit -m "toolkit 소스 업데이트 $(date '+%Y-%m-%d %H:%M:%S')"
 
