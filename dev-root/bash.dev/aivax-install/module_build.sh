@@ -20,11 +20,11 @@ function WRITE_LOG()
 }
 
 # toolkit config 업데이트
-function update_toolkit_config()
+function update_toolkit_config_and_source()
 {
     # git_root=/home1/git-root
 
-    WRITE_LOG $FUNCNAME $LINENO "start update toolkit config"
+    WRITE_LOG $FUNCNAME $LINENO "start update toolkit config and source"
 
     cd ${git_root}/aivax_toolkit
 
@@ -43,33 +43,45 @@ function update_toolkit_config()
 
     \cp -rfv ${git_root}/khan.pythonscript/khan-shell-interface/local_resource/script_config/aivax/* ${git_root}/aivax_toolkit/local_resource/script_config/aivax/
 
-
-    cd $g_path
-
-
-    WRITE_LOG $FUNCNAME $LINENO "finish update toolkit config"
-}
-
-# toolkit source 업데이트
-function update_toolkit_source()
-{
-    # git_root=/home1/git-root
-
-    WRITE_LOG $FUNCNAME $LINENO "start update toolkit source"
-
-    cd ${git_root}/aivax_toolkit
-
-    git pull
-
     \cp -rfv ${git_root}/khan.pythonscript/khan-shell-interface/aivax_toolkit.py ${git_root}/aivax_toolkit/
     \cp -rfv ${git_root}/khan.pythonscript/khan-shell-interface/lib_include_wins.py ${git_root}/aivax_toolkit/lib_include.py
 
     #TODO: 나머지 소스는 실제 수정이 필요하면 직접 commit
 
+    git add ${git_root}/aivax_toolkit/
+
+    git commit -m "toolkit 소스 업데이트 $(date '+%Y-%m-%d %H:%M:%S')"
+
+    git push
+
     cd $g_path
 
-    WRITE_LOG $FUNCNAME $LINENO "start update toolkit source"
+
+    WRITE_LOG $FUNCNAME $LINENO "finish update toolkit config and source"
 }
+
+# # toolkit source 업데이트
+# function update_toolkit_source()
+# {
+#     # git_root=/home1/git-root
+
+#     WRITE_LOG $FUNCNAME $LINENO "start update toolkit source"
+
+#     cd ${git_root}/aivax_toolkit
+
+#     git pull
+
+#     \cp -rfv ${git_root}/khan.pythonscript/khan-shell-interface/aivax_toolkit.py ${git_root}/aivax_toolkit/
+#     \cp -rfv ${git_root}/khan.pythonscript/khan-shell-interface/lib_include_wins.py ${git_root}/aivax_toolkit/lib_include.py
+
+#     #TODO: 나머지 소스는 실제 수정이 필요하면 직접 commit
+
+#     git add ${git_root}/aivax_toolkit/aivax_toolkit.py
+
+#     cd $g_path
+
+#     WRITE_LOG $FUNCNAME $LINENO "start update toolkit source"
+# }
 
 # pytoolkit whl 빌드
 function build_toolkit_whl_module()
@@ -223,10 +235,10 @@ function main()
     WRITE_LOG $FUNCNAME $LINENO "start build whl module"
 
     #toolkit config 업데이트
-    update_toolkit_config
+    update_toolkit_config_and_source
 
     #toolkit 소스 업데이트
-    update_toolkit_source
+    # update_toolkit_source
 
     #toolkit whl 업데이트
     build_toolkit_whl_module
