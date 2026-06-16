@@ -47,9 +47,8 @@ function merge_git()
 
     cd ${git_root}/aivax/apps/
 
-    git switch ${git_branch}
-
     git pull
+    git switch ${git_branch}
 
     # git merge origin/develop --no-edit
     git merge origin/develop
