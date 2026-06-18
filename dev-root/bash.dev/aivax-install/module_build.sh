@@ -258,6 +258,62 @@ function build_pycomlibex_whl_module()
     WRITE_LOG $FUNCNAME $LINENO "finish build pycomlibex whl module"
 }
 
+# pycombuild
+function build_pylib_whl_lib()
+{
+    # git_root=/home1/git-root
+    WRITE_LOG $FUNCNAME $LINENO "start build pylib/pycomlib whl module"
+
+    mkdir -p ${git_root}/khan.pythonscript/python-build-tempdir/khan_pylib_build_pyc
+
+    cd ${git_root}/khan.pythonscript/python-build-tempdir/khan_pylib_build_pyc/
+    # svn update --username khan --password '1111' --non-interactive
+
+    # python temp dir 경로의 whl 정리
+    rm -rf ${git_root}/khan.pythonscript/python-build-tempdir/khan_pylib_build_pyc/lib*
+
+    rm -rf ${git_root}/khan.pythonscript/python-build-tempdir/khan_pylib_build_pyc/dist/*
+
+    \cp -rf ${git_root}/khan.pythonscript/khan-shell-interface/khan_pylib/lib* ${git_root}/khan.pythonscript/python-build-tempdir/khan_pylib_build_pyc/
+
+    #ubuntu는 python3
+
+    cd ${git_root}/khan.pythonscript/python-build-tempdir/khan_pylib_build_pyc
+
+    find . -type d -not -path "./.*" -not -path "./dist*" -exec touch {}/__init__.py \;
+    python -m compileall -b .
+
+    find . -name "__pycache__" -type d -exec rm -rf {} +
+    find . -name "*.py" -not -name "__init__.py" -not -name "setup.py" -delete
+
+    rm -rf ${git_root}/khan.pythonscript/python-build-tempdir/khan_pylib_build_pyc/build/*
+    python -m build --wheel
+    # python -m build > /dev/null
+
+    unzip -l dist/pycomlib-1.1.7-py3-none-any.whl | head -100
+
+    #uv 테스트
+    uv pip install --force-reinstall dist/pycomlib-1.1.7-py3-none-any.whl
+
+    # build 결과물 업데이트 및 소스 commit
+    # TODO: 오타가 있다. build_ouput -> build_output 점진적으로 고치자.
+    \cp -rfv ${git_root}/khan.pythonscript/python-build-tempdir/khan_pylib_build_pyc/dist/pycomlib-1.1.7-py3-none-any.whl ${git_root}/khan.pythonscript/python-build-tempdir/build_ouput/
+
+    cd ${git_root}/khan.pythonscript/python-build-tempdir/build_ouput/
+    svn update --username khan --password '1111' --non-interactive
+
+    svn status
+    svn commit -m "pylib update" --username khan --password '1111' --non-interactive
+    svn status
+
+    uv pip uninstall pycomlib
+
+    # cd -
+    cd ${g_path}
+
+    WRITE_LOG $FUNCNAME $LINENO "finish build pylib/pycomlib whl module"
+}
+
 function main()
 {
     WRITE_LOG $FUNCNAME $LINENO "start build whl module"
@@ -277,6 +333,9 @@ function main()
 
     #pycommlibex 업데이트
     build_pycomlibex_whl_module
+
+    #pylib 업데이트 추가, 26.06.19
+    build_pylib_whl_lib
 
     #TODO: toolkit 테스트
 
