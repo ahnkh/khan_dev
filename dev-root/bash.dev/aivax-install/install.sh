@@ -1440,7 +1440,7 @@ function __backup_opensearch_snapshot()
     # /etc/opensearch.yml, 다시 업데이트 한다. => 통합
 
     # api call만 수행
-    curl -u admin:'Sniper123!@#' -X PUT "https://127.0.0.1:9200/_snapshot/aivax_snapshot" \
+    curl -sk -u admin:'Sniper123!@#' -X PUT "https://127.0.0.1:9200/_snapshot/aivax_snapshot" \
 -H "Content-Type: application/json" \
 -d '
 {
