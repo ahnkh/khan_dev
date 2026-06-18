@@ -19,6 +19,32 @@ function WRITE_LOG()
     # echo $string &>> ${g_path}/${TRACE_LOG}
 }
 
+# __init__.py, 자동 생성, 누락에 대한 대비
+function create_init_py()
+{
+    WRITE_LOG $FUNCNAME $LINENO "start create __init__.py"
+
+    # git_root=/home1/git-root
+    cd ${git_root}/khan.pythonscript/khan-shell-interface/service_modules
+    find . -type d -not -path "./.*" -not -path "./dist*" -exec touch {}/__init__.py \;
+
+    svn status
+
+    cd ${git_root}/khan.pythonscript/khan-shell-interface/util_modules/wins_manage_modules
+    find . -type d -not -path "./.*" -not -path "./dist*" -exec touch {}/__init__.py \;
+    svn status
+
+    cd ${git_root}/khan.pythonscript/khan-shell-interface/util_modules/operation_util_manage_modules
+    find . -type d -not -path "./.*" -not -path "./dist*" -exec touch {}/__init__.py \;
+
+    #TODO: commit은 하지 않는다. 개발중 commit
+
+    cd $g_path
+
+    WRITE_LOG $FUNCNAME $LINENO "finish create __init__.py"
+
+}
+
 # toolkit config 업데이트
 function update_toolkit_config_and_source()
 {
@@ -236,11 +262,12 @@ function main()
 {
     WRITE_LOG $FUNCNAME $LINENO "start build whl module"
 
-    #toolkit config 업데이트
+    #toolkit config, 소스 업데이트
+    # update_toolkit_source
     update_toolkit_config_and_source
 
-    #toolkit 소스 업데이트
-    # update_toolkit_source
+    # init.py 업데이트
+    create_init_py
 
     #toolkit whl 업데이트
     build_toolkit_whl_module
