@@ -124,6 +124,11 @@ function init_default_setup()
     \cp -rf ./data-setup/etc-resource/aivax_policy.json /home1/aivax/data_resource/policy_signal/
     \cp -rf ./data-setup/etc-resource/block.html /home1/aivax/data_resource/
 
+    # opensearch, 백업 경로 지정, opensearch의 설치 전에 수행되어야 한다.
+    mkdir -p /backup/opensearch_snapshot
+    chown -hR opensearch:opensearch /backup/opensearch_snapshot
+    chmod 750 /backup/opensearch_snapshot
+
     #TODO: opensearch data, 파티션 변경 필요 
     #/home1 => app, 또는 root, symbolic link
     #/data => 로그 저장영역
@@ -517,43 +522,11 @@ function __install_nodejs()
     WRITE_LOG $FUNCNAME $LINENO "finish install nodejs"
 }
 
-
-function __install_opensearch()
+# opensearch, config 설정
+function __install_opensearch_config()
 {
-    WRITE_LOG $FUNCNAME $LINENO "start install opensearch"
-
-    # opensearch 설치, opensearch는 별도로 설치한다. 옵션화, (제거할수 있다)
-    # 일단 작성후, 경로 또는 세부 테스트.
-    dnf install ./extension/rpm-install/3rd-repo/opensearch/v3.3.2/opensearch-3.3.2-linux-x64.rpm -y -q
-
-    #TODO: 디렉토리 존재여부, 디렉토리가 존재하고, 설치 되어 있으면 skip 한다.
-    if [ -d /home1/opensearch ]
-    then
-        # mv /home1/aivax/data_resource/opensearch /home1/aivax/data_resource/opensearch.$(date +%Y%m%d%H%M)
-        # TODO: 종료코드, 현재시점은 최초 설치만 고려
-        WRITE_LOG $FUNCNAME $LINENO "opensearch is already installed, stop install"
-        return
-    fi
-
     
-
-    #TODO: 여러 경로로 이동 필요, temp 경로롤 이용한다. (/home1/install/temp)
-
-    # 기본 디렉토리 생성, 두번 체크
-    # mkdir -p /home1/aivax/data_resource/opensearch/
-
-    # 설치후, 데이터 복사, config, 권한 설정 필요
-
-    # mkdir -p /home1/install/temp/opensearch
-
-    # mkdir -p /home1/install/temp/opensearch/config
-    # mkdir -p /home1/install/temp/opensearch/data
-
-    # tar xzf ./data-setup/opensearch-setup/opensearch.config.tar.gz -C /home1/install/temp/opensearch/config/
-    # tar xzvf ./extension/opensearch-install/opensearch.data.tar.gz -C /home1/install/temp/opensearch/data/
-
     rm -rf /tmp/install-temp/opensearch-config
-    rm -rf /tmp/install-temp/opensearch-data
 
     mkdir -p /tmp/install-temp/opensearch-config
     tar xzf ./data-setup/opensearch-setup/opensearch.config.tar.gz  -C /tmp/install-temp/opensearch-config
@@ -575,70 +548,6 @@ function __install_opensearch()
     chown -R opensearch:opensearch /etc/opensearch
     chmod -R 750 /etc/opensearch
 
-    mkdir -p /tmp/install-temp/opensearch-data
-    tar xzf ./data-setup/opensearch-setup/opensearch.data.tar.gz -C /tmp/install-temp/opensearch-data/
-
-    # 상세 수정은 installer에서.
-    mv /tmp/install-temp/opensearch-data/opensearch_docker /tmp/install-temp/opensearch-data/opensearch
-
-    #TODO: 경로 변경, 일단 스크립트에서는 수동으로 교체, installer에서 정식으로 교체
-
-    # if [ -d /home1/aivax/data_resource/opensearch ]
-    # then
-    #     mv /home1/aivax/data_resource/opensearch /home1/aivax/data_resource/opensearch.$(date +%Y%m%d%H%M)
-    # fi
-
-    # mv /tmp/install-temp/opensearch-data/opensearch /home1/aivax/data_resource/
-
-    # chown -R opensearch:opensearch /home1/aivax/data_resource/opensearch
-    # chmod -R 750 /home1/aivax/data_resource/opensearch
-
-    # 과거 데이터 migration, 일단 임시, 상세 제어 필요
-    #TODO: 이미 경로가 변경되었다. 호출될 수 없는 구문 => 여기는 좀더 세밀하게 조정한다.
-    # if [ -d /home1/aivax/data_resource/opensearch ]
-    # then
-    #     WRITE_LOG $FUNCNAME $LINENO "restore opensearch data"
-    #     mv /home1/aivax/data_resource/opensearch /home1/
-    # else
-    #     
-    # fi
-
-    #기본 설치 - installer에서 조금더 보강
-    mv /tmp/install-temp/opensearch-data/opensearch /home1/
-
-    chown -R opensearch:opensearch /home1/opensearch
-    chmod -R 750 /home1/opensearch
-
-    # tar xzvf ./extension/opensearch-install/opensearch.config.tar.gz -C /home1/install/temp/opensearch/data/
-    # tar xzvf ./extension/opensearch-install/opensearch.data.tar.gz -C /home1/install/temp/opensearch/data/
-
-    # # TODO: opensearch 경로 변경 필요 => 프로그램으로 해결 필요
-
-    # #TODO: config 복사, 미세 조정 필요, pem 등
-    # cp -rf /etc/opensearch/
-
-    # #TODO: data 복사 경로 복사 먼저 + opensearch.yml 쪽 먼저 수정 필요
-    # # 프로그램으로 해결하거나, sed 명령으로 수정 필요
-
-    # #TODO: 경로 확인 필요
-    # cp -rf /home1/install/temp/opensearch/data/ /var/lib/opensearch/
-
-    # # 권한 설정 추가, SNIPER OS는 경로가 다르다. 경로를 외부 설정으로 제어
-    # chown -R opensearch:opensearch /home1/aivax/data_resource/opensearch/
-    # chmod -R 750 /home1/aivax/data_resource/opensearch/
-
-    # chown -R opensearch:opensearch /etc/opensearch
-    # chmod -R 750 /etc/opensearch
-    # # chown -R opensearch:opensearch /var/lib/opensearch
-
-    # #VM size 설정
-    # sysctl -w vm.max_map_count=262144
-    echo "vm.max_map_count=262144" >> /etc/sysctl.conf #영구설정
-
-    #TODO: systemd 수정
-
-    #TODO: 설치 테스트, 장애 발생시 재생성 필요
-
     # /etc/opensearch/opensearh.yml, 경로 변경, 우선 스크립트로
     # NEW_PATH="/home1/aivax/data_resource/opensearch"
     NEW_PATH="/home1/opensearch"
@@ -647,30 +556,21 @@ function __install_opensearch()
     sudo sed -i "s|path.data:.*|path.data: $NEW_PATH|g" "$CONFIG_FILE"
     # sudo sed -i "s|path.logs:.*|path.logs: $NEW_PATH/logs|g" "$CONFIG_FILE"
 
-    # config 설정
+    # #VM size 설정 반복으로 설정, 1번만 설정
+    # sysctl -w vm.max_map_count=262144
+    # echo "vm.max_map_count=262144" >> /etc/sysctl.conf #영구설정
 
-    # opensearch의 기본 service 파일 경로, /etc/로 변경 => 위험
-#     cat > /etc/systemd/system/opensearch.service <<EOF
-# [Unit]
-# Description=OpenSearch
-# After=network.target
+    if grep -q '^vm.max_map_count=' /etc/sysctl.conf; then
+        sed -i 's/^vm.max_map_count=.*/vm.max_map_count=262144/' /etc/sysctl.conf
+    else
+        echo 'vm.max_map_count=262144' >> /etc/sysctl.conf
+    fi
 
-# [Service]
-# Type=simple
-# User=opensearch
-# Group=opensearch
+    # 테스트 출력
+    # sysctl -p
 
-# Environment=OPENSEARCH_HOME=/data/opensearch
-# Environment=OPENSEARCH_PATH_CONF=/data/opensearch/config
-
-# ExecStart=/data/opensearch/bin/opensearch
-
-# Restart=always
-# LimitNOFILE=65535
-
-# [Install]
-# WantedBy=multi-user.target
-# EOF
+    # 모두 삭제
+    # sed -i '/^vm.max_map_count=/d' /etc/sysctl.conf
 
     cat > /etc/systemd/system/opensearch.service <<'EOF'
 [Unit]
@@ -783,6 +683,139 @@ ProtectClock=true
 [Install]
 WantedBy=multi-user.target
 EOF
+}
+
+# opensearch, data 설정
+function __install_opensearch_data()
+{
+    #TODO: 여러 경로로 이동 필요, temp 경로롤 이용한다. (/home1/install/temp)
+    rm -rf /tmp/install-temp/opensearch-data
+
+    # TODO: 경로 변경에 대한 대처.
+
+    #TODO: 디렉토리 존재여부, 디렉토리가 존재하고, 설치 되어 있으면 skip 한다.    
+    if [ -d /home1/opensearch ]
+    then
+        # mv /home1/aivax/data_resource/opensearch /home1/aivax/data_resource/opensearch.$(date +%Y%m%d%H%M)
+        # TODO: 종료코드, 현재시점은 최초 설치만 고려
+        WRITE_LOG $FUNCNAME $LINENO "opensearch is already installed, stop install"
+        return
+    fi
+
+    mkdir -p /tmp/install-temp/opensearch-data
+    tar xzf ./data-setup/opensearch-setup/opensearch.data.tar.gz -C /tmp/install-temp/opensearch-data/
+
+    # 상세 수정은 installer에서.
+    mv /tmp/install-temp/opensearch-data/opensearch_docker /tmp/install-temp/opensearch-data/opensearch
+
+    #기본 설치 - installer에서 조금더 보강
+    mv /tmp/install-temp/opensearch-data/opensearch /home1/
+
+    chown -R opensearch:opensearch /home1/opensearch
+    chmod -R 750 /home1/opensearch
+}
+
+function __install_opensearch()
+{
+    WRITE_LOG $FUNCNAME $LINENO "start install opensearch"
+
+    # opensearch 설치, opensearch는 별도로 설치한다. 옵션화, (제거할수 있다)
+    # 일단 작성후, 경로 또는 세부 테스트.
+    dnf install ./extension/rpm-install/3rd-repo/opensearch/v3.3.2/opensearch-3.3.2-linux-x64.rpm -y -q
+
+    # 설정 config, opensearch의 설치여부와 상관없이 업데이트 한다.
+    __install_opensearch_config
+
+    # data, 최초 설치시에만 업데이트 하고, 설치되어 있으면 유지한다. (개선 필요)
+    __install_opensearch_data
+    
+    # 기본 디렉토리 생성, 두번 체크
+    # mkdir -p /home1/aivax/data_resource/opensearch/ => 제거
+
+    # 설치후, 데이터 복사, config, 권한 설정 필요
+
+    # mkdir -p /home1/install/temp/opensearch
+
+    # mkdir -p /home1/install/temp/opensearch/config
+    # mkdir -p /home1/install/temp/opensearch/data
+
+    # tar xzf ./data-setup/opensearch-setup/opensearch.config.tar.gz -C /home1/install/temp/opensearch/config/
+    # tar xzvf ./extension/opensearch-install/opensearch.data.tar.gz -C /home1/install/temp/opensearch/data/
+
+    #TODO: 경로 변경, 일단 스크립트에서는 수동으로 교체, installer에서 정식으로 교체
+
+    # if [ -d /home1/aivax/data_resource/opensearch ]
+    # then
+    #     mv /home1/aivax/data_resource/opensearch /home1/aivax/data_resource/opensearch.$(date +%Y%m%d%H%M)
+    # fi
+
+    # mv /tmp/install-temp/opensearch-data/opensearch /home1/aivax/data_resource/
+
+    # chown -R opensearch:opensearch /home1/aivax/data_resource/opensearch
+    # chmod -R 750 /home1/aivax/data_resource/opensearch
+
+    # 과거 데이터 migration, 일단 임시, 상세 제어 필요
+    #TODO: 이미 경로가 변경되었다. 호출될 수 없는 구문 => 여기는 좀더 세밀하게 조정한다.
+    # if [ -d /home1/aivax/data_resource/opensearch ]
+    # then
+    #     WRITE_LOG $FUNCNAME $LINENO "restore opensearch data"
+    #     mv /home1/aivax/data_resource/opensearch /home1/
+    # else
+    #     
+    # fi
+
+    # tar xzvf ./extension/opensearch-install/opensearch.config.tar.gz -C /home1/install/temp/opensearch/data/
+    # tar xzvf ./extension/opensearch-install/opensearch.data.tar.gz -C /home1/install/temp/opensearch/data/
+
+    # # TODO: opensearch 경로 변경 필요 => 프로그램으로 해결 필요
+
+    # #TODO: config 복사, 미세 조정 필요, pem 등
+    # cp -rf /etc/opensearch/
+
+    # #TODO: data 복사 경로 복사 먼저 + opensearch.yml 쪽 먼저 수정 필요
+    # # 프로그램으로 해결하거나, sed 명령으로 수정 필요
+
+    # #TODO: 경로 확인 필요
+    # cp -rf /home1/install/temp/opensearch/data/ /var/lib/opensearch/
+
+    # # 권한 설정 추가, SNIPER OS는 경로가 다르다. 경로를 외부 설정으로 제어
+    # chown -R opensearch:opensearch /home1/aivax/data_resource/opensearch/
+    # chmod -R 750 /home1/aivax/data_resource/opensearch/
+
+    # chown -R opensearch:opensearch /etc/opensearch
+    # chmod -R 750 /etc/opensearch
+    # # chown -R opensearch:opensearch /var/lib/opensearch
+
+    #TODO: systemd 수정
+
+    #TODO: 설치 테스트, 장애 발생시 재생성 필요
+
+    # config 설정
+
+    # opensearch의 기본 service 파일 경로, /etc/로 변경 => 위험
+#     cat > /etc/systemd/system/opensearch.service <<EOF
+# [Unit]
+# Description=OpenSearch
+# After=network.target
+
+# [Service]
+# Type=simple
+# User=opensearch
+# Group=opensearch
+
+# Environment=OPENSEARCH_HOME=/data/opensearch
+# Environment=OPENSEARCH_PATH_CONF=/data/opensearch/config
+
+# ExecStart=/data/opensearch/bin/opensearch
+
+# Restart=always
+# LimitNOFILE=65535
+
+# [Install]
+# WantedBy=multi-user.target
+# EOF
+
+    
 
     WRITE_LOG $FUNCNAME $LINENO "finish install opensearch"
 }
@@ -1386,6 +1419,41 @@ function configure_after_install()
     #TODO: 상세한 예외처리는 installer에서
     wait_ready_opensearch
 
+    # 미사용 인덱스 설정
+    __delete_opensearch_unused_index
+
+    # opensearch 백업 설정 추가, 향후 installer에서 동일 로직 교체
+    # 기본 /backup/opensearch_snapshot 이며 설정값으로 가져오는 로직까지는 개선 => 전역 설정이 필요할수 있다.
+    __backup_opensearch_snapshot
+
+    # 라이선스 업데이트, 제일 밑으로
+    __update_serial_license
+
+    WRITE_LOG $FUNCNAME $LINENO "finish configure after install"
+
+}
+
+function __backup_opensearch_snapshot()
+{
+    WRITE_LOG $FUNCNAME $LINENO "backup opensearch snapshot (/backup/opensearch_snapshot)"
+
+    # /etc/opensearch.yml, 다시 업데이트 한다. => 통합
+
+    # api call만 수행
+    curl -u admin:'Sniper123!@#' -X PUT "https://127.0.0.1:9200/_snapshot/aivax_snapshot" \
+-H "Content-Type: application/json" \
+-d '
+{
+  "type": "fs",
+  "settings": {
+    "location": "/backup/opensearch_snapshot"
+  }
+}'
+
+}
+
+function __delete_opensearch_unused_index()
+{
     #opensearch, 부가 index의 삭제, 초기화
     # 향후 계정, 포트 등 접속 정보는 installer에서 제거
     curl -u admin:'Sniper123!@#' -sk -XDELETE "https://127.0.0.1:9200/top_queries-*"     
@@ -1398,12 +1466,6 @@ function configure_after_install()
 
     # index 목록의 조회
     curl -u admin:'Sniper123!@#' -sk https://127.0.0.1:9200/_cat/indices?v
-
-    # 라이선스 업데이트, 제일 밑으로
-    __update_serial_license
-
-    WRITE_LOG $FUNCNAME $LINENO "finish configure after install"
-
 }
 
 function wait_ready_opensearch()
