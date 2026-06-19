@@ -129,6 +129,10 @@ function init_default_setup()
     chown -hR opensearch:opensearch /backup/opensearch_snapshot
     chmod 750 /backup/opensearch_snapshot
 
+    # 백업 경로, 기본 생성, /backup 파티션이 있다는 가정
+    mkdir -p /backup/attach_file_backup
+    mkdir -p /backup/prompt_log_backup
+
     #TODO: opensearch data, 파티션 변경 필요 
     #/home1 => app, 또는 root, symbolic link
     #/data => 로그 저장영역
@@ -437,6 +441,8 @@ GRANT ALL PRIVILEGES ON *.* TO '${DB_USER}'@'%' WITH GRANT OPTION;
 
 CREATE USER IF NOT EXISTS '${DB_USER}'@'localhost' IDENTIFIED BY '${DB_PASS}';
 GRANT ALL PRIVILEGES ON ${DB_NAME}.* TO '${DB_USER}'@'localhost';
+
+GRANT CREATE, DROP, ALTER, INDEX, INSERT, UPDATE, DELETE, SELECT, LOCK TABLES ON *.* TO '${DB_USER}'@'localhost';
 
 FLUSH PRIVILEGES;
 EOF
