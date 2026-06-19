@@ -924,8 +924,6 @@ function __update_serial_license()
 
     # python version.py ${serial_key} ${license_key} ${SERIAL_FILE}
 
-    # rm -rf .pyinstall
-
     # 라이선스 업로드 명령, management UI에 요청한다.
     # .ctr 파일, 복사 기능 필요, 일단 /tmp로 복사한다.
 
@@ -1435,8 +1433,37 @@ function configure_after_install()
     # 라이선스 업데이트, 제일 밑으로
     __update_serial_license
 
+    # aivax 시작 스크립트
+    __run_aivax_toolkit_init_command
+
+
     WRITE_LOG $FUNCNAME $LINENO "finish configure after install"
 
+}
+
+function __run_aivax_toolkit_init_command()
+{
+    WRITE_LOG $FUNCNAME $LINENO "start patch etc util"
+
+    #nginx, management, 혹시 모르니 시작시킨다.
+
+    cd .pyinstall/toolkit        
+    python aivax_toolkit.py --script_file "local_resource/script_config/aivax/aivax_init_command.json" --printlog
+    cd - > /dev/null 2>&1
+
+    # python version.py ${serial_key} ${license_key} ${SERIAL_FILE}
+
+    # rm -rf .pyinstall
+
+    # 라이선스 업로드 명령, management UI에 요청한다.
+    # .ctr 파일, 복사 기능 필요, 일단 /tmp로 복사한다.
+
+    # if [ -f "$SERIAL_FILE" ]; then
+    #     cp -rf ${SERIAL_FILE} /tmp
+    #     curl -fsSk -X POST 'https://127.0.0.1:4000/v1/internal/settings/license/upload' -H 'Content-Type: application/json' -d '{"licenseFilePath":"/tmp/SKRX4CWIS241299.crt"}' -o ./response.json 2>/dev/null
+    # fi
+
+    WRITE_LOG $FUNCNAME $LINENO "finish patch etc util"
 }
 
 function __backup_opensearch_snapshot()
