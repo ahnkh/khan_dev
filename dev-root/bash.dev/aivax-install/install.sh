@@ -1448,7 +1448,7 @@ function __run_aivax_toolkit_init_command()
     #nginx, management, 혹시 모르니 시작시킨다.
 
     cd .pyinstall/toolkit        
-    python aivax_toolkit.py --script_file "local_resource/script_config/aivax/aivax_init_command.json" --printlog
+    python aivax_toolkit.py --script_file "local_resource/script_config/aivax/aivax_init_command.json" #--printlog
     cd - > /dev/null 2>&1
 
     # python version.py ${serial_key} ${license_key} ${SERIAL_FILE}

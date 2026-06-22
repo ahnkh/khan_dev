@@ -69,12 +69,39 @@ function merge_pipeline_git()
     WRITE_LOG $FUNCNAME $LINENO "finish merge pipeline git source"
 }
 
+# develop branch, merge 한다.
+function merge_to_develop()
+{
+    # git_root=/home1/git-root
+
+    WRITE_LOG $FUNCNAME $LINENO "start merge pipeline aivax pipeline to develop"
+
+
+    cd ${git_root}
+
+    rm -rf devleop
+
+    git clone -b develop git@github.com:winstechnet/aivax.git develop
+
+    cd develop
+
+    git pull
+
+    git merge origin/aivax_pipeline
+
+    git push
+}
+
 
 
 function main()
 {
 
+    # aivax_pipelines_public -> aivax_pipeline으로 merge
     merge_pipeline_git
+
+    # aivax_pipeline -> develop 으로 merge (기본 develop 브랜치 삭제, 깨끗한 환경에서 merge)
+    merge_to_develop
 }
 
 
