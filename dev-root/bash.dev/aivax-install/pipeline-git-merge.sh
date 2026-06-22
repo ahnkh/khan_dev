@@ -76,10 +76,9 @@ function merge_to_develop()
 
     WRITE_LOG $FUNCNAME $LINENO "start merge pipeline aivax pipeline to develop"
 
-
     cd ${git_root}
 
-    rm -rf devleop
+    rm -rf develop
 
     git clone -b develop git@github.com:winstechnet/aivax.git develop
 
