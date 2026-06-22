@@ -78,9 +78,14 @@ function merge_to_develop()
 
     cd ${git_root}
 
-    rm -rf develop
+    # 너무 오래 걸린다.
+    if [ -z develop ]
+    then
 
-    git clone -b develop git@github.com:winstechnet/aivax.git develop
+        rm -rf develop
+        git clone -b develop git@github.com:winstechnet/aivax.git develop
+
+    fi
 
     cd develop
 
