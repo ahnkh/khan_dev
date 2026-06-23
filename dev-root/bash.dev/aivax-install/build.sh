@@ -368,6 +368,21 @@ function release_package()
     WRITE_LOG $FUNCNAME $LINENO "finish release package"
 }
 
+# 대상 서버, 패키지 경로, backup 초기화
+function clean_package_file()
+{
+    WRITE_LOG $FUNCNAME $LINENO "start clean package file"
+
+    ssh -o ConnectTimeout=5 root@10.0.50.84 "rm -rf /backup/aivax-install*"
+    ssh -o ConnectTimeout=5 root@10.0.50.85 "rm -rf /backup/aivax-install*"
+
+    timeout 30 ssh -o ConnectTimeout=5 root@10.0.240.150 "rm -rf /backup/aivax-install.v*"
+    ssh -o ConnectTimeout=5 root@10.0.55.150 "rm -rf /backup/aivax-install.v*"
+    ssh -o ConnectTimeout=5 root@10.0.55.152 "rm -rf /backup/aivax-install.v*"
+
+    WRITE_LOG $FUNCNAME $LINENO "finish clean package file"
+}
+
 
 function main()
 {
@@ -401,6 +416,9 @@ function main()
 
     #자동업로드 기능 추가
     cd /data/data-root/aivax-install-root/
+
+    clean_package_file
+    
     bash auto-install.sh
 
     WRITE_LOG $FUNCNAME $LINENO "finish aivax build"
