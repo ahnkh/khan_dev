@@ -1,29 +1,26 @@
-package aivaxinstall
+package main
 
 import (
+	im "aivax-install/install_modules"
 	"encoding/json"
-	"fmt"
+
+	// "fmt"
+	"log"
 	"os"
 )
 
-// 상수, 우선 하나의 파일로 정의
-const (
+//우선 하나로 작성후 모듈 분리
+
+/***
+* //최초 시작, 가장 기본적인 core 모듈의 설치
+* rpm, python이 가장 시작이다.
+ */
+func install_base_module(){
+
 	
-	BOLD string = "\x1b[1m"
 
-	RED string = "\x1b[31m"
-	GREEN string = "\x1b[32m"
-	BLUE string = "\x1b[34m"
-	YELLOW string = "\x1b[33m"
-	MAGENTA string = "\x1b[36m"
-	GRAY string = "\x1b[90m"
-	PURPLE string = "\x1b[35m"
-	WHITE string = "\x1b[37m"
+}
 
-	NC string = "\x1b[0m"
-
-	LOCAL_JSON_PATH string = "/config.json"
-)
 
 /**
 * AIVAX 패키지 installer
@@ -45,7 +42,10 @@ func load_local_config(){
 	* config 경로는 우선 고정, 로컬 상수로
 	*/
 
-	data, err := os.ReadFile(LOCAL_JSON_PATH)
+	//내부 config 경로
+	var strInstallConfig string = globalValue.strInstallConfig
+
+	data, err := os.ReadFile(strInstallConfig)
 	if nil != err {
 		panic(err)
 	}
@@ -66,6 +66,17 @@ func install_module(){
 	/**
 	*
 	*/
+
+	//os_env_install
+	// osEnvInstall := &im.OsEnvInstall{}
+	var osEnvInstall im.OsEnvInstall
+
+	osEnvInstall.InstallOsEnv()
+}
+
+//최초 시작시 수행
+func init() {
+
 }
 
 
@@ -73,12 +84,16 @@ func install_module(){
 func main() {
 
 	//임시, print 구문 추가
-	fmt.Println("start install aivax")
+	// fmt.Println("start install aivax")
+	log.Println("start install aivax")
 
+	//최초 config, 기본 실행, config/install.json으로 지정
 	load_local_config()
 
 	//패치전 서비스 종료 - 우선 개발, 이후 각 기능, 개별 서비스 종료 기능 
 	//서비스 종료는 별도의 명령으로 다시 제공
+
+	install_base_module()
 
 	init_default_setup()
 
@@ -90,6 +105,6 @@ func main() {
 	//프로세스, 재기동
 
 	//임시, 설치 종료 print 구문 추가
-	fmt.Println("finish install aivax")
+	log.Println("finish install aivax")
 	
 }

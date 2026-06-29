@@ -1,0 +1,65 @@
+{
+    "debug_trace":
+    {
+        "trace_log" : "install.log",
+        "log_levl" : 2
+    },
+
+    "enable_flag":
+    {
+        "enable_rpm_repo" : true,
+        "enable_opensearch" : true,
+        "enable_mariadb" : true,
+        "enable_slm" : true
+    },
+
+    "aivax_setup" : 
+    {
+        "aivax_root" : "/home1/aivax",
+
+        "env_root" : "/root/.aivenv",
+
+        "serial_key" : "SKRX4CWIS241299",
+        "license_key" : "af38d40897b5c174"
+    },
+
+    "opensearch_setup": 
+    {
+        "opensearch_data_root" : "/data/opensearch",
+
+        "opensearch_host" : "127.0.0.1",
+        "opensearch_port" : 9200,
+        "opensearch_id" : "admin",
+        "opensearch_password" : "Sniper123!@#",
+
+        "opensearch_snapshot_root" : "/backup/opensearch_snapshot",
+        "opensearch_owner" : "opensearch"
+    },
+
+    "pipeline_setup":
+    {
+        "pipeline_host" : "127.0.0.1",
+        "pipeline_port" : 9099
+    },
+
+    "slm_setup" : 
+    {
+        "slm_root" : "slm",
+        "slm_host" : "127.0.0.1",
+        "slm_port" : 1200
+    },
+
+    "mariadb_setup" : 
+    {
+        "mariadb_host" : "127.0.0.1",
+        "mariadb_port" : 3306,
+        "mariad_database" : "app",
+        "mariadb_id" : "app",
+        "mariadb_password" : "app"
+    }
+}
+
+
+
+    
+}

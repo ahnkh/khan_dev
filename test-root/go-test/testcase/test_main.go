@@ -35,6 +35,12 @@ var slTestModules = []TestModule {
 		Desc: "dialog 테스트",
 		T: &test_module.DialogExample{},
 	},
+
+	{
+		Use:  true, 
+		Desc: "fmt print 테스트",
+		T: &test_module.StringExample{},
+	},
 }
 
 

@@ -19,6 +19,14 @@
             "request": "launch",
             "mode": "debug",
             "program": "${workspaceFolder}/test-root/go-test/testcase"
+        },
+
+        {
+            "name": "aivax install",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "${workspaceFolder}/dev-root/go.dev/aivax-install"
         }
 
 
