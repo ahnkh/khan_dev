@@ -879,7 +879,7 @@ function __patch_ai_engine()
 function __update_serial_license()
 {
 
-    WRITE_LOG $FUNCNAME $LINENO "start patch etc util"
+    # WRITE_LOG $FUNCNAME $LINENO "start patch etc util"
 
     #nginx, management, 혹시 모르니 시작시킨다.
     systemctl start nginx
@@ -949,7 +949,7 @@ function __update_serial_license()
     #     curl -fsSk -X POST 'https://127.0.0.1:4000/v1/internal/settings/license/upload' -H 'Content-Type: application/json' -d '{"licenseFilePath":"/tmp/SKRX4CWIS241299.crt"}' -o ./response.json 2>/dev/null
     # fi
 
-    WRITE_LOG $FUNCNAME $LINENO "finish patch etc util"
+    # WRITE_LOG $FUNCNAME $LINENO "finish patch etc util"
 
 }
 
@@ -1234,7 +1234,6 @@ function __patch_sslproxy()
     systemctl enable aivax-sslproxy.service
     systemctl start aivax-sslproxy
 
-
     #aivx_pro.sh를 실행해 본다. TODO: 경로, 향후 변경되어야 한다.
     # 잠시 주석 처리
     # cd /home1/aivax/sslproxy/etc_resource
@@ -1460,32 +1459,18 @@ function configure_after_install()
 
 function __run_aivax_toolkit_init_command()
 {
-    WRITE_LOG $FUNCNAME $LINENO "start patch etc util"
-
-    #nginx, management, 혹시 모르니 시작시킨다.
+    # WRITE_LOG $FUNCNAME $LINENO "start patch etc util"
 
     cd .pyinstall/toolkit        
     python aivax_toolkit.py --script_file "local_resource/script_config/aivax/aivax_init_command.json" #--printlog
     cd - > /dev/null 2>&1
 
-    # python version.py ${serial_key} ${license_key} ${SERIAL_FILE}
-
-    # rm -rf .pyinstall
-
-    # 라이선스 업로드 명령, management UI에 요청한다.
-    # .ctr 파일, 복사 기능 필요, 일단 /tmp로 복사한다.
-
-    # if [ -f "$SERIAL_FILE" ]; then
-    #     cp -rf ${SERIAL_FILE} /tmp
-    #     curl -fsSk -X POST 'https://127.0.0.1:4000/v1/internal/settings/license/upload' -H 'Content-Type: application/json' -d '{"licenseFilePath":"/tmp/SKRX4CWIS241299.crt"}' -o ./response.json 2>/dev/null
-    # fi
-
-    WRITE_LOG $FUNCNAME $LINENO "finish patch etc util"
+    # WRITE_LOG $FUNCNAME $LINENO "finish patch etc util"
 }
 
 function __backup_opensearch_snapshot()
 {
-    WRITE_LOG $FUNCNAME $LINENO "backup opensearch snapshot (/backup/opensearch_snapshot)"
+    # WRITE_LOG $FUNCNAME $LINENO "backup opensearch snapshot (/backup/opensearch_snapshot)"
 
     # /etc/opensearch.yml, 다시 업데이트 한다. => 통합
 
