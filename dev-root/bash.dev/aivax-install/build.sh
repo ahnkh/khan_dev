@@ -376,7 +376,7 @@ function clean_package_file()
     ssh -o ConnectTimeout=5 root@10.0.50.84 "rm -rf /backup/aivax-install*"
     ssh -o ConnectTimeout=5 root@10.0.50.85 "rm -rf /backup/aivax-install*"
 
-    timeout 30 ssh -o ConnectTimeout=5 root@10.0.240.150 "rm -rf /backup/aivax-install.v*"
+    timeout 30 ssh -o ConnectTimeout=5 root@10.0.240.150 -p222 "rm -rf /backup/aivax-install.v*"
     ssh -o ConnectTimeout=5 root@10.0.55.150 "rm -rf /backup/aivax-install.v*"
     ssh -o ConnectTimeout=5 root@10.0.55.152 "rm -rf /backup/aivax-install.v*"
 
