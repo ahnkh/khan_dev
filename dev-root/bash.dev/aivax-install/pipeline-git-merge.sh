@@ -30,7 +30,7 @@ function merge_pipeline_git()
 
     git remote -v
 
-    git pull
+    echo "git pull"; git pull
 
     # 과거 소스, 정리
     cd ${git_root}/aivax_pipeline/
@@ -39,7 +39,7 @@ function merge_pipeline_git()
 
     rm -rf pipeline.old
 
-    mv pipeline pipeline.old
+    echo "mv pipeline pipeline.old"; mv pipeline pipeline.old
 
     # cd ${git_root}/
 
@@ -56,11 +56,11 @@ function merge_pipeline_git()
 
     cd ${git_root}/aivax_pipeline/pipeline
 
-    git status
+    echo "git status"; git status
 
-    git add .
+    echo "git add ."; git add .
 
-    git status
+    echo "git status"; git status
 
     git commit -m "pipeline commit $(date '+%Y-%m-%d %H:%M:%S')"
 

@@ -197,6 +197,8 @@ function install_module()
 
     __install_opensearch
 
+    __install_slm
+
     # suricata 제거
     # __install_suricata
 
@@ -204,6 +206,12 @@ function install_module()
 
     WRITE_LOG $FUNCNAME $LINENO "finish install module"
 }
+
+# install()
+# {
+
+# }
+# install
 
 # rpm 저장, 변경된 구조, pseudo 코드
 function __install_rpm_repo()
@@ -474,14 +482,15 @@ function __install_nginx()
     # cp -rf ./extension/nginx/nginx-conf/aivax.conf /etc/nginx/conf.d/
     # cp -rf ./extension/nginx/nginx-conf/ssl /etc/nginx/
 
+    #TODO: 여기까지는 설치 단계에서 처리 필요
     \cp -rf ./data-setup/nginx-setup/nginx-conf/aivax.conf /etc/nginx/conf.d/
     \cp -rf ./data-setup/nginx-setup/nginx-conf/ssl /etc/nginx/
 
-    # 테스트, 아래 결과의 메시지 파싱, 프로그램으로 체크
-    nginx -t
-
     systemctl enable nginx
     systemctl start nginx
+
+    # 테스트, 아래 결과의 메시지 파싱, 프로그램으로 체크
+    nginx -t
 
     # systemctl reload nginx
 
@@ -824,6 +833,14 @@ function __install_opensearch()
     
 
     WRITE_LOG $FUNCNAME $LINENO "finish install opensearch"
+}
+
+function __install_slm()
+{
+    echo
+
+
+    
 }
 
 #ai 엔진 설치
