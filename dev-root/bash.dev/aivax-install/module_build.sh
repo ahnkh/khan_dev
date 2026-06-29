@@ -22,9 +22,14 @@ function WRITE_LOG()
 # __init__.py, 자동 생성, 누락에 대한 대비
 function create_init_py()
 {
+    # git_root=/home1/git-root
     WRITE_LOG $FUNCNAME $LINENO "start create __init__.py"
 
-    # git_root=/home1/git-root
+    cd ${git_root}/khan.pythonscript/khan-shell-interface/common_modules
+    find . -type d -not -path "./.*" -not -path "./dist*" -exec touch {}/__init__.py \;
+
+    svn status
+    
     cd ${git_root}/khan.pythonscript/khan-shell-interface/service_modules
     find . -type d -not -path "./.*" -not -path "./dist*" -exec touch {}/__init__.py \;
 
@@ -140,7 +145,7 @@ function build_toolkit_whl_module()
     # cd ${git_root}/khan.pythonscript/python-build-tempdir/toolkit_build/
 
     #ubuntu는 python3
-    python -m build > /dev/null #TODO: 오류, 로그는 향후 정리
+    python -m build &> /dev/null #TODO: 오류, 로그는 향후 정리
 
     unzip -l dist/pytoolkit-1.0.0-py3-none-any.whl | head -100
 
@@ -186,7 +191,7 @@ function build_service_whl_module()
     \cp -rf ${git_root}/khan.pythonscript/khan-shell-interface/service_modules ${git_root}/khan.pythonscript/python-build-tempdir/service_module_build/
 
     #ubuntu는 python3
-    python -m build > /dev/null
+    python -m build &> /dev/null
 
     unzip -l dist/pyservice-1.0.3-py3-none-any.whl | head -100
 
@@ -232,7 +237,7 @@ function build_pycomlibex_whl_module()
     \cp -rf ${git_root}/khan.pythonscript/khan-shell-interface/common_modules ${git_root}/khan.pythonscript/python-build-tempdir/common_module_build/
 
     #ubuntu는 python3
-    python -m build > /dev/null
+    python -m build &> /dev/null
 
     unzip -l dist/pycomlibex-1.1.2-py3-none-any.whl | head -100
 
@@ -287,7 +292,8 @@ function build_pylib_whl_lib()
     find . -name "*.py" -not -name "__init__.py" -not -name "setup.py" -delete
 
     rm -rf ${git_root}/khan.pythonscript/python-build-tempdir/khan_pylib_build_pyc/build/*
-    python -m build --wheel
+    python -m build --wheel &> /dev/null
+    # python -m build &> /dev/null
     # python -m build > /dev/null
 
     unzip -l dist/pycomlib-1.1.7-py3-none-any.whl | head -100
