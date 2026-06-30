@@ -154,6 +154,7 @@ function git_patch_sslproxy()
     #TODO: 하나씩 이동, sslproxy
     # cp -rfv ${git_root}/aivax_public/aivax-package/sslproxy_temp_repo/repository/* ${git_root}/aivax_public/aivax-package/sslproxy/
     \cp -rfv ${git_root}/aivax_public/aivax-package/sslproxy_temp_repo/repository/sslproxy ${git_root}/aivax_public/aivax-package/sslproxy/
+    \cp -rfv ${git_root}/aivax_public/aivax-package/sslproxy_temp_repo/repository/sslproxy.conf ${git_root}/aivax_public/aivax-package/sslproxy/
     \cp -rfv ${git_root}/aivax_public/aivax-package/sslproxy_temp_repo/repository/Note.md ${git_root}/aivax_public/aivax-package/sslproxy/.note.md
 
     # python 모듈 이동, ai_engine
