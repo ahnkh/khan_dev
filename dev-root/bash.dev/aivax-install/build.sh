@@ -10,7 +10,8 @@ package_root=/data/data-root/aivax-install-root/aivax-install
 
 # 패키지 명칭에 추가할 버전, 대소문자 등 관리 불편으로 git대신 하드코딩
 #향후 개선.
-aivax_ver=v1.0.0.0
+# 버전 변경 => 향후 개선.
+aivax_ver=v1.0.0.1
 
 aivax_package_release_root="/data/data-root/aivax-install-root"
 
