@@ -11,13 +11,17 @@ package_root=/data/data-root/aivax-install-root/aivax-install
 # 패키지 명칭에 추가할 버전, 대소문자 등 관리 불편으로 git대신 하드코딩
 #향후 개선.
 # 버전 변경 => 향후 개선.
-aivax_ver=v1.0.0.1
+aivax_ver="v1.0.0.1"
 
 aivax_package_release_root="/data/data-root/aivax-install-root"
 
 #TODO: 환경변수로.
 # git_branch="develop"
 git_branch="qa_release"
+
+package_server_ip="10.0.55.150"
+package_server_port="22"
+
 
 # 버전정보, git의 tag에서 가져온다.
 # GIT_TAG=$(git describe --tags --abbrev=0)
@@ -138,6 +142,9 @@ function build_toolkit()
 
     tar -czf toolkit.tar.gz --exclude='.git' --exclude='.gitignore' toolkit/
 
+    #원격 서버로 미리 이동
+    scp --connect-timeout 10 toolkit.tar.gz ${package_server_ip}:${package_server_port}:${aivax_package_release_root}/aivax-patch/
+
     mv toolkit.tar.gz ${package_root}/aivax-patch/
 
     WRITE_LOG $FUNCNAME $LINENO "finish build toolkit"
@@ -239,6 +246,8 @@ function update_install_script()
 
     cp -rfv install.sh ${package_root}/
 
+    scp --connect-timeout 10 install.sh ${package_server_ip}:${package_server_port}:${package_root}/
+
     WRITE_LOG $FUNCNAME $LINENO "finish update install script"
 }
 
@@ -252,6 +261,12 @@ function update_pycomlib()
 
     cd ${git_root}/khan.pythonscript/
     svn update --username khan --password '1111' --non-interactive
+
+    scp --connect-timeout 10 ${git_root}/khan.pythonscript/python-build-tempdir/build_ouput/pycomlib-1.1.7-py3-none-any.whl ${package_server_ip}:${package_server_port}:${package_root}/extension/python-install/offline-wheel/
+    scp --connect-timeout 10 ${git_root}/khan.pythonscript/python-build-tempdir/build_ouput/pycomlibex-1.1.2-py3-none-any.whl ${package_server_ip}:${package_server_port}:${package_root}/extension/python-install/offline-wheel/
+
+    scp --connect-timeout 10 ${git_root}/khan.pythonscript/python-build-tempdir/build_ouput/pyservice-1.0.3-py3-none-any.whl ${package_server_ip}:${package_server_port}:${package_root}/extension/python-install/offline-wheel/
+    scp --connect-timeout 10 ${git_root}/khan.pythonscript/python-build-tempdir/build_ouput/pytoolkit-1.0.0-py3-none-any.whl ${package_server_ip}:${package_server_port}:${package_root}/extension/python-install/offline-wheel/
 
     cp -rfv ${git_root}/khan.pythonscript/python-build-tempdir/build_ouput/pycomlib-1.1.7-py3-none-any.whl ${package_root}/extension/python-install/offline-wheel/
     cp -rfv ${git_root}/khan.pythonscript/python-build-tempdir/build_ouput/pycomlibex-1.1.2-py3-none-any.whl ${package_root}/extension/python-install/offline-wheel/
