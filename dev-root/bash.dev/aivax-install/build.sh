@@ -143,7 +143,7 @@ function build_toolkit()
     tar -czf toolkit.tar.gz --exclude='.git' --exclude='.gitignore' toolkit/
 
     #원격 서버로 미리 이동
-    scp -o ConnectTimeout=10 toolkit.tar.gz ${package_server_ip}:${package_server_port}:${aivax_package_release_root}/aivax-patch/
+    scp -P ${package_server_port} -o ConnectTimeout=10 toolkit.tar.gz ${package_server_ip}:${aivax_package_release_root}/aivax-patch/
 
     mv toolkit.tar.gz ${package_root}/aivax-patch/
 
@@ -161,14 +161,14 @@ function git_patch_sslproxy()
 
     #TODO: 하나씩 이동, sslproxy
     # cp -rfv ${git_root}/aivax_public/aivax-package/sslproxy_temp_repo/repository/* ${git_root}/aivax_public/aivax-package/sslproxy/
-    \cp -rfv ${git_root}/aivax_public/aivax-package/sslproxy_temp_repo/repository/sslproxy ${git_root}/aivax_public/aivax-package/sslproxy/
-    \cp -rfv ${git_root}/aivax_public/aivax-package/sslproxy_temp_repo/repository/sslproxy.conf ${git_root}/aivax_public/aivax-package/sslproxy/
-    \cp -rfv ${git_root}/aivax_public/aivax-package/sslproxy_temp_repo/repository/Note.md ${git_root}/aivax_public/aivax-package/sslproxy/.note.md
+    \cp -rf ${git_root}/aivax_public/aivax-package/sslproxy_temp_repo/repository/sslproxy ${git_root}/aivax_public/aivax-package/sslproxy/
+    \cp -rf ${git_root}/aivax_public/aivax-package/sslproxy_temp_repo/repository/sslproxy.conf ${git_root}/aivax_public/aivax-package/sslproxy/
+    \cp -rf ${git_root}/aivax_public/aivax-package/sslproxy_temp_repo/repository/Note.md ${git_root}/aivax_public/aivax-package/sslproxy/.note.md
 
     # python 모듈 이동, ai_engine
     # __pycache__는 지워야 한다.
     find ${git_root}/aivax_public/aivax-package/sslproxy_temp_repo/repository/ai_engine | grep __pycache__ | xargs -i rm -rf {}
-    \cp -rfv ${git_root}/aivax_public/aivax-package/sslproxy_temp_repo/repository/ai_engine/* ${git_root}/aivax_public/aivax-package/ai_engine/
+    \cp -rf ${git_root}/aivax_public/aivax-package/sslproxy_temp_repo/repository/ai_engine/* ${git_root}/aivax_public/aivax-package/ai_engine/
 
     cd ${git_root}/aivax_public/
     git add ${git_root}/aivax_public/aivax-package/sslproxy/
@@ -246,7 +246,7 @@ function update_install_script()
 
     cp -rfv install.sh ${package_root}/
 
-    scp -o ConnectTimeout=10 install.sh ${package_server_ip}:${package_server_port}:${package_root}/
+    scp -P ${package_server_port} -o ConnectTimeout=10 install.sh ${package_server_ip}:${package_root}/
 
     WRITE_LOG $FUNCNAME $LINENO "finish update install script"
 }
@@ -262,11 +262,11 @@ function update_pycomlib()
     cd ${git_root}/khan.pythonscript/
     svn update --username khan --password '1111' --non-interactive
 
-    scp -o ConnectTimeout=10 ${git_root}/khan.pythonscript/python-build-tempdir/build_ouput/pycomlib-1.1.7-py3-none-any.whl ${package_server_ip}:${package_server_port}:${package_root}/extension/python-install/offline-wheel/
-    scp -o ConnectTimeout=10 ${git_root}/khan.pythonscript/python-build-tempdir/build_ouput/pycomlibex-1.1.2-py3-none-any.whl ${package_server_ip}:${package_server_port}:${package_root}/extension/python-install/offline-wheel/
+    scp -P ${package_server_port} -o ConnectTimeout=10 ${git_root}/khan.pythonscript/python-build-tempdir/build_ouput/pycomlib-1.1.7-py3-none-any.whl root@${package_server_ip}:${package_root}/extension/python-install/offline-wheel/
+    scp -P ${package_server_port} -o ConnectTimeout=10 ${git_root}/khan.pythonscript/python-build-tempdir/build_ouput/pycomlibex-1.1.2-py3-none-any.whl root@${package_server_ip}:${package_root}/extension/python-install/offline-wheel/
 
-    scp -o ConnectTimeout=10 ${git_root}/khan.pythonscript/python-build-tempdir/build_ouput/pyservice-1.0.3-py3-none-any.whl ${package_server_ip}:${package_server_port}:${package_root}/extension/python-install/offline-wheel/
-    scp -o ConnectTimeout=10 ${git_root}/khan.pythonscript/python-build-tempdir/build_ouput/pytoolkit-1.0.0-py3-none-any.whl ${package_server_ip}:${package_server_port}:${package_root}/extension/python-install/offline-wheel/
+    scp -P ${package_server_port} -o ConnectTimeout=10 ${git_root}/khan.pythonscript/python-build-tempdir/build_ouput/pyservice-1.0.3-py3-none-any.whl root@${package_server_ip}:${package_root}/extension/python-install/offline-wheel/
+    scp -P ${package_server_port} -o ConnectTimeout=10 ${git_root}/khan.pythonscript/python-build-tempdir/build_ouput/pytoolkit-1.0.0-py3-none-any.whl root@${package_server_ip}:${package_root}/extension/python-install/offline-wheel/
 
     cp -rfv ${git_root}/khan.pythonscript/python-build-tempdir/build_ouput/pycomlib-1.1.7-py3-none-any.whl ${package_root}/extension/python-install/offline-wheel/
     cp -rfv ${git_root}/khan.pythonscript/python-build-tempdir/build_ouput/pycomlibex-1.1.2-py3-none-any.whl ${package_root}/extension/python-install/offline-wheel/
