@@ -143,7 +143,7 @@ function build_toolkit()
     tar -czf toolkit.tar.gz --exclude='.git' --exclude='.gitignore' toolkit/
 
     #원격 서버로 미리 이동
-    scp -P ${package_server_port} -o ConnectTimeout=10 toolkit.tar.gz ${package_server_ip}:${aivax_package_release_root}/aivax-patch/
+    scp -P ${package_server_port} -o ConnectTimeout=10 toolkit.tar.gz root@${package_server_ip}:${package_root}/aivax-patch/
 
     mv toolkit.tar.gz ${package_root}/aivax-patch/
 
