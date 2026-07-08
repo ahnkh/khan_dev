@@ -12,18 +12,13 @@ aivax_package_release_root="/data/data-root/aivax-install-root"
 
 git_branch="qa_release"
 
-target_server="10.0.240.150"
-
-# GIT_TAG=$(git describe --tags --abbrev=0)
-# DISPLAY_VERSION=${GIT_TAG//_/ }
-# echo "$DISPLAY_VERSION"
-# AIVAX_VERSION="SNIPER AIVAX V1.0.0.0"
+sslproxy_git_server="10.0.240.150"
 
 function WRITE_LOG()
 {
 
     GREEN='\033[1;32m'
-    NC='\033[0m' # No Color
+    NC='\033[0m'
 
     bold=$(tput bold)
     normal=$(tput sgr0)
@@ -45,7 +40,6 @@ function merge_git()
     git switch ${git_branch}
 
     git merge origin/develop --no-edit
-    # git merge origin/develop
 
     git push
 
@@ -61,9 +55,6 @@ function build_management()
     cd ${git_root}/aivax/apps/management
 
     git switch ${git_branch}
-
-    # git checkout frontend/package-lock.json
-    # git checkout backend/package-lock.json
 
     git pull
 
@@ -114,20 +105,20 @@ function git_patch_sslproxy()
 
     mkdir -p ${git_root}/aivax/sslproxy_temp_repo
     mkdir -p ${git_root}/aivax/sslproxy
+    mkdir -p ${git_root}/aivax/ai_engine
 
-    scp -P222 -r root@${target_server}:/backup/repository ${git_root}/aivax/sslproxy_temp_repo/
+    scp -P222 -r root@${sslproxy_git_server}:/backup/repository ${git_root}/aivax/sslproxy_temp_repo/
 
     \cp -rfv ${git_root}/aivax/sslproxy_temp_repo/repository/sslproxy ${git_root}/aivax/sslproxy/
     \cp -rfv ${git_root}/aivax/sslproxy_temp_repo/repository/sslproxy.conf ${git_root}/aivax/sslproxy/
     \cp -rfv ${git_root}/aivax/sslproxy_temp_repo/repository/Note.md ${git_root}/aivax/sslproxy/.note.md
 
     find ${git_root}/aivax/sslproxy_temp_repo/repository/ai_engine | grep __pycache__ | xargs -i rm -rf {}
-    \cp -rfv ${git_root}/aivax/sslproxy_temp_repo/repository/ai_engine/* ${git_root}/aivax/aivax-package/ai_engine/
+    \cp -rfv ${git_root}/aivax/sslproxy_temp_repo/repository/ai_engine/* ${git_root}/aivax/ai_engine/
 
     WRITE_LOG $FUNCNAME $LINENO "finish patch sslproxy"
 }
 
-#sslproxy도 별도 git으로 관리
 function build_sslproxy()
 {
     WRITE_LOG $FUNCNAME $LINENO "start build sslproxy"
@@ -148,6 +139,8 @@ function build_ai_engine()
 {
     WRITE_LOG $FUNCNAME $LINENO "start build ai_engine"
 
+    cd ${git_root}/aivax/
+
     git pull
 
     tar -czf ai_engine.tar.gz --exclude='.git' --exclude='.gitignore' ai_engine/
@@ -167,8 +160,7 @@ function make_version_text_file()
     AIVAX_TAG=$(git -C ${git_root}/aivax describe --tags --abbrev=0 2>/dev/null)
     AIVAX_HASH=$(git -C ${git_root}/aivax rev-parse --short HEAD 2>/dev/null)
 
-    #sslproxy hash
-    ENGINE_FILE="${git_root}/aivax/sslproxy"
+    ENGINE_FILE="${git_root}/aivax/sslproxy/sslproxy"
 
     FILE_HASH=$(sha256sum "$ENGINE_FILE" | awk '{print $1}')
     ENGINE_HASH_SHORT=${FILE_HASH:0:7}

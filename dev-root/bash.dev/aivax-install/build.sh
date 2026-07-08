@@ -19,6 +19,8 @@ aivax_package_release_root="/data/data-root/aivax-install-root"
 # git_branch="develop"
 git_branch="qa_release"
 
+sslproxy_git_server="10.0.240.150"
+
 package_server_ip="10.0.55.150"
 package_server_port="22"
 
@@ -157,7 +159,7 @@ function git_patch_sslproxy()
 
     mkdir -p ${git_root}/aivax_public/aivax-package/sslproxy_temp_repo
 
-    scp -P222 -r root@10.0.240.150:/backup/repository ${git_root}/aivax_public/aivax-package/sslproxy_temp_repo/
+    scp -P222 -r root@${sslproxy_git_server}:/backup/repository ${git_root}/aivax_public/aivax-package/sslproxy_temp_repo/
 
     #TODO: 하나씩 이동, sslproxy
     # cp -rfv ${git_root}/aivax_public/aivax-package/sslproxy_temp_repo/repository/* ${git_root}/aivax_public/aivax-package/sslproxy/
@@ -228,6 +230,8 @@ function build_sslproxy()
 function build_ai_engine()
 {
     WRITE_LOG $FUNCNAME $LINENO "start build ai_engine"
+
+    cd ${git_root}/aivax_public/aivax-package/
 
     git pull
 
