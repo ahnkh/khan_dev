@@ -99,6 +99,8 @@ function main()
     #pycomlib 업데이트
     update_pycomlib
 
+    # TODO: pip, rpm 업데이트, 이건 발생시 직접 복사
+
     WRITE_LOG $FUNCNAME $LINENO "finish scp copy"
 }
 
