@@ -25,7 +25,7 @@ function WRITE_LOG()
         
     echo -e "${GREEN}[$(date '+%Y/%m/%d %H:%M:%S')]${NC}${bold} $3 ${normal}"
     
-    echo $string &>> ${g_path}/${TRACE_LOG}
+    # echo $string &>> ${g_path}/${TRACE_LOG}
 }
 
 
