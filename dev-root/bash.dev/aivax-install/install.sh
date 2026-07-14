@@ -129,9 +129,11 @@ function init_default_setup()
     chown -hR opensearch:opensearch /backup/opensearch_snapshot
     chmod 750 /backup/opensearch_snapshot
 
+    # mkdir -p /data
+
     # 백업 경로, 기본 생성, /backup 파티션이 있다는 가정
-    mkdir -p /backup/attach_file_backup
-    mkdir -p /backup/prompt_log_backup
+    mkdir -p /data/backup/attach_file_backup
+    mkdir -p /data/backup/prompt_log_backup
 
     #TODO: opensearch data, 파티션 변경 필요 
     #/home1 => app, 또는 root, symbolic link
@@ -565,7 +567,7 @@ function __install_opensearch_config()
 
     # /etc/opensearch/opensearh.yml, 경로 변경, 우선 스크립트로
     # NEW_PATH="/home1/aivax/data_resource/opensearch"
-    NEW_PATH="/home1/opensearch"
+    NEW_PATH="/data/opensearch"
     CONFIG_FILE="/etc/opensearch/opensearch.yml"
 
     sudo sed -i "s|path.data:.*|path.data: $NEW_PATH|g" "$CONFIG_FILE"
@@ -603,11 +605,8 @@ EnvironmentFile=-/etc/sysconfig/opensearch
 User=opensearch
 Group=opensearch
 
-#WorkingDirectory=/home1/aivax/data_resource/opensearch
-WorkingDirectory=/home1/opensearch
-
-#ExecStartPre=/bin/mkdir -p /home1/aivax/data_resource/opensearch/tmp
-#ExecStartPre=/bin/chown opensearch:opensearch /home1/aivax/data_resource/opensearch/tmp
+#WorkingDirectory=/data/aivax/data_resource/opensearch
+WorkingDirectory=/data/opensearch
 
 ExecStartPre=/bin/mkdir -p /dev/shm/performanceanalyzer
 ExecStartPre=/bin/chown opensearch:opensearch /dev/shm/performanceanalyzer
@@ -658,7 +657,7 @@ SystemCallErrorNumber=EPERM
 
 RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
 
-ReadWritePaths=/home1/opensearch
+ReadWritePaths=/data/opensearch
 ReadWritePaths=/dev/shm
 ReadWritePaths=-/etc/opensearch
 ReadWritePaths=-/mnt/snapshots
@@ -709,7 +708,7 @@ function __install_opensearch_data()
     # TODO: 경로 변경에 대한 대처.
 
     #TODO: 디렉토리 존재여부, 디렉토리가 존재하고, 설치 되어 있으면 skip 한다.    
-    if [ -d /home1/opensearch ]
+    if [ -d /data/opensearch ]
     then
         # mv /home1/aivax/data_resource/opensearch /home1/aivax/data_resource/opensearch.$(date +%Y%m%d%H%M)
         # TODO: 종료코드, 현재시점은 최초 설치만 고려
@@ -726,7 +725,7 @@ function __install_opensearch_data()
     #기본 설치 - installer에서 조금더 보강
     mv /tmp/install-temp/opensearch-data/opensearch /home1/
 
-    chown -R opensearch:opensearch /home1/opensearch
+    chown -R opensearch:opensearch /data/opensearch
     chmod -R 750 /home1/opensearch
 }
 
@@ -837,9 +836,18 @@ function __install_opensearch()
 
 function __install_slm()
 {
+
+    WRITE_LOG $FUNCNAME $LINENO "start install slm service"
     echo
 
+    tar xzf ./extension/slm-install/slm.tar.gz  
 
+    \cp -rf slm /home1/aivax/slm/
+
+    \cp -rf ./extension/slm-install/run.sh /home1/aivax/slm/
+    \cp -rf ./extension/slm-install/stop.sh /home1/aivax/slm/
+
+    WRITE_LOG $FUNCNAME $LINENO "finish install slm service"
     
 }
 

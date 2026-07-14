@@ -40,7 +40,53 @@ function switch_model()
     ln -sfn  /home1/aivax/slm/models/v0.2/sf-2b-v0.2/safeguard-2b-explain-v0.2/safeguard-2b-explain-v0.2-bf16.gguf /home1/aivax/slm/models/cipher-guard-current.gguf && ls -al /home1/aivax/slm/models/cipher-guard-current.gguf && ./stop.sh ; ./run.sh
     ln -sfn  /home1/aivax/slm/models/v0.2/sf-2b-v0.2/safeguard-2b-explain-v0.2/safeguard-2b-explain-v0.2-q8_0.gguf /home1/aivax/slm/models/cipher-guard-current.gguf && ls -al /home1/aivax/slm/models/cipher-guard-current.gguf && ./stop.sh ; ./run.sh
 
-    
+    # 서비스 개발, 4차 제공 - 2b
+    ln -sfn  /home1/aivax/slm/models/v0.3/sf-2b-v0.3/safeguard-2b-explain-v0.3/safeguard-2b-explain-v0.3-q8_0.gguf /home1/aivax/slm/models/cipher-guard-current.gguf && ls -al /home1/aivax/slm/models/cipher-guard-current.gguf && ./stop.sh ; ./run.sh
+
+
+}
+
+function test_prompt5()
+{
+
+ curl http://127.0.0.1:1200/v1/chat/completions   -H 'Content-Type: application/json'   -d "{
+    \"messages\": [
+      {
+        \"role\": \"user\",
+        \"content\": \"홍길동 전화번호는 010-1234-5678이고 이메일은 test@example.com입니다.\"
+      }
+    ],
+    \"max_tokens\": 3000,
+    \"temperature\": 0,
+    \"repeat_penalty\": 1.15
+  }"
+
+
+
+    echo "service 개발 프롬프트 테스트"
+
+    # 임시 프롬프트
+cat > test.json <<EOF
+{
+  "messages":[
+    {
+      "role" : "user",
+      "content" : "김도현의 앱 아이디는 dohyun.kim이고 이메일은 dh.kim@appmail.kr입니다
+"
+    }
+  ],
+  "max_tokens" : 3000,
+  "temperature" : 0,
+  "repeat_penalty" : 1.15
+}
+EOF
+time curl -s "http://127.0.0.1:1200/v1/chat/completions" -H "Content-Type: application/json" --max-time 1800 -d @test.json | jq
+
+    time curl -s "http://127.0.0.1:1200/completions" -H "Content-Type: application/json" --max-time 1800 -d @test.json | jq
+}
+
+function test_prompt4()
+{
     echo "test1 프롬프트"; cat test/req1.json
     echo "----------------------------------------------------"
     time curl -s -X POST "http://127.0.0.1:1200/v1/chat/completions" -H "Content-Type: application/json" --max-time 1800 -d @test/req1.json | jq 
@@ -147,18 +193,15 @@ function switch_model()
     # 임시 프롬프트
 cat > test.json <<EOF
 {
-  "prompt": "### Instruction:\n 다음 텍스트에서 개인정보, 민감정보, 가드레일, 또는 악성/욕설 문장을 탐지하고 JSON 형식으로 반환하세요 \n\n### Input:\n fluent bit의 opensearch 로그 생성 테스트 입니다.\n### Response\n",
+  "prompt": "### Instruction:\n 다음 텍스트에서 개인정보, 민감정보, 가드레일, 또는 악성/욕설 문장을 탐지하고 JSON 형식으로 반환하세요 \n\n### Input:\n 국민연금의 수령일은 언제인가요?.\n### Response\n",
   "n_predict" : 128,
   "temperature" : 0,
   "repeat_penalty" :1.15
 }
 EOF
 
-    cat test/test.json
+    cat test.json
     time curl -s -X POST "http://127.0.0.1:1200/completions" -H "Content-Type: application/json" --max-time 1800 -d @test.json | jq
-
-    
-
 }
 
 
