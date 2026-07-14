@@ -737,6 +737,13 @@ function __install_opensearch()
     # 일단 작성후, 경로 또는 세부 테스트.
     dnf install ./extension/rpm-install/3rd-repo/opensearch/v3.3.2/opensearch-3.3.2-linux-x64.rpm -y -q
 
+    # 제일먼저, /home1/opensearch가 있으면, data 경로로 이동한다.
+    if [ -d /home1/opensearch ]
+    then
+        WRITE_LOG $FUNCNAME $LINENO "move opensearch data, /home1 to /data"
+        mv /home1/opensearch /data/
+    fi
+
     # 설정 config, opensearch의 설치여부와 상관없이 업데이트 한다.
     __install_opensearch_config
 

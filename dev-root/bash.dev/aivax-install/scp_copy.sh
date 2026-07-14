@@ -28,9 +28,30 @@ function WRITE_LOG()
     # echo $string &>> ${g_path}/${TRACE_LOG}
 }
 
+#git merge, 충돌이 날수 있어, 이건 반영이 필요하다.
+function merge_git()
+{
+    WRITE_LOG $FUNCNAME $LINENO "start merge git"
+
+    cd ${git_root}/aivax/apps/
+
+    git pull
+    git switch ${git_branch}
+
+    # git merge origin/develop --no-edit
+    git merge origin/develop
+
+    git push
+
+    cd ${g_path}
+
+    WRITE_LOG $FUNCNAME $LINENO "finish merge git"
+}
+
+
 
 # toolkit build, 원격지로 복사한다. rsync는 배제
-function build_toolkit()
+function scp_toolkit()
 {
     WRITE_LOG $FUNCNAME $LINENO "start build toolkit"
 
@@ -91,7 +112,9 @@ function main()
 {
     WRITE_LOG $FUNCNAME $LINENO "start scp copy"
 
-    build_toolkit
+    merge_git
+
+    scp_toolkit
 
     # 설치 스크립트, 향후 변경
     update_install_script
