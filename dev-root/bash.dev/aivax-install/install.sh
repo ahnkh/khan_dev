@@ -126,7 +126,7 @@ function init_default_setup()
 
     # opensearch, 백업 경로 지정, opensearch의 설치 전에 수행되어야 한다.
     mkdir -p /data/backup/opensearch_snapshot
-    chown -hR opensearch:opensearch /backup/opensearch_snapshot
+    chown -hR opensearch:opensearch /data/backup/opensearch_snapshot
     chmod 750 /data/backup/opensearch_snapshot
 
     # mkdir -p /data
@@ -740,7 +740,11 @@ function __install_opensearch()
     # 제일먼저, /home1/opensearch가 있으면, data 경로로 이동한다.
     if [ -d /home1/opensearch ]
     then
-        WRITE_LOG $FUNCNAME $LINENO "move opensearch data, /home1 to /data"
+        WRITE_LOG $FUNCNAME $LINENO "move opensearch data, /home1 to /data (take several minutes for large data volumes)"
+
+        # 다음 방식으로 수정 필요, 우선 수동 가이드, 더이상 /home1/opensearch를 사용하는 고객사는 없다.
+        # rsync -aHAX --info=progress2 /home1/opensearch/ /data/opensearch/
+        # mv /home1/opensearch /home1/opensearch.bak
         mv /home1/opensearch /data/
     fi
 
@@ -845,7 +849,6 @@ function __install_slm()
 {
 
     WRITE_LOG $FUNCNAME $LINENO "start install slm service"
-    echo
 
     tar xzf ./extension/slm-install/slm.tar.gz  
 
@@ -1491,7 +1494,7 @@ function __backup_opensearch_snapshot()
 
     #1번더 체크
     mkdir -p /data/backup/opensearch_snapshot
-    chown -hR opensearch:opensearch /backup/opensearch_snapshot
+    chown -hR opensearch:opensearch /data/backup/opensearch_snapshot
     chmod 750 /data/backup/opensearch_snapshot
 
     # api call만 수행
