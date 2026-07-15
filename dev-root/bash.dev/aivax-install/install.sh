@@ -723,10 +723,10 @@ function __install_opensearch_data()
     mv /tmp/install-temp/opensearch-data/opensearch_docker /tmp/install-temp/opensearch-data/opensearch
 
     #기본 설치 - installer에서 조금더 보강
-    mv /tmp/install-temp/opensearch-data/opensearch /home1/
+    mv /tmp/install-temp/opensearch-data/opensearch /data/
 
     chown -R opensearch:opensearch /data/opensearch
-    chmod -R 750 /home1/opensearch
+    chmod -R 750 /data/opensearch
 }
 
 function __install_opensearch()
