@@ -852,7 +852,8 @@ function __install_slm()
 
     tar xzf ./extension/slm-install/slm.tar.gz  
 
-    \cp -rf slm /home1/aivax/slm/
+    # \cp -rf slm /home1/aivax/slm/
+    mv slm /home1/aivax/
 
     \cp -rf ./extension/slm-install/run.sh /home1/aivax/slm/
     \cp -rf ./extension/slm-install/stop.sh /home1/aivax/slm/
@@ -1521,6 +1522,15 @@ function __delete_opensearch_unused_index()
 
     # template의 삭제 
     curl -u admin:'Sniper123!@#' -sk -XDELETE "https://127.0.0.1:9200/_index_template/query_insights_top_queries_template" 
+
+    # aivax_log, 만약을 대비해서 기본으로 추가한다.
+    curl -u 'admin:Sniper123!@#' -k -fs https://127.0.0.1:9200/aivax_log >/dev/null || curl -u 'admin:Sniper123!@#' -k -X PUT https://127.0.0.1:9200/aivax_log -H 'Content-Type: application/json' \
+-d '{
+  "settings": {
+    "number_of_shards": 1,
+    "number_of_replicas": 0
+  }
+}'
 
     # index 목록의 조회
     curl -u admin:'Sniper123!@#' -sk https://127.0.0.1:9200/_cat/indices?v
