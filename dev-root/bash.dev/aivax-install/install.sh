@@ -1471,6 +1471,9 @@ function configure_after_install()
     # aivax 시작 스크립트
     __run_aivax_toolkit_init_command
 
+    # 한번더 재시작
+    systemctl restart aivax-toolkit
+
 
     WRITE_LOG $FUNCNAME $LINENO "finish configure after install"
 

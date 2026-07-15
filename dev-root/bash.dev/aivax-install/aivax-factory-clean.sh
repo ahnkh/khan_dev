@@ -39,7 +39,8 @@ function clear_opensearch()
 {
     WRITE_LOG $FUNCNAME $LINENO "clear aivax log db"
 
-    rm -rf /home1/opensearch
+    # rm -rf /home1/opensearch
+    rm -rf /data/opensearch
 
     rm -rf /etc/opensearch.old
     rm -rf /etc/opensearch
@@ -175,7 +176,6 @@ function clear_os_env()
 
     # echo "AIVAX venv entries removed."
     # echo "Backup: ${PROFILE}.bak"
-
 
 }
 
