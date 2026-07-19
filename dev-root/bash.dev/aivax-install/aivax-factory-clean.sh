@@ -39,7 +39,7 @@ function clear_opensearch()
 {
     WRITE_LOG $FUNCNAME $LINENO "clear aivax log db"
 
-    # rm -rf /home1/opensearch
+    rm -rf /home1/opensearch
     rm -rf /data/opensearch
 
     rm -rf /etc/opensearch.old
