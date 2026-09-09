@@ -267,11 +267,11 @@ function update_pycomlib()
     cd ${git_root}/khan.pythonscript/
     svn update --username khan --password '1111' --non-interactive
 
-    scp -P ${package_server_port} -o ConnectTimeout=10 ${git_root}/khan.pythonscript/python-build-tempdir/build_ouput/pycomlib-1.1.7-py3-none-any.whl root@${package_server_ip}:${package_root}/extension/python-install/offline-wheel/
-    scp -P ${package_server_port} -o ConnectTimeout=10 ${git_root}/khan.pythonscript/python-build-tempdir/build_ouput/pycomlibex-1.1.2-py3-none-any.whl root@${package_server_ip}:${package_root}/extension/python-install/offline-wheel/
+    # scp -P ${package_server_port} -o ConnectTimeout=10 ${git_root}/khan.pythonscript/python-build-tempdir/build_ouput/pycomlib-1.1.7-py3-none-any.whl root@${package_server_ip}:${package_root}/extension/python-install/offline-wheel/
+    # scp -P ${package_server_port} -o ConnectTimeout=10 ${git_root}/khan.pythonscript/python-build-tempdir/build_ouput/pycomlibex-1.1.2-py3-none-any.whl root@${package_server_ip}:${package_root}/extension/python-install/offline-wheel/
 
-    scp -P ${package_server_port} -o ConnectTimeout=10 ${git_root}/khan.pythonscript/python-build-tempdir/build_ouput/pyservice-1.0.3-py3-none-any.whl root@${package_server_ip}:${package_root}/extension/python-install/offline-wheel/
-    scp -P ${package_server_port} -o ConnectTimeout=10 ${git_root}/khan.pythonscript/python-build-tempdir/build_ouput/pytoolkit-1.0.0-py3-none-any.whl root@${package_server_ip}:${package_root}/extension/python-install/offline-wheel/
+    # scp -P ${package_server_port} -o ConnectTimeout=10 ${git_root}/khan.pythonscript/python-build-tempdir/build_ouput/pyservice-1.0.3-py3-none-any.whl root@${package_server_ip}:${package_root}/extension/python-install/offline-wheel/
+    # scp -P ${package_server_port} -o ConnectTimeout=10 ${git_root}/khan.pythonscript/python-build-tempdir/build_ouput/pytoolkit-1.0.0-py3-none-any.whl root@${package_server_ip}:${package_root}/extension/python-install/offline-wheel/
 
     cp -rfv ${git_root}/khan.pythonscript/python-build-tempdir/build_ouput/pycomlib-1.1.7-py3-none-any.whl ${package_root}/extension/python-install/offline-wheel/
     cp -rfv ${git_root}/khan.pythonscript/python-build-tempdir/build_ouput/pycomlibex-1.1.2-py3-none-any.whl ${package_root}/extension/python-install/offline-wheel/
@@ -395,12 +395,12 @@ function clean_package_file()
 {
     WRITE_LOG $FUNCNAME $LINENO "start clean package file"
 
-    ssh -o ConnectTimeout=5 root@10.0.50.84 "rm -rf /backup/aivax-install*"
-    ssh -o ConnectTimeout=5 root@10.0.50.85 "rm -rf /backup/aivax-install*"
+    # ssh -o ConnectTimeout=5 root@10.0.50.84 "rm -rf /backup/aivax-install*"
+    # ssh -o ConnectTimeout=5 root@10.0.50.85 "rm -rf /backup/aivax-install*"
 
-    timeout 30 ssh -o ConnectTimeout=5 root@10.0.240.150 -p222 "rm -rf /backup/aivax-install.v*"
-    ssh -o ConnectTimeout=5 root@10.0.55.150 "rm -rf /backup/aivax-install.v*"
-    ssh -o ConnectTimeout=5 root@10.0.55.152 "rm -rf /backup/aivax-install.v*"
+    # timeout 30 ssh -o ConnectTimeout=5 root@10.0.240.150 -p222 "rm -rf /backup/aivax-install.v*"
+    # ssh -o ConnectTimeout=5 root@10.0.55.150 "rm -rf /backup/aivax-install.v*"
+    # ssh -o ConnectTimeout=5 root@10.0.55.152 "rm -rf /backup/aivax-install.v*"
 
     WRITE_LOG $FUNCNAME $LINENO "finish clean package file"
 }
