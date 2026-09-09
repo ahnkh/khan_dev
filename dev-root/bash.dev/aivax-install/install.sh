@@ -188,6 +188,8 @@ function __istall_rpm_package()
 
     dnf install --disablerepo="*" --enablerepo="aivax-repo" squid -y -q
 
+    dnf install --disablerepo="*" --enablerepo="aivax-repo" cmake -y -q
+
     WRITE_LOG $FUNCNAME $LINENO "finish install rpm package"
 }
 

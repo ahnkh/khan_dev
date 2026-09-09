@@ -145,7 +145,7 @@ function build_toolkit()
     tar -czf toolkit.tar.gz --exclude='.git' --exclude='.gitignore' toolkit/
 
     #원격 서버로 미리 이동
-    scp -P ${package_server_port} -o ConnectTimeout=10 toolkit.tar.gz root@${package_server_ip}:${package_root}/aivax-patch/
+    # scp -P ${package_server_port} -o ConnectTimeout=10 toolkit.tar.gz root@${package_server_ip}:${package_root}/aivax-patch/
 
     mv toolkit.tar.gz ${package_root}/aivax-patch/
 
@@ -249,8 +249,9 @@ function update_install_script()
     cd ${git_root}/khan_dev/dev-root/bash.dev/aivax-install
 
     cp -rfv install.sh ${package_root}/
+    cp -rfv installer.sh ${package_root}/
 
-    scp -P ${package_server_port} -o ConnectTimeout=10 install.sh ${package_server_ip}:${package_root}/
+    # scp -P ${package_server_port} -o ConnectTimeout=10 install.sh ${package_server_ip}:${package_root}/
 
     WRITE_LOG $FUNCNAME $LINENO "finish update install script"
 }
@@ -417,10 +418,12 @@ function main()
 
     build_toolkit
 
-    git_patch_sslproxy
+    # 구조가 변경됨 주석 처리
+    # git_patch_sslproxy
 
-    build_sslproxy
-    build_ai_engine
+    # 일단 과거 버전 사용
+    # build_sslproxy
+    # build_ai_engine
 
     # 설치 스크립트, 향후 변경
     update_install_script
