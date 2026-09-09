@@ -28,17 +28,11 @@ function install_default_modules()
 
 function ui_interface()
 {
-    # 현재경로, 설치용 venv를 만들어 보자. 모듈 최소화
     __setup_pip_venv_for_install
-
-    #dialog, python, service module wrapper
     
     tar xzf ./aivax-patch/toolkit.tar.gz --strip-components=1 -C .
 
-    # cd .pyinstall/toolkit
-
-    # 테스트.
-    python aivax_toolkit.py --debug --printlog --dummy
+    ./.installer install
 
     cd - > /dev/null 2>&1
 
