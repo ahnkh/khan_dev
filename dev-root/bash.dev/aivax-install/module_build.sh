@@ -19,6 +19,17 @@ function WRITE_LOG()
     # echo $string &>> ${g_path}/${TRACE_LOG}
 }
 
+#svn update 제일 먼저 동기화
+function update_kshell_svn()
+{
+    # 제일 먼저 svn 업데이트
+    cd ${git_root}/khan.pythonscript/khan-shell-interface/
+    svn update
+
+    cd ${git_root}/khan.pythonscript/khan-shell-interface/khan_pylib
+    svn update
+}
+
 # __init__.py, 자동 생성, 누락에 대한 대비
 function create_init_py()
 {
@@ -323,6 +334,9 @@ function build_pylib_whl_lib()
 function main()
 {
     WRITE_LOG $FUNCNAME $LINENO "start build whl module"
+
+    #svn, 제일 먼저 동기화
+    update_kshell_svn
 
     #toolkit config, 소스 업데이트
     # update_toolkit_source
