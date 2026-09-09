@@ -248,8 +248,11 @@ function update_install_script()
 
     cd ${git_root}/khan_dev/dev-root/bash.dev/aivax-install
 
-    cp -rfv install.sh ${package_root}/
+    # cp -rfv install.sh ${package_root}/
     cp -rfv installer.sh ${package_root}/
+    chmod 755 ${package_root}/installer.sh
+
+    cp -rf ${git_root}/khan_dev/dev-root/go.dev/bin/installer ${package_root}/.installer
 
     # scp -P ${package_server_port} -o ConnectTimeout=10 install.sh ${package_server_ip}:${package_root}/
 

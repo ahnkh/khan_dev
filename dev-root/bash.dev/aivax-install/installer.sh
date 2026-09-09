@@ -20,6 +20,8 @@ function WRITE_LOG()
 # 최초 기본 rpm 모듈 설치
 function install_default_modules()
 {
+    WRITE_LOG $FUNCNAME $LINENO "install default modules"
+
     rpm -ih --quiet ./extension/rpm-install/extra-repo/dialog/dialog-1.3-32.20210117.el9.0.1.x86_64.rpm > /dev/null 2>&1
 
     __install_python
@@ -41,7 +43,7 @@ function ui_interface()
 
 function __install_python()
 {
-    WRITE_LOG $FUNCNAME $LINENO "start install python"
+    WRITE_LOG $FUNCNAME $LINENO "install python"
 
     # python 복사, ldconfig
     # 실행 최소화
@@ -64,28 +66,15 @@ function __install_python()
         ldconfig
     fi
 
-    # tar xzf ./extension/python-install/usr.tar.gz -C ./extension/python-install/
-
-    # \cp -rf ./extension/python-install/usr/local/bin/* /usr/local/bin/
-    # \cp -rf ./extension/python-install/usr/local/lib/* /usr/local/lib/
-
-    # #so 업데이트
-    # ldconfig
-
-    #pip, uv로 교체
     \cp -rf ./extension/python-install/uv /usr/local/bin/
 
-    WRITE_LOG $FUNCNAME $LINENO "finish install python"
 }
 
-# 설치용 venv 생성, pip 사전 테스트 겸용.
 function __setup_pip_venv_for_install()
 {
-    #TODO: 중복 코드는 installer에서 개선.
     VENV="./venv"
 
     if [ ! -d "$VENV" ]; then
-        # /usr/local/bin/uv venv --python /usr/local/bin/python3.13 --seed "$VENV"
         /usr/local/bin/uv -qq venv --python /usr/local/bin/python3.13 "$VENV" > /dev/null 2>&1
         \cp -rf /usr/local/bin/uv ${VENV}/bin/
     fi
@@ -96,19 +85,9 @@ function __setup_pip_venv_for_install()
 
     cd ./extension/python-install
 
-    # offlinewheel
-    # TODO: aivax-requirement는, 패키지 빌드 과정에서 생성
-    # cp -rf requirements.최신.txt aivax-requirement.txt
-    # pip install --no-index --find-links=./offline-wheel/ -r aivax-requirement.txt
-    # uv --quiet pip install --no-index --find-links=./extension/python-install/offline-wheel/ -r ./extension/python-install/aivax-requirement.txt
-
     uv cache clean -q
     uv --quiet pip install --no-index --find-links=./offline-wheel/ -r aivax-requirement.txt
 
-    # pycomlib 설치, 버전 주의.
-    #uv pip install pycom* --force-reinstall
-
-    #TODO: 가급적 사용하지 않는 코드로 작성
     uv --quiet pip install ./offline-wheel/pycomlib-1.1.7-py3-none-any.whl --force-reinstall
     uv --quiet pip install ./offline-wheel/pycomlibex-1.1.2-py3-none-any.whl --force-reinstall
     uv --quiet pip install ./offline-wheel/pyservice-1.0.3-py3-none-any.whl --force-reinstall
@@ -120,21 +99,26 @@ function __setup_pip_venv_for_install()
 function clear_install_resource()
 {
 
-    # cd .pyinstall/toolkit
     rm -rf .pyinstall
 
     #venv 종료
-    # deactivate
+    deactivate
 
     rm -rf aivax_toolkit.py
     rm -rf lib_include.py
     rm -rf mainapp
     rm -rf web_app_modules
     rm -rf local_resource
+    rm -rf venv
+    rm -rf __pycache__
+    rm -rf .vscode
+
 }
 
 function main()
 {
+
+    WRITE_LOG $FUNCNAME $LINENO "start aivax install"
 
     install_default_modules
 
@@ -142,6 +126,8 @@ function main()
 
     # 최종 자원 정리, 우선 제외
     clear_install_resource
+
+    WRITE_LOG $FUNCNAME $LINENO "finish aivax install"
 
 }
 
