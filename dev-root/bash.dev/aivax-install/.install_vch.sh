@@ -249,3 +249,5 @@ function main()
 
     __setup_aivax_venv
 }
+
+main $@
