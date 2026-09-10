@@ -1,20 +1,25 @@
 
-
 g_path=$( cd "$(dirname "$0")" ; pwd )
 
-
-function main()
+function WRITE_LOG()
 {
 
-    __install_opensearch
+    GREEN='\033[1;32m'
+    NC='\033[0m'
 
+    bold=$(tput bold)
+    normal=$(tput sgr0)
 
+    local string="[$(date '+%Y/%m/%d %H:%M:%S')][$$][$1:($2)] $3 $4"
+        
+    echo -e "${GREEN}[$(date '+%Y/%m/%d %H:%M:%S')]${NC}${bold} $3 ${normal}"
+    
 }
-
 
 function __install_opensearch_config()
 {
-    
+    WRITE_LOG $FUNCNAME $LINENO "install opensearch config"
+
     rm -rf /tmp/install-temp/opensearch-config
 
     mkdir -p /tmp/install-temp/opensearch-config
@@ -158,6 +163,8 @@ EOF
 
 function __install_opensearch_data()
 {
+    WRITE_LOG $FUNCNAME $LINENO "install opensearch data"
+
     rm -rf /tmp/install-temp/opensearch-data
 
     if [ -d /data/opensearch ]
@@ -180,7 +187,7 @@ function __install_opensearch_data()
 
 function __install_opensearch()
 {
-    WRITE_LOG $FUNCNAME $LINENO "start install opensearch"
+    WRITE_LOG $FUNCNAME $LINENO "install opensearch"
 
     dnf install ./extension/rpm-install/3rd-repo/opensearch/v3.3.2/opensearch-3.3.2-linux-x64.rpm -y -q
 
@@ -189,15 +196,14 @@ function __install_opensearch()
     __install_opensearch_data
     
 
-    WRITE_LOG $FUNCNAME $LINENO "finish install opensearch"
+    # WRITE_LOG $FUNCNAME $LINENO "finish install opensearch"
 }
 
 
 function __setup_aivax_venv()
 {
 
-    WRITE_LOG $FUNCNAME $LINENO "start setup aivax venv"
-
+    WRITE_LOG $FUNCNAME $LINENO "setup aivax venv"
     
     mkdir -p /home1/aivax
     
@@ -235,7 +241,6 @@ fi
 
     cd - > /dev/null 2>&1
 
-    WRITE_LOG $FUNCNAME $LINENO "finish setup aivax venv"
 }
 
 function main()
