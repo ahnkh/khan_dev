@@ -252,6 +252,12 @@ function update_install_script()
     cp -rfv installer.sh ${package_root}/
     chmod 755 ${package_root}/installer.sh
 
+    cp -rfv .install_vch.sh ${package_root}/
+    cp -rfv .migrate.sh ${package_root}/
+
+    chmod 755 ${package_root}/.install_vch.sh
+    chmod 755 ${package_root}/.migrate.sh
+
     cp -rf ${git_root}/khan_dev/dev-root/go.dev/bin/installer ${package_root}/.installer
 
     # scp -P ${package_server_port} -o ConnectTimeout=10 install.sh ${package_server_ip}:${package_root}/
