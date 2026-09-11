@@ -22,12 +22,17 @@ function WRITE_LOG()
 #svn update 제일 먼저 동기화
 function update_kshell_svn()
 {
+
+    WRITE_LOG $FUNCNAME $LINENO "start update kshell svn"
+
     # 제일 먼저 svn 업데이트
     cd ${git_root}/khan.pythonscript/khan-shell-interface/
     svn update
 
     cd ${git_root}/khan.pythonscript/khan-shell-interface/khan_pylib
     svn update
+
+    WRITE_LOG $FUNCNAME $LINENO "finish update kshell svn"
 }
 
 # __init__.py, 자동 생성, 누락에 대한 대비

@@ -36,8 +36,6 @@ function ui_interface()
 
     ./.installer install
 
-    cd - > /dev/null 2>&1
-
 }
 
 
@@ -100,8 +98,7 @@ function clear_install_resource()
 {
 
     rm -rf .pyinstall
-
-    #venv 종료
+    
     deactivate
 
     rm -rf aivax_toolkit.py
@@ -123,8 +120,7 @@ function main()
     install_default_modules
 
     ui_interface
-
-    # 최종 자원 정리, 우선 제외
+    
     clear_install_resource
 
     WRITE_LOG $FUNCNAME $LINENO "finish aivax install"

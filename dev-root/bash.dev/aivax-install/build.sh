@@ -360,7 +360,7 @@ function release_package()
     #aivax의 패치 형상을 기준으로 hash를 만든다.
 
     #install.sh가 변경시에도 hash를 만들도록 임시 추가, 향후 git의 hash로 처리되어야 한다.
-    cp -rf aivax-install/install.sh aivax-install/aivax-patch/install-temp
+    cp -rf aivax-install/installer.sh aivax-install/aivax-patch/install-temp
 
     hash=$(tar -cf - aivax-install/aivax-patch/ | sha256sum | awk '{print $1}' | cut -c1-6)
 
