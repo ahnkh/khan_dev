@@ -17,7 +17,8 @@ aivax_package_release_root="/data/data-root/aivax-install-root"
 
 #TODO: 환경변수로.
 # git_branch="develop"
-git_branch="qa_release"
+# git_branch="qa_release"
+git_branch="certificate"
 
 sslproxy_git_server="10.0.240.150"
 
@@ -419,7 +420,7 @@ function main()
 {
     WRITE_LOG $FUNCNAME $LINENO "start aivax build"
 
-    merge_git
+    # merge_git
 
     build_management
 
