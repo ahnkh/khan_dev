@@ -69,13 +69,13 @@ function merge_git()
 }
 
 
-function build_management2()
-{
-    # management build 오류, 9.1일자 패키지로 대체
-    cp -rf ${git_root}/management.tar.gz ${package_root}/aivax-patch/
-    cd ${g_path}
+# function build_management2()
+# {
+#     # management build 오류, 9.1일자 패키지로 대체
+#     cp -rf ${git_root}/management.tar.gz ${package_root}/aivax-patch/
+#     cd ${g_path}
 
-}
+# }
 
 # management build, 이동
 # TODO: 경로등에 대해서는 installer, aivax-builder에서 개선
@@ -430,12 +430,9 @@ function main()
     WRITE_LOG $FUNCNAME $LINENO "start aivax build"
 
     # merge_git
-
-    # management 오류, 잠시 소스 복사
-    # build_management
-
-    build_management2
-
+    
+    build_management
+    # build_management2
 
     build_pipeline
 
