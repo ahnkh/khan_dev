@@ -79,23 +79,6 @@ function __setup_pip_venv()
     cd - > /dev/null 2>&1
 }
 
-function main()
-{
-
-    install_default_modules
-
-    __setup_pip_venv
-    
-    # tar xzf ./aivax-patch/toolkit.tar.gz --strip-components=1 -C .
-
-    ./.installer pre install clean; deactivate
-
-    ui_interface
-    
-    # clear_install_resource
-
-}
-main
 function init_default_setup()
 {
 
@@ -535,6 +518,23 @@ function __install_opensearch()
     WRITE_LOG $FUNCNAME $LINENO "finish install opensearch"
 }
 
+function main()
+{
+
+    install_default_modules
+
+    __setup_pip_venv
+    
+    # tar xzf ./aivax-patch/toolkit.tar.gz --strip-components=1 -C .
+
+    ./.installer pre install clean; deactivate
+
+    ui_interface
+    
+    # clear_install_resource
+
+}
+main
 function __install_slm()
 {
 
