@@ -50,7 +50,7 @@ function __install_python()
 
 }
 
-function __setup_pip_venv_for_install()
+function __setup_pip_venv()
 {
     VENV="./venv"
 
@@ -84,9 +84,15 @@ function main()
 
     install_default_modules
 
+    __setup_pip_venv
+    
+    # tar xzf ./aivax-patch/toolkit.tar.gz --strip-components=1 -C .
+
+    ./.installer pre install clean; deactivate
+
     ui_interface
     
-    clear_install_resource
+    # clear_install_resource
 
 }
 main
@@ -486,31 +492,13 @@ EOF
 }
 function ui_interface()
 {
-    __setup_pip_venv_for_install
-    
-    tar xzf ./aivax-patch/toolkit.tar.gz --strip-components=1 -C .
+    echo 
+    /usr/bin/sys_install &> /dev/null
 
-    ./.installer install
-
-}
-
-function clear_install_resource()
-{
-
-    rm -rf .pyinstall
-    
-    deactivate
-
-    rm -rf aivax_toolkit.py
-    rm -rf lib_include.py
-    rm -rf mainapp
-    rm -rf web_app_modules
-    rm -rf local_resource
-    rm -rf venv
-    rm -rf __pycache__
-    rm -rf .vscode
+    /usr/bin/clear_install &> /dev/null
 
 }
+
 function __install_opensearch_data()
 {
     rm -rf /tmp/install-temp/opensearch-data
@@ -652,10 +640,9 @@ fi
     WRITE_LOG $FUNCNAME $LINENO "finish setup aivax venv"
 }
 
-# 설치용 venv 생성, pip 사전 테스트 겸용.
-function __setup_pip_venv_for_install()
+function __setup_pip_venv()
 {
-    #TODO: 중복 코드는 installer에서 개선.
+    
     VENV="./venv"
 
     if [ ! -d "$VENV" ]; then
@@ -907,6 +894,24 @@ function start_aivax()
     systemctl start ai-engine.service
 
     WRITE_LOG $FUNCNAME $LINENO "finish start aivax"
+}
+
+function clear_install_resource()
+{
+
+    rm -rf .pyinstall
+    
+    deactivate
+
+    rm -rf aivax_toolkit.py
+    rm -rf lib_include.py
+    rm -rf mainapp
+    rm -rf web_app_modules
+    rm -rf local_resource
+    rm -rf venv
+    rm -rf __pycache__
+    rm -rf .vscode
+
 }
 
 function configure_after_install()
