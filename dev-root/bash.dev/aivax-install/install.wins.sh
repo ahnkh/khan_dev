@@ -1,5 +1,6 @@
-
 g_path=$( cd "$(dirname "$0")" ; pwd )
+
+TRACE_LOG="./trace-log"
 
 function WRITE_LOG()
 {
@@ -14,82 +15,36 @@ function WRITE_LOG()
         
     echo -e "${GREEN}[$(date '+%Y/%m/%d %H:%M:%S')]${NC}${bold} $3 ${normal}"
     
+    echo $string &>> ${g_path}/${TRACE_LOG}
 }
 
+function WRITE_ERROR()
+{
+
+    RED='\033[0;31m'    
+    NC='\033[0m'
+
+    bold=$(tput bold)
+    normal=$(tput sgr0)
+    
+    echo -e "${RED}${bold}[$(date '+%Y/%m/%d %H:%M:%S')] $3 ${normal} ${NC} "
+    
+    local string="[$(date '+%Y/%m/%d %H:%M:%S')][$$][$1:($2)] $3 $4"
+        
+    echo $string &>> ${g_path}/${log_file}
+}
+
+
+# 최초 기본 rpm 모듈 설치
 function install_default_modules()
 {
-    WRITE_LOG $FUNCNAME $LINENO "install default modules"
-
     rpm -ih --quiet ./extension/rpm-install/extra-repo/dialog/dialog-1.3-32.20210117.el9.0.1.x86_64.rpm > /dev/null 2>&1
 
     __install_python
 
 }
 
-function __install_python()
-{
-    WRITE_LOG $FUNCNAME $LINENO "install python"
-
-    PYTHON_BIN="/usr/local/bin/python3.13"
-    PYTHON_VERSION="3.13"
-
-    if [ -x "$PYTHON_BIN" ] && "$PYTHON_BIN" --version 2>&1 | grep -q "Python ${PYTHON_VERSION}"
-    then
-        WRITE_LOG $FUNCNAME $LINENO "python ${PYTHON_VERSION} already installed"
-    else
-        
-        tar xzf ./extension/python-install/usr.tar.gz -C ./extension/python-install/
-
-        \cp -rf ./extension/python-install/usr/local/bin/* /usr/local/bin/
-        \cp -rf ./extension/python-install/usr/local/lib/* /usr/local/lib/
-
-        ldconfig
-    fi
-
-    \cp -rf ./extension/python-install/uv /usr/local/bin/
-
-}
-
-function __setup_pip_venv_for_install()
-{
-    VENV="./venv"
-
-    if [ ! -d "$VENV" ]; then
-        /usr/local/bin/uv -qq venv --python /usr/local/bin/python3.13 "$VENV" > /dev/null 2>&1
-        \cp -rf /usr/local/bin/uv ${VENV}/bin/
-    fi
-
-    source ./venv/bin/activate
-
-    python -m ensurepip --default-pip > /dev/null 2>&1
-
-    cd ./extension/python-install
-
-    uv cache clean -q
-    uv --quiet pip install --no-index --find-links=./offline-wheel/ -r aivax-requirement.txt
-
-    # uv --quiet pip install --no-index ./offline-wheel/pycomlib-1.1.7-py3-none-any.whl --force-reinstall
-    # uv --quiet pip install --no-index ./offline-wheel/pycomlibex-1.1.2-py3-none-any.whl --force-reinstall
-    # uv --quiet pip install --no-index ./offline-wheel/pyservice-1.0.3-py3-none-any.whl --force-reinstall
-    # uv --quiet pip install --no-index ./offline-wheel/pytoolkit-1.0.0-py3-none-any.whl --force-reinstall
-
-    uv --quiet pip install --no-index --force-reinstall ./offline-wheel/pycomlib-1.1.7-py3-none-any.whl ./offline-wheel/pycomlibex-1.1.2-py3-none-any.whl \
-    ./offline-wheel/pyservice-1.0.3-py3-none-any.whl ./offline-wheel/pytoolkit-1.0.0-py3-none-any.whl
-    
-    cd - > /dev/null 2>&1
-}
-
-function main()
-{
-
-    install_default_modules
-
-    ui_interface
-    
-    clear_install_resource
-
-}
-main
+# 기본 설정 추가
 function init_default_setup()
 {
 
@@ -484,33 +439,7 @@ ProtectClock=true
 WantedBy=multi-user.target
 EOF
 }
-function ui_interface()
-{
-    __setup_pip_venv_for_install
-    
-    tar xzf ./aivax-patch/toolkit.tar.gz --strip-components=1 -C .
 
-    ./.installer install
-
-}
-
-function clear_install_resource()
-{
-
-    rm -rf .pyinstall
-    
-    deactivate
-
-    rm -rf aivax_toolkit.py
-    rm -rf lib_include.py
-    rm -rf mainapp
-    rm -rf web_app_modules
-    rm -rf local_resource
-    rm -rf venv
-    rm -rf __pycache__
-    rm -rf .vscode
-
-}
 function __install_opensearch_data()
 {
     rm -rf /tmp/install-temp/opensearch-data
@@ -676,7 +605,7 @@ function __setup_pip_venv_for_install()
     cd - > /dev/null 2>&1
 }
 
-function __install_python__()
+function __install_python()
 {
     WRITE_LOG $FUNCNAME $LINENO "start install python"
 
@@ -995,346 +924,441 @@ function wait_ready_opensearch()
     return 1
 }
 
+function main()
+{
+
+    install_default_modules
+
+    init_default_setup
+    
+    stop_aivax
+
+    install_module
+
+    patch_aivax_source
+
+    start_aivax
+
+    configure_after_install
+
+}
+
+main $@
+
 # declare -A CONST_DEFINE
 
 # CONST_DEFINE[aivax_rpm_repo_path]="extension/rpm/core-rpm/repos.d/aivax.repo"
 # CONST_DEFINE[system_rpm_repo_path]="/etc/yum.repos.d/"
 
+# # rpm 설치
+# function __install_rpm_modules()
+# {
+#     #rpm이 정상이면, dnf로 설치할수 있다.
+#     #예외처리는 프로그램으로. shell에서 실행하는 것 주의
 
-function __install_rpm_modules__()
-{
+#     dnf install jq --disablerepo="*" --enablerepo="aivax" -y
 
-    dnf install jq --disablerepo="*" --enablerepo="aivax" -y
+#     dnf install tree --disablerepo="*" --enablerepo="aivax" -y
 
-    dnf install tree --disablerepo="*" --enablerepo="aivax" -y
+#     dnf install sqlite --disablerepo="*" --enablerepo="aivax" -y
 
-    dnf install sqlite --disablerepo="*" --enablerepo="aivax" -y
+#     dnf install libreoffice-headless --disablerepo="*" --enablerepo="aivax" -y #TODO: 서버용으로 설치
 
-    dnf install libreoffice-headless --disablerepo="*" --enablerepo="aivax" -y #TODO: 서버용으로 설치
+#     dnf install tesseract --disablerepo="*" --enablerepo="aivax" -y 
 
-    dnf install tesseract --disablerepo="*" --enablerepo="aivax" -y 
-
-    dnf install tesseract-langpack-kor --disablerepo="*" --enablerepo="aivax" -y 
-}
-
-
-function __install_rpm_repo__()
-{
-    WRITE_LOG $FUNCNAME $LINENO "start install rpm repo"
-
-    mkdir -p /etc/yum.repos.d
-    cp -rf ./extension/rpm-install/aivax.repo /etc/yum.respos.d/
-    
-    rpm -ivh createrepo/createrepo_c-libs-0.20.1-4.el9.x86_64.rpm createrepo/createrepo_c-0.20.1-4.el9.x86_64.rpm
-
-    mkdir -p /home1/aivax/extension/rpm/
-    mkdir -p /home1/aivax/extension/rpm/3rd-repo/mariadb/
-
-    cp -rf ./extension/rpm/base-repo /home1/aivax/extension/rpm/
-    cp -rf ./extension/rpm/extra-repo /home1/aivax/extension/rpm/
-
-    cp -rf ./extension/rpm/3rd-repo/mariadb/v11.3.2 /home1/aivax/extension/rpm/3rd-repo/mariadb/
-
-    cp -rf ./extension/rpm/3rd-repo/office-headless /home1/aivax/extension/rpm/3rd-repo/
-
-    \cp -f ./extension/rpm-install/base-repo/*.rpm /home1/install/extension/rpm-repo/
-
-    \cp -f ./extension/rpm-install/extra-repo/libreoffice-headless/*.rpm /home1/install/extension/rpm-repo/
-
-    \cp -f ./extension/rpm-install/extra-repo/tesseract/*.rpm /home1/install/extension/rpm-repo/
-
-    \cp -f ./extension/rpm-install/extra-repo/nginx/*.rpm /home1/install/extension/rpm-repo/
-
-    \cp -f ./extension/rpm-install/extra-repo/mariadb/v11.3.2/*.rpm /home1/install/extension/rpm-repo/
-
-    createrepo /home1/install/extension/rpm-repo/ 
-
-    dnf clean all
-    dnf makecache
-
-    dnf repolist
-
-    WRITE_LOG $FUNCNAME $LINENO "finish install rpm repo"
-}
-
-function __install_sslproxy_env()
-{
-    WRITE_LOG $FUNCNAME $LINENO "start install sslproxy env"
-
-    cp -rf ./extension/lib/libnet.so.1.8.0 /lib64/
-
-    ln -s /lib64/libnet.so.1.8.0 /lib64/libnet.so.1
-
-    WRITE_LOG $FUNCNAME $LINENO "finish install sslproxy env"
-}
-
-function __setup_data_resource()
-{
-    WRITE_LOG $FUNCNAME $LINENO "start setup data resource"
-
-    WRITE_LOG $FUNCNAME $LINENO "finish data resource"
-}
-
-function __setup_aivax_service()
-{
-    WRITE_LOG $FUNCNAME $LINENO "start setup aivax service"
-
-    WRITE_LOG $FUNCNAME $LINENO "finish setup aivax service"
-}
-
-function __start_aivax_process()
-{
-    WRITE_LOG $FUNCNAME $LINENO "start aivax process"
-
-    systemctl start nginx
-    systemctl start opensearch
-    systemctl start fluent-bit
-    systemctl start mariadb
-
-    systemctl start aivax-management
-    systemctl start aivax-pipeline
-    systemctl start aivax-apiserver
-    systemctl start aivax-sslproxy
-
-    WRITE_LOG $FUNCNAME $LINENO "start aivax process"
-}
-
-function __install_suricata()
-{
-
-    WRITE_LOG $FUNCNAME $LINENO "start install suricata"
-
-    mkdir -p /var/log/suricata /var/run/suricata
-
-    mkdir -p /var/lib/suricata/rules
-    
-    \cp -rf ./extension/lib/suricata/suricata* /usr/local/bin/
-    \cp -rf ./extension/lib/suricata/libxdp.so.1.5.0 /lib64/
-
-    chmod 755 /usr/local/bin/suricata*
-
-    ln -s /lib64/libxdp.so.1.5.0 /lib64/libxdp.so.1
-
-    mkdir -p /etc/suricata
-
-    \cp -rf ./extenstion/lib/suricata/config/classification.config /etc/suricata/
-    \cp -rf ./extenstion/lib/suricata/config/reference.config /etc/suricata/
-    \cp -rf ./extenstion/lib/suricata/config/suricata.yaml /etc/suricata/
-    \cp -rf ./extenstion/lib/suricata/config/suricata_ai_mirror.lua /etc/suricata/
-    \cp -rf ./extenstion/lib/suricata/config/threshold.config /etc/suricata/
-
-    \cp -rf ./extension/lib/suricata/etc/config/* /etc/suricata/
+#     dnf install tesseract-langpack-kor --disablerepo="*" --enablerepo="aivax" -y 
 
     
-    mkdir /var/lib/suricata -p
 
-    \cp -rf ./extension/lib/suricata/var/lib/* /var/lib/
+#     #TODO: C/C++ 개발 환경도 추가.
 
+#     #TODO: opensearch, mariadb는 별도 설치.
+# }
+
+
+# function __install_rpm_repo()
+# {
+#     WRITE_LOG $FUNCNAME $LINENO "start install rpm repo"
+
+#     # repo 설정, 기존 repos.d 복사후 한개만 설정
+#     # aivax_repo_path=${CONST_DEFINE[aivax_rpm_repo_path]} => 일단 향후 고민.
+
+#     # TODO: 프로그램에서는 경로는 config로 제어, 경로 변경시 바로 대응이 가능하도록 설계 할것
+
+#     # config 복사
+#     # systemd의 환경은 수정하지 않는다.
+#     # mv /etc/yum.repos.d /etc/yum.repos.d_bak
+#     mkdir -p /etc/yum.repos.d
+#     # cp -rf ./extension/rpm/core-rpm/repos.d/aivax.repo /etc/yum.repos.d/
+#     cp -rf ./extension/rpm-install/aivax.repo /etc/yum.respos.d/
+
+#     # createrepo, dnf 실수 방지용으로 설치한다.
     
-    cp -rf ./aivax-patch/systemd/suricata-install/suricata.service /etc/systemd/system/
+#     rpm -ivh createrepo/createrepo_c-libs-0.20.1-4.el9.x86_64.rpm createrepo/createrepo_c-0.20.1-4.el9.x86_64.rpm
 
-    systemctl daemon-reload
-    systemctl enable suricata.service
+#     #rpm은 미리 ./extensioni/rpm/ 디렉토리에 복사한채 빌드한다.
 
-    WRITE_LOG $FUNCNAME $LINENO "finish install suricata"
+#     # repo 복사, 우선, 그냥 작성한다.
+#     # rpm은 필요한 모듈만 복사한다.
+#     # mkdir -p /home1/aivax/extension/rpm/
+#     # mkdir -p /home1/aivax/extension/rpm/3rd-repo/mariadb/
 
-}
+#     # #기본 및 확장 rpm 복사
+#     # cp -rf ./extension/rpm/base-repo /home1/aivax/extension/rpm/
+#     # cp -rf ./extension/rpm/extra-repo /home1/aivax/extension/rpm/
 
-function __install_opensearch()
-{
-    WRITE_LOG $FUNCNAME $LINENO "start install opensearch"
+#     # #mariadb, 버전 11.3.2
+#     # cp -rf ./extension/rpm/3rd-repo/mariadb/v11.3.2 /home1/aivax/extension/rpm/3rd-repo/mariadb/
 
-    dnf install ./extension/rpm-install/3rd-repo/opensearch/v3.3.2/opensearch-3.3.2-linux-x64.rpm -y -q
+#     # #TODO: libreoffice, 분리해서 관리한다.
+#     # cp -rf ./extension/rpm/3rd-repo/office-headless /home1/aivax/extension/rpm/3rd-repo/
 
-    mkdir -p /home1/aivax/data_resource/opensearch/
+#     # 기본 rpm
+#     # jq, tree, strace, ltrace, tcpump
+#     \cp -f ./extension/rpm-install/base-repo/*.rpm /home1/install/extension/rpm-repo/
 
-    mkdir -p /home1/install/temp/opensearch
+#     # libreoffice
+#     \cp -f ./extension/rpm-install/extra-repo/libreoffice-headless/*.rpm /home1/install/extension/rpm-repo/
 
-    mkdir -p /home1/install/temp/opensearch/config
-    mkdir -p /home1/install/temp/opensearch/data
+#     # tesseract, ocr
+#     \cp -f ./extension/rpm-install/extra-repo/tesseract/*.rpm /home1/install/extension/rpm-repo/
 
-    tar xzf ./data-setup/opensearch-setup/opensearch.config.tar.gz -C /home1/install/temp/opensearch/config/
-    tar xzvf ./extension/opensearch-install/opensearch.data.tar.gz -C /home1/install/temp/opensearch/data/
+#     # nginx
+#     \cp -f ./extension/rpm-install/extra-repo/nginx/*.rpm /home1/install/extension/rpm-repo/
 
-    tar xzf ./data-setup/opensearch-setup/opensearch.config.tar.gz 
-
-    \cp -rf /etc/opensearch /etc/opensearch.old
-    mv opensearch /etc/
-
-    chown -R opensearch:opensearch /etc/opensearch
-    chmod -R 750 /etc/opensearch
-
-    tar xzf ./data-setup/opensearch-setup/opensearch.data.tar.gz
-
-    mv opensearch_docker opensearch
-
-    if [ -d /home1/aivax/data_resource/opensearch ]
-    then
-        mv /home1/aivax/data_resource/opensearch /home1/aivax/data_resource/opensearch.$(date +%Y%m%d%H%M)
-    fi
-
-    mv opensearch /home1/aivax/data_resource/
-
-    chown -R opensearch:opensearch /home1/aivax/data_resource/opensearch
-    chmod -R 750 /home1/aivax/data_resource/opensearch
-
-    tar xzvf ./extension/opensearch-install/opensearch.config.tar.gz -C /home1/install/temp/opensearch/data/
-    tar xzvf ./extension/opensearch-install/opensearch.data.tar.gz -C /home1/install/temp/opensearch/data/
-
-    cp -rf /etc/opensearch/
-
-    cp -rf /home1/install/temp/opensearch/data/ /var/lib/opensearch/
-
-    chown -R opensearch:opensearch /home1/aivax/data_resource/opensearch/
-    chmod -R 750 /home1/aivax/data_resource/opensearch/
-
-    chown -R opensearch:opensearch /etc/opensearch
-    chmod -R 750 /etc/opensearch
-    chown -R opensearch:opensearch /var/lib/opensearch
-
-    sysctl -w vm.max_map_count=262144
-    echo "vm.max_map_count=262144" >> /etc/sysctl.conf
-
-    NEW_PATH="/home1/aivax/data_resource/opensearch"
-    CONFIG_FILE="/etc/opensearch/opensearch.yml"
-
-    sudo sed -i "s|path.data:.*|path.data: $NEW_PATH|g" "$CONFIG_FILE"
-    sudo sed -i "s|path.logs:.*|path.logs: $NEW_PATH/logs|g" "$CONFIG_FILE"
+#     # mariadb
+#     \cp -f ./extension/rpm-install/extra-repo/mariadb/v11.3.2/*.rpm /home1/install/extension/rpm-repo/
 
 
-    cat > /etc/systemd/system/opensearch.service <<EOF
-[Unit]
-Description=OpenSearch
-After=network.target
+#     #TODO: createrepo, 설치 시점에 다시 갱신한다.   
+#     createrepo /home1/install/extension/rpm-repo/ 
 
-[Service]
-Type=simple
-User=opensearch
-Group=opensearch
+#     dnf clean all
+#     dnf makecache
 
-Environment=OPENSEARCH_HOME=/data/opensearch
-Environment=OPENSEARCH_PATH_CONF=/data/opensearch/config
+#     # 테스트용, 출력
+#     dnf repolist
 
-ExecStart=/data/opensearch/bin/opensearch
+#     WRITE_LOG $FUNCNAME $LINENO "finish install rpm repo"
+# }
 
-Restart=always
-LimitNOFILE=65535
+# 패치 시점이, 실제 구조는 프로그램으로 해결.
+# function __install_sslproxy_env()
+# {
+#     WRITE_LOG $FUNCNAME $LINENO "start install sslproxy env"
 
-[Install]
-WantedBy=multi-user.target
-EOF
+#     # 이건 테스트 하면서, 
+#     cp -rf ./extension/lib/libnet.so.1.8.0 /lib64/
 
-    cat > /etc/systemd/system/opensearch.service <<'EOF'
-[Unit]
-Description=OpenSearch
-Documentation=https://opensearch.org/
-Wants=network-online.target
-After=network-online.target
+#     #TODO -f 주의
+#     ln -s /lib64/libnet.so.1.8.0 /lib64/libnet.so.1
 
-[Service]
-Type=notify
-RuntimeDirectory=opensearch
-PrivateTmp=true
-EnvironmentFile=-/etc/default/opensearch
-EnvironmentFile=-/etc/sysconfig/opensearch
-User=opensearch
-Group=opensearch
+#     WRITE_LOG $FUNCNAME $LINENO "finish install sslproxy env"
+# }
 
-WorkingDirectory=/home1/aivax/data_resource/opensearch
+# # 디스크, 자원등 설정, 초기에 설정해야 하는 기능과 묶어서 관리 필요
+# function __setup_data_resource()
+# {
+#     WRITE_LOG $FUNCNAME $LINENO "start setup data resource"
+
+#     WRITE_LOG $FUNCNAME $LINENO "finish data resource"
+# }
+
+# # 서비스 등록
+# function __setup_aivax_service()
+# {
+#     WRITE_LOG $FUNCNAME $LINENO "start setup aivax service"
+
+#     WRITE_LOG $FUNCNAME $LINENO "finish setup aivax service"
+# }
 
 
-#ExecStartPre=/bin/mkdir -p /home1/aivax/data_resource/opensearch/tmp
-#ExecStartPre=/bin/chown opensearch:opensearch /home1/aivax/data_resource/opensearch/tmp
+# # aivax 프로세스 실행
+# function __start_aivax_process()
+# {
+#     WRITE_LOG $FUNCNAME $LINENO "start aivax process"
 
-ExecStartPre=/bin/mkdir -p /dev/shm/performanceanalyzer
-ExecStartPre=/bin/chown opensearch:opensearch /dev/shm/performanceanalyzer
+#     systemctl start nginx
+#     systemctl start opensearch
+#     systemctl start fluent-bit
+#     systemctl start mariadb
 
-ExecStart=/usr/share/opensearch/bin/systemd-entrypoint -p ${PID_DIR}/opensearch.pid --quiet
+#     systemctl start aivax-management
+#     systemctl start aivax-pipeline
+#     systemctl start aivax-apiserver
+#     systemctl start aivax-sslproxy
 
-StandardOutput=journal
-StandardError=inherit
-SyslogIdentifier=opensearch
+#     WRITE_LOG $FUNCNAME $LINENO "start aivax process"
+# }
 
-LimitNOFILE=65535
-LimitNPROC=4096
-LimitAS=infinity
-LimitFSIZE=infinity
+# #suricata 관련 설치
+# function __install_suricata()
+# {
 
-TimeoutStopSec=0
-KillSignal=SIGTERM
-KillMode=process
-SendSIGKILL=no
-SuccessExitStatus=143
+#     WRITE_LOG $FUNCNAME $LINENO "start install suricata"
 
-TimeoutStartSec=75
+#     #설치 모듈은 lib/suricata에서 가져온다.
+#     #config도 같이 관리
 
-PrivateTmp=true
-ProtectSystem=full
-ProtectKernelTunables=true
-ProtectKernelModules=true
-ProtectControlGroups=true
-ProtectProc=invisible
-RestrictNamespaces=true
-LockPersonality=true
-NoNewPrivileges=true
-RestrictSUIDSGID=true
-RestrictRealtime=true
-ProtectHostname=true
-ProtectKernelLogs=true
-ProtectClock=true
+#     #suricata 관련
+#     mkdir -p /var/log/suricata /var/run/suricata
 
-CapabilityBoundingSet=~CAP_SYS_ADMIN ~CAP_SYS_PTRACE ~CAP_NET_ADMIN ~CAP_BLOCK_SUSPEND ~CAP_LEASE ~CAP_SYS_PACCT ~CAP_SYS_TTY_CONFIG
+#     mkdir -p /var/lib/suricata/rules
+    
 
-SystemCallArchitectures=native
-SystemCallFilter=seccomp mincore
-SystemCallFilter=madvise mlock mlock2 munlock get_mempolicy sched_getaffinity sched_setaffinity fcntl
-SystemCallFilter=@system-service
-SystemCallFilter=~@reboot
-SystemCallFilter=~@swap
-SystemCallErrorNumber=EPERM
+#     \cp -rf ./extension/lib/suricata/suricata* /usr/local/bin/
+#     \cp -rf ./extension/lib/suricata/libxdp.so.1.5.0 /lib64/
 
-RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+#     chmod 755 /usr/local/bin/suricata*
 
-ReadWritePaths=/home1/aivax/data_resource/opensearch
-ReadWritePaths=/dev/shm
-ReadWritePaths=-/etc/opensearch
-ReadWritePaths=-/mnt/snapshots
+#     ln -s /lib64/libxdp.so.1.5.0 /lib64/libxdp.so.1
 
-#ReadOnlyPaths=-/etc/os-release -/usr/lib/os-release -/etc/system-release
-#ReadOnlyPaths=/proc/self/mountinfo /proc/diskstats
-#ReadOnlyPaths=/proc/self/cgroup
-#ReadOnlyPaths=/sys/fs/cgroup
+#     # etc/config 복사
+#     mkdir -p /etc/suricata
 
-ReadOnlyPaths=/proc/self/cgroup /sys/fs/cgroup/cpu /sys/fs/cgroup/cpu/-
-ReadOnlyPaths=/sys/fs/cgroup/cpuacct /sys/fs/cgroup/cpuacct/- /sys/fs/cgroup/memory /sys/fs/cgroup/memory/-
-ReadOnlyPaths=/sys/fs/cgroup/system.slice/-
+#     # \cp -rf ./extenstion/lib/suricata/config/classification.config /etc/suricata/
+#     # \cp -rf ./extenstion/lib/suricata/config/reference.config /etc/suricata/
+#     # \cp -rf ./extenstion/lib/suricata/config/suricata.yaml /etc/suricata/
+#     # \cp -rf ./extenstion/lib/suricata/config/suricata_ai_mirror.lua /etc/suricata/
+#     # \cp -rf ./extenstion/lib/suricata/config/threshold.config /etc/suricata/
 
-RestrictNamespaces=true
+#     \cp -rf ./extension/lib/suricata/etc/config/* /etc/suricata/
 
-NoNewPrivileges=true
+#     # /var/lib 복사, TODO: 향후 suricata로 확정되면, 소스 정리 필요
+#     # mkdir /var/lib/suricata -p
 
-# Memory and execution protection
+#     \cp -rf ./extension/lib/suricata/var/lib/* /var/lib/
 
-# Allow only native system calls
-SystemCallArchitectures=native
-# Service does not share key material with other services
-KeyringMode=private
-# Prevent changing ABI personality
-LockPersonality=true
-# Prevent creating SUID/SGID files
-RestrictSUIDSGID=true
-# Prevent acquiring realtime scheduling
-RestrictRealtime=true
-# Prevent changes to system hostname
-ProtectHostname=true
-# Prevent reading/writing kernel logs
-ProtectKernelLogs=true
-# Prevent tampering with the system clock
-ProtectClock=true
+#     #서비스 등록
+#     cp -rf ./aivax-patch/systemd/suricata-install/suricata.service /etc/systemd/system/
 
-[Install]
-WantedBy=multi-user.target
-EOF
+#     systemctl daemon-reload
+#     systemctl enable suricata.service
 
-    WRITE_LOG $FUNCNAME $LINENO "finish install opensearch"
-}
+#     WRITE_LOG $FUNCNAME $LINENO "finish install suricata"
+
+# }
+
+# function __install_opensearch()
+# {
+#     WRITE_LOG $FUNCNAME $LINENO "start install opensearch"
+
+#     # opensearch 설치, opensearch는 별도로 설치한다. 옵션화, (제거할수 있다)
+#     # 일단 작성후, 경로 또는 세부 테스트.
+#     dnf install ./extension/rpm-install/3rd-repo/opensearch/v3.3.2/opensearch-3.3.2-linux-x64.rpm -y -q
+
+#     #TODO: 여러 경로로 이동 필요, temp 경로롤 이용한다. (/home1/install/temp)
+
+#     # 기본 디렉토리 생성, 두번 체크
+#     # mkdir -p /home1/aivax/data_resource/opensearch/
+
+#     # 설치후, 데이터 복사, config, 권한 설정 필요
+
+#     # mkdir -p /home1/install/temp/opensearch
+
+#     # mkdir -p /home1/install/temp/opensearch/config
+#     # mkdir -p /home1/install/temp/opensearch/data
+
+#     # tar xzf ./data-setup/opensearch-setup/opensearch.config.tar.gz -C /home1/install/temp/opensearch/config/
+#     # tar xzvf ./extension/opensearch-install/opensearch.data.tar.gz -C /home1/install/temp/opensearch/data/
+
+#     tar xzf ./data-setup/opensearch-setup/opensearch.config.tar.gz 
+
+#     #과거 opensearch backup
+#     \cp -rf /etc/opensearch /etc/opensearch.old
+#     mv opensearch /etc/
+
+#     chown -R opensearch:opensearch /etc/opensearch
+#     chmod -R 750 /etc/opensearch
+
+#     tar xzf ./data-setup/opensearch-setup/opensearch.data.tar.gz
+
+#     # 상세 수정은 installer에서.
+#     mv opensearch_docker opensearch
+
+#     if [ -d /home1/aivax/data_resource/opensearch ]
+#     then
+#         mv /home1/aivax/data_resource/opensearch /home1/aivax/data_resource/opensearch.$(date +%Y%m%d%H%M)
+#     fi
+
+#     mv opensearch /home1/aivax/data_resource/
+
+#     chown -R opensearch:opensearch /home1/aivax/data_resource/opensearch
+#     chmod -R 750 /home1/aivax/data_resource/opensearch
+
+#     # tar xzvf ./extension/opensearch-install/opensearch.config.tar.gz -C /home1/install/temp/opensearch/data/
+#     # tar xzvf ./extension/opensearch-install/opensearch.data.tar.gz -C /home1/install/temp/opensearch/data/
+
+#     # # TODO: opensearch 경로 변경 필요 => 프로그램으로 해결 필요
+
+#     # #TODO: config 복사, 미세 조정 필요, pem 등 
+#     # cp -rf /etc/opensearch/
+
+#     # #TODO: data 복사 경로 복사 먼저 + opensearch.yml 쪽 먼저 수정 필요
+#     # # 프로그램으로 해결하거나, sed 명령으로 수정 필요
+
+#     # #TODO: 경로 확인 필요
+#     # cp -rf /home1/install/temp/opensearch/data/ /var/lib/opensearch/
+
+#     # # 권한 설정 추가, SNIPER OS는 경로가 다르다. 경로를 외부 설정으로 제어
+#     # chown -R opensearch:opensearch /home1/aivax/data_resource/opensearch/
+#     # chmod -R 750 /home1/aivax/data_resource/opensearch/
+
+#     # chown -R opensearch:opensearch /etc/opensearch
+#     # chmod -R 750 /etc/opensearch
+#     # # chown -R opensearch:opensearch /var/lib/opensearch
+
+#     # #VM size 설정
+#     # sysctl -w vm.max_map_count=262144
+#     echo "vm.max_map_count=262144" >> /etc/sysctl.conf #영구설정
+
+#     #TODO: systemd 수정
+
+#     #TODO: 설치 테스트, 장애 발생시 재생성 필요
+
+#     # /etc/opensearch/opensearh.yml, 경로 변경, 우선 스크립트로
+#     NEW_PATH="/home1/aivax/data_resource/opensearch"
+#     CONFIG_FILE="/etc/opensearch/opensearch.yml"
+
+#     sudo sed -i "s|path.data:.*|path.data: $NEW_PATH|g" "$CONFIG_FILE"
+#     # sudo sed -i "s|path.logs:.*|path.logs: $NEW_PATH/logs|g" "$CONFIG_FILE"
+
+#     # config 설정
+
+#     # opensearch의 기본 service 파일 경로, /etc/로 변경 => 위험
+# #     cat > /etc/systemd/system/opensearch.service <<EOF
+# # [Unit]
+# # Description=OpenSearch
+# # After=network.target
+
+# # [Service]
+# # Type=simple
+# # User=opensearch
+# # Group=opensearch
+
+# # Environment=OPENSEARCH_HOME=/data/opensearch
+# # Environment=OPENSEARCH_PATH_CONF=/data/opensearch/config
+
+# # ExecStart=/data/opensearch/bin/opensearch
+
+# # Restart=always
+# # LimitNOFILE=65535
+
+# # [Install]
+# # WantedBy=multi-user.target
+# # EOF
+
+#     cat > /etc/systemd/system/opensearch.service <<'EOF'
+# [Unit]
+# Description=OpenSearch
+# Documentation=https://opensearch.org/
+# Wants=network-online.target
+# After=network-online.target
+
+# [Service]
+# Type=notify
+# RuntimeDirectory=opensearch
+# PrivateTmp=true
+# EnvironmentFile=-/etc/default/opensearch
+# EnvironmentFile=-/etc/sysconfig/opensearch
+# User=opensearch
+# Group=opensearch
+
+# WorkingDirectory=/home1/aivax/data_resource/opensearch
+
+
+# #ExecStartPre=/bin/mkdir -p /home1/aivax/data_resource/opensearch/tmp
+# #ExecStartPre=/bin/chown opensearch:opensearch /home1/aivax/data_resource/opensearch/tmp
+
+# ExecStartPre=/bin/mkdir -p /dev/shm/performanceanalyzer
+# ExecStartPre=/bin/chown opensearch:opensearch /dev/shm/performanceanalyzer
+
+# ExecStart=/usr/share/opensearch/bin/systemd-entrypoint -p ${PID_DIR}/opensearch.pid --quiet
+
+# StandardOutput=journal
+# StandardError=inherit
+# SyslogIdentifier=opensearch
+
+# LimitNOFILE=65535
+# LimitNPROC=4096
+# LimitAS=infinity
+# LimitFSIZE=infinity
+
+# TimeoutStopSec=0
+# KillSignal=SIGTERM
+# KillMode=process
+# SendSIGKILL=no
+# SuccessExitStatus=143
+
+# TimeoutStartSec=75
+
+# PrivateTmp=true
+# ProtectSystem=full
+# ProtectKernelTunables=true
+# ProtectKernelModules=true
+# ProtectControlGroups=true
+# ProtectProc=invisible
+# RestrictNamespaces=true
+# LockPersonality=true
+# NoNewPrivileges=true
+# RestrictSUIDSGID=true
+# RestrictRealtime=true
+# ProtectHostname=true
+# ProtectKernelLogs=true
+# ProtectClock=true
+
+# CapabilityBoundingSet=~CAP_SYS_ADMIN ~CAP_SYS_PTRACE ~CAP_NET_ADMIN ~CAP_BLOCK_SUSPEND ~CAP_LEASE ~CAP_SYS_PACCT ~CAP_SYS_TTY_CONFIG
+
+# SystemCallArchitectures=native
+# SystemCallFilter=seccomp mincore
+# SystemCallFilter=madvise mlock mlock2 munlock get_mempolicy sched_getaffinity sched_setaffinity fcntl
+# SystemCallFilter=@system-service
+# SystemCallFilter=~@reboot
+# SystemCallFilter=~@swap
+# SystemCallErrorNumber=EPERM
+
+# RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+
+# ReadWritePaths=/home1/aivax/data_resource/opensearch
+# ReadWritePaths=/dev/shm
+# ReadWritePaths=-/etc/opensearch
+# ReadWritePaths=-/mnt/snapshots
+
+# #ReadOnlyPaths=-/etc/os-release -/usr/lib/os-release -/etc/system-release
+# #ReadOnlyPaths=/proc/self/mountinfo /proc/diskstats
+# #ReadOnlyPaths=/proc/self/cgroup
+# #ReadOnlyPaths=/sys/fs/cgroup
+
+# ReadOnlyPaths=/proc/self/cgroup /sys/fs/cgroup/cpu /sys/fs/cgroup/cpu/-
+# ReadOnlyPaths=/sys/fs/cgroup/cpuacct /sys/fs/cgroup/cpuacct/- /sys/fs/cgroup/memory /sys/fs/cgroup/memory/-
+# ReadOnlyPaths=/sys/fs/cgroup/system.slice/-
+
+# RestrictNamespaces=true
+
+# NoNewPrivileges=true
+
+# # Memory and execution protection
+
+# # Allow only native system calls
+# SystemCallArchitectures=native
+# # Service does not share key material with other services
+# KeyringMode=private
+# # Prevent changing ABI personality
+# LockPersonality=true
+# # Prevent creating SUID/SGID files
+# RestrictSUIDSGID=true
+# # Prevent acquiring realtime scheduling
+# RestrictRealtime=true
+# # Prevent changes to system hostname
+# ProtectHostname=true
+# # Prevent reading/writing kernel logs
+# ProtectKernelLogs=true
+# # Prevent tampering with the system clock
+# ProtectClock=true
+
+# [Install]
+# WantedBy=multi-user.target
+# EOF
+
+#     WRITE_LOG $FUNCNAME $LINENO "finish install opensearch"
+# }
