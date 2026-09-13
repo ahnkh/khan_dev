@@ -189,7 +189,7 @@ function __install_opensearch()
 {
     WRITE_LOG $FUNCNAME $LINENO "install opensearch"
 
-    dnf install ./extension/rpm-install/3rd-repo/opensearch/v3.3.2/opensearch-3.3.2-linux-x64.rpm -y -q
+    dnf install ./extension/rpm-install/3rd-repo/opensearch/v3.8.0/opensearch-3.8.0-linux-x64.rpm -y -q
 
     __install_opensearch_config
 
