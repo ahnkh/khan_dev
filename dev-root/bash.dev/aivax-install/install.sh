@@ -59,13 +59,17 @@ function __setup_pip_venv()
         \cp -rf /usr/local/bin/uv ${VENV}/bin/
     fi
 
+    WRITE_LOG $FUNCNAME $LINENO "activate python env"
     source ./venv/bin/activate
 
+    WRITE_LOG $FUNCNAME $LINENO "ensure pip"
     python -m ensurepip --default-pip > /dev/null 2>&1
 
     cd ./extension/python-install
-
+    
     uv cache clean -q
+
+    WRITE_LOG $FUNCNAME $LINENO "uv pip install requirement"
     uv --quiet pip install --no-index --find-links=./offline-wheel/ -r aivax-requirement.txt
 
     # uv --quiet pip install --no-index ./offline-wheel/pycomlib-1.1.7-py3-none-any.whl --force-reinstall
@@ -73,6 +77,7 @@ function __setup_pip_venv()
     # uv --quiet pip install --no-index ./offline-wheel/pyservice-1.0.3-py3-none-any.whl --force-reinstall
     # uv --quiet pip install --no-index ./offline-wheel/pytoolkit-1.0.0-py3-none-any.whl --force-reinstall
 
+    WRITE_LOG $FUNCNAME $LINENO "uv pip install toolkit"
     uv --quiet pip install --no-index --force-reinstall ./offline-wheel/pycomlib-1.1.7-py3-none-any.whl ./offline-wheel/pycomlibex-1.1.2-py3-none-any.whl \
     ./offline-wheel/pyservice-1.0.3-py3-none-any.whl ./offline-wheel/pytoolkit-1.0.0-py3-none-any.whl
     
