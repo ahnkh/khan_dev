@@ -418,11 +418,13 @@ function create_integrity_manifest()
 
     local PACKAGE_DIR="$1"
 
-    cd "$PACKAGE_DIR" || exit 1
+    # cd "$PACKAGE_DIR" || exit 1
+
+    rm -rf ./.integrity.digest
 
     find . -type f ! -name ".integrity.digest" -print0 \
         | sort -z \
-        | xargs -0 sha256sum > .integrity.digest
+        | xargs -0 sha256sum > ./.integrity.digest
 
     WRITE_LOG $FUNCNAME $LINENO "finish create integrity manifest"
 }
