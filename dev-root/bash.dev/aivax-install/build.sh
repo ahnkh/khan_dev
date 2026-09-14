@@ -411,6 +411,22 @@ function release_package()
     WRITE_LOG $FUNCNAME $LINENO "finish release package"
 }
 
+# 패키지 해시 생성
+function create_integrity_manifest()
+{
+    WRITE_LOG $FUNCNAME $LINENO "start create integrity manifest"
+
+    local PACKAGE_DIR="$1"
+
+    cd "$PACKAGE_DIR" || exit 1
+
+    find . -type f ! -name ".integrity.digest" -print0 \
+        | sort -z \
+        | xargs -0 sha256sum > .integrity.digest
+
+    WRITE_LOG $FUNCNAME $LINENO "finish create integrity manifest"
+}
+
 # 대상 서버, 패키지 경로, backup 초기화
 function clean_package_file()
 {
@@ -455,6 +471,9 @@ function main()
 
     #버전 파일 생성
     make_version_text_file
+
+    #무결성 파일 생성
+    create_integrity_manifest
 
     #패치 실행
     #patch.sh => 하나로 통합
