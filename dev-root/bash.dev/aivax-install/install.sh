@@ -481,9 +481,11 @@ EOF
 function ui_interface()
 {
     echo 
-    /usr/bin/sys_install &> /dev/null
+    sys_install config &> /dev/null
 
-    /usr/bin/clear_install &> /dev/null
+    dialog title=aivax system &> /dev/null
+
+    clear dialog ui &> /dev/null
 
 }
 
