@@ -416,17 +416,19 @@ function create_integrity_manifest()
 {
     WRITE_LOG $FUNCNAME $LINENO "start create integrity manifest"
 
-    local PACKAGE_DIR="$1"
+    # local PACKAGE_DIR="$1"
 
-    # cd "$PACKAGE_DIR" || exit 1
+    cd "$package_root"
 
-    rm -rf ./.integrity.digest
+    rm -rf ${package_root}/.integrity.digest
 
     find . -type f ! -name ".integrity.digest" -print0 \
         | sort -z \
-        | xargs -0 sha256sum > ./.integrity.digest
+        | xargs -0 sha256sum > ${package_root}/.integrity.digest
 
     WRITE_LOG $FUNCNAME $LINENO "finish create integrity manifest"
+
+    cd -
 }
 
 # 대상 서버, 패키지 경로, backup 초기화
