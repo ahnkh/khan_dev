@@ -23,9 +23,9 @@ function __migrate_mariadb()
     systemctl start mariadb
     systemctl stop aivax-management
 
-    tar xf ./extension/nodejs-install/node-v24.11.1-linux-x64.tar 
+    tar xf ./extension/nodejs-install/node-v26.8.2-linux-x64.tar 
 
-    \mv node-v24.11.1-linux-x64 /home1/aivax/extension/nodejs
+    \mv node-v26.8.2-linux-x64 /home1/aivax/extension/nodejs
 
     cd /home1/aivax/management/backend 
 
