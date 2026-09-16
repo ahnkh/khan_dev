@@ -86,6 +86,9 @@ function update_toolkit_config_and_source()
 
     \cp -rfv ${git_root}/khan.pythonscript/khan-shell-interface/local_resource/db_resource/sql_query_map/rdb_query/json/* ${git_root}/aivax_toolkit/local_resource/db_resource/sql_query_map/rdb_query/json/
 
+    mkdir -p ${git_root}/aivax_toolkit/local_resource/db_resource/db_init_script/wins_script/
+    \cp -rfv ${git_root}/khan.pythonscript/khan-shell-interface/local_resource/db_resource/db_init_script/wins_script/wins_mariadb_create_database.sql ${git_root}/aivax_toolkit/local_resource/db_resource/db_init_script/wins_script/
+
     \cp -rfv ${git_root}/khan.pythonscript/khan-shell-interface/local_resource/http_query_map/wins_query/* ${git_root}/aivax_toolkit/local_resource/http_query_map/wins_query/
 
     \cp -rfv ${git_root}/khan.pythonscript/khan-shell-interface/local_resource/script_config/aivax/* ${git_root}/aivax_toolkit/local_resource/script_config/aivax/
