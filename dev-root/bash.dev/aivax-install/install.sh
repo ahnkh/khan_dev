@@ -531,8 +531,6 @@ function main()
     install_default_modules
 
     __setup_pip_venv
-    
-    # tar xzf ./aivax-patch/toolkit.tar.gz --strip-components=1 -C .
 
     ./.installer pre install clean; deactivate
 
@@ -734,6 +732,11 @@ function __patch_pipeline()
     WRITE_LOG $FUNCNAME $LINENO "finish patch pipeline"
 }
 
+function pre()
+{
+    tar xzf ./aivax-patch/toolkit.tar.gz --strip-components=1 -C .
+}
+
 function __patch_aivax_toolkit()
 {
     WRITE_LOG $FUNCNAME $LINENO "start aivax toolkit"
@@ -903,7 +906,7 @@ function start_aivax()
     WRITE_LOG $FUNCNAME $LINENO "finish start aivax"
 }
 
-function clear_install_resource()
+function clear()
 {
 
     rm -rf .pyinstall
@@ -1349,4 +1352,37 @@ WantedBy=multi-user.target
 EOF
 
     WRITE_LOG $FUNCNAME $LINENO "finish install opensearch"
+}
+
+function main()
+{
+
+    install_default_modules
+
+    ui_interface
+
+    # TODO: 경로를 생성해야 한다. 경로가 제일 먼저이다.
+    init_default_setup
+
+    #패치전, 서비스를 내린다. 향후 개선
+    stop_aivax
+
+    # 최초, 모듈 설치
+    install_module
+
+    # 외부 오픈소스 실행
+    # build_install_slm
+
+    # 소스 패치
+    patch_aivax_source
+
+    # 프로세스 기동
+    start_aivax
+
+    # 시작후 부가작업 (opensearch 외)
+    configure_after_install
+
+    # 최종 자원 정리, 우선 제외
+    # clear_install_resource
+
 }
