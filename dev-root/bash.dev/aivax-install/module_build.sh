@@ -93,6 +93,9 @@ function update_toolkit_config_and_source()
 
     \cp -rfv ${git_root}/khan.pythonscript/khan-shell-interface/local_resource/script_config/aivax/* ${git_root}/aivax_toolkit/local_resource/script_config/aivax/
 
+    mkdir -p ${git_root}/aivax_toolkit/local_resource/service_resources/mail_sytle_html
+    \cp -rfv ${git_root}/khan.pythonscript/khan-shell-interface/local_resource/service_resources/mail_style_html/aivax* ${git_root}/aivax_toolkit/local_resource/service_resources/mail_style_html/
+
     \cp -rfv ${git_root}/khan.pythonscript/khan-shell-interface/aivax_toolkit.py ${git_root}/aivax_toolkit/
     \cp -rfv ${git_root}/khan.pythonscript/khan-shell-interface/lib_include_wins.py ${git_root}/aivax_toolkit/lib_include.py
 
