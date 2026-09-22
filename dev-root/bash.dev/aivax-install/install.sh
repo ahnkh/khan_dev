@@ -77,7 +77,7 @@ function __setup_pip_venv()
     # uv --quiet pip install --no-index ./offline-wheel/pyservice-1.0.3-py3-none-any.whl --force-reinstall
     # uv --quiet pip install --no-index ./offline-wheel/pytoolkit-1.0.0-py3-none-any.whl --force-reinstall
 
-    WRITE_LOG $FUNCNAME $LINENO "uv pip install toolkit"
+    # WRITE_LOG $FUNCNAME $LINENO "uv pip install toolkit"
     # uv --quiet pip install --no-index --force-reinstall ./offline-wheel/pycomlib-1.1.7-py3-none-any.whl ./offline-wheel/pycomlibex-1.1.2-py3-none-any.whl \
     # ./offline-wheel/pyservice-1.0.3-py3-none-any.whl ./offline-wheel/pytoolkit-1.0.0-py3-none-any.whl
     
