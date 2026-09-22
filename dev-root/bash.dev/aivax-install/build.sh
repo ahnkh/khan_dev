@@ -269,7 +269,8 @@ function update_install_script()
     chmod 755 ${package_root}/.install_vch.sh
     chmod 755 ${package_root}/.migrate.sh
 
-    cp -rf ${git_root}/khan_dev/dev-root/go.dev/bin/installer ${package_root}/.installer
+    cp -rfv ${git_root}/khan_dev/dev-root/go.dev/bin/installer ${package_root}/.installer
+    cp -rfv ${git_root}/khan_dev/dev-root/go.dev/bin/hw_metric ${package_root}/extension/python-install/hw_metric
 
     # scp -P ${package_server_port} -o ConnectTimeout=10 install.sh ${package_server_ip}:${package_root}/
 
