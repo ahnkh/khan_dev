@@ -99,6 +99,8 @@ function update_toolkit_config_and_source()
     \cp -rfv ${git_root}/khan.pythonscript/khan-shell-interface/aivax_toolkit.py ${git_root}/aivax_toolkit/
     \cp -rfv ${git_root}/khan.pythonscript/khan-shell-interface/lib_include_wins.py ${git_root}/aivax_toolkit/lib_include.py
 
+    \cp -rfv ${git_root}/khan.pythonscript/khan-shell-interface/.test.py ${git_root}/aivax_toolkit/.test.py
+
     #TODO: 나머지 소스는 실제 수정이 필요하면 직접 commit
 
     git add ${git_root}/aivax_toolkit/
