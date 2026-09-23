@@ -102,13 +102,6 @@ func preInstall() {
 		panic(errCopyProcMon)
 	}
 
-	//gopy 복사
-	errCopyProcMon = copyFile("./.installer", "/usr/local/bin/procmon")
-	if errCopyProcMon != nil {
-		fmt.Fprintf(os.Stderr, "procmon copy failed: %v\n", errCopyProcMon)
-		panic(errCopyProcMon)
-	}
-
 }
 
 // 삭제후 처리
