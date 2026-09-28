@@ -21,6 +21,8 @@ type Metrics struct {
 	Sensors []SensorInfo `json:"sensors,omitempty"`
 	GPU     []GPUInfo    `json:"gpu,omitempty"`
 	Power   PowerInfo              `json:"power"`
+	// Fan     FanInfo                `json:"fan"`
+	Fan     map[string]float64  `json:"fan"`
 }
 
 type CPUInfo struct {
@@ -65,6 +67,10 @@ type PowerInfo struct {
 	Total  float64 `json:"total_w"`
 	CPU    float64 `json:"cpu_w"`
 	Memory float64 `json:"memory_w"`
+}
+
+type FanInfo struct {
+	Fans map[string]float64 `json:"fans"`
 }
 
 // --------------------------------------------------
@@ -507,6 +513,52 @@ func collectPower() PowerInfo {
 	return power
 }
 
+// func collectFan() FanInfo {
+func collectFan() map[string]float64 {	
+	// fan := FanInfo{
+	// 	Fans: make(map[string]float64),
+	// }
+
+	fans := make(map[string]float64)
+
+	cmd := exec.Command(
+		"ipmitool",
+		"sensor",
+	)
+
+	output, err := cmd.Output()
+	if err != nil {
+		return fans
+	}
+
+	lines := strings.Split(string(output), "\n")
+
+	for _, line := range lines {
+		parts := strings.Split(line, "|")
+
+		if len(parts) < 3 {
+			continue
+		}
+
+		name := strings.TrimSpace(parts[0])
+		valueString := strings.TrimSpace(parts[1])
+		unit := strings.TrimSpace(parts[2])
+
+		if !strings.EqualFold(unit, "RPM") {
+			continue
+		}
+
+		value, err := strconv.ParseFloat(valueString, 64)
+		if err != nil {
+			continue
+		}
+
+		fans[name] = value
+	}
+
+	return fans
+}
+
 // --------------------------------------------------
 // NVIDIA GPU
 // --------------------------------------------------
@@ -608,6 +660,8 @@ func main() {
 	// Power
 	power := collectPower()
 
+	fan := collectFan()
+
 	// JSON
 	metrics := Metrics{
 		Time: time.Now().Format(time.RFC3339),
@@ -620,6 +674,7 @@ func main() {
 		Memory:  memory,
 		Disks:   disks,
 		Sensors: sensors,
+		Fan:     fan,
 		// GPU:     gpu,
 		Power:   power,
 	}
