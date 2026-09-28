@@ -21,8 +21,8 @@ type Metrics struct {
 	Sensors []SensorInfo `json:"sensors,omitempty"`
 	GPU     []GPUInfo    `json:"gpu,omitempty"`
 	Power   PowerInfo              `json:"power"`
-	// Fan     FanInfo                `json:"fan"`
-	Fan     map[string]float64  `json:"fan"`
+	Fan     FanInfo                `json:"fan"`
+	// Fan     map[string]float64  `json:"fan"`
 }
 
 type CPUInfo struct {
@@ -62,14 +62,17 @@ type GPUInfo struct {
 }
 
 type PowerInfo struct {
+	Count  int     `json:"count"`
 	PSU1   float64 `json:"psu1_w"`
 	PSU2   float64 `json:"psu2_w"`
 	Total  float64 `json:"total_w"`
+	FAN    float64 `json:"fan_w"`
 	CPU    float64 `json:"cpu_w"`
 	Memory float64 `json:"memory_w"`
 }
 
 type FanInfo struct {
+	Count int                `json:"count"`
 	Fans map[string]float64 `json:"fans"`
 }
 
@@ -483,7 +486,11 @@ func collectPower() PowerInfo {
 		valueString := strings.TrimSpace(parts[1])
 		unit := strings.TrimSpace(parts[2])
 
-		if unit != "Watts" {
+		// if unit != "Watts" {
+		// 	continue
+		// }
+
+		if !strings.EqualFold(unit, "Watts") {
 			continue
 		}
 
@@ -495,9 +502,11 @@ func collectPower() PowerInfo {
 		switch name {
 		case "PSU1_PIN":
 			power.PSU1 = value
+			power.Count++
 
 		case "PSU2_PIN":
 			power.PSU2 = value
+			power.Count++
 
 		case "Total_Power":
 			power.Total = value
@@ -513,13 +522,14 @@ func collectPower() PowerInfo {
 	return power
 }
 
-// func collectFan() FanInfo {
-func collectFan() map[string]float64 {	
-	// fan := FanInfo{
-	// 	Fans: make(map[string]float64),
-	// }
+func collectFan() FanInfo {
+// func collectFan() map[string]float64 {	
+	fan := FanInfo{
+		Count: 0,
+		Fans: make(map[string]float64),
+	}
 
-	fans := make(map[string]float64)
+	// fans := make(map[string]float64)
 
 	cmd := exec.Command(
 		"ipmitool",
@@ -528,7 +538,7 @@ func collectFan() map[string]float64 {
 
 	output, err := cmd.Output()
 	if err != nil {
-		return fans
+		return fan
 	}
 
 	lines := strings.Split(string(output), "\n")
@@ -553,10 +563,11 @@ func collectFan() map[string]float64 {
 			continue
 		}
 
-		fans[name] = value
+		fan.Fans[name] = value
+		fan.Count++
 	}
 
-	return fans
+	return fan
 }
 
 // --------------------------------------------------
