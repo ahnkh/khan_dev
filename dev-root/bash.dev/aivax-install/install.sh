@@ -536,10 +536,10 @@ function main()
 
     ui_interface
     
-    # clear_install_resource
+    # clear_aivax
 
 }
-main
+main && exit
 function __install_slm()
 {
 
@@ -1359,6 +1359,215 @@ EOF
     WRITE_LOG $FUNCNAME $LINENO "finish install opensearch"
 }
 
+
+function clear_aivax_patch()
+{
+    WRITE_LOG $FUNCNAME $LINENO "clear aivax patch"
+
+    rm -rf /home1/aivax
+    rm -rf /home1/aivax.old
+
+    sleep 1
+
+}
+
+function clear_opensearch()
+{
+    WRITE_LOG $FUNCNAME $LINENO "clear aivax log db"
+
+    rm -rf /home1/opensearch
+    rm -rf /data/opensearch
+
+    rm -rf /etc/opensearch.old
+    rm -rf /etc/opensearch
+
+    sleep 1
+
+}
+
+function clear_mariadb()
+{
+    WRITE_LOG $FUNCNAME $LINENO "clear aivax policy db"
+
+    systemctl stop mariadb
+
+    rm -rf /var/lib/mysql
+
+    rm -rf /var/log/mariadb*
+    rm -rf /var/log/mysql*
+
+    dnf remove -y -q mariadb mariadb-server  --disablerepo='*'
+
+    sleep 1
+}
+
+function clear_python()
+{
+
+    WRITE_LOG $FUNCNAME $LINENO "clear python"
+
+    if [ -f /home1/aivax-venv/bin/activate ]
+    then
+        source /home1/aivax-venv/bin/activate
+        deactivate
+    fi
+
+    rm -rf /home1/aivax-venv
+
+    rm -rf /usr/local/bin/python3.13
+    rm -rf /usr/local/bin/python3.13-config
+    rm -rf /usr/local/bin/pydoc3.13
+    rm -rf /usr/local/bin/uv
+
+    ldconfig
+
+    sleep 1
+}
+
+function clear_rpm()
+{
+    WRITE_LOG $FUNCNAME $LINENO "clear rpm"
+
+    rm -rf /home1/install/extension
+
+    rm -rf /etc/yum.repos.d/aivax.repo
+
+    sleep 1
+}
+
+function clear_etc_module()
+{
+    WRITE_LOG $FUNCNAME $LINENO "clear etc module"
+
+    rm -rf /etc/nginx/conf.d/aivax.conf
+    rm -rf /etc/nginx/ssl
+
+    rm -rf /usr/local/bin/multi_licenses_crypt
+    rm -rf /usr/local/bin/license_key_v2
+
+    sleep 1
+}
+
+function clear_service()
+{
+    WRITE_LOG $FUNCNAME $LINENO "clear service"
+
+    rm -rf /etc/systemd/system/fluent-bit.service
+
+    rm -rf /etc/systemd/system/ai-engine.service
+
+    rm -rf /etc/systemd/system/aivax-management.service
+    rm -rf /etc/systemd/system/aivax-pipeline.service
+    rm -rf /etc/systemd/system/aivax-sslproxy.service
+    rm -rf /etc/systemd/system/aivax-toolkit.service
+    rm -rf /etc/systemd/system/opensearch.service
+
+    SERVICES=(
+        
+        fluent-bit
+        opensearch
+        
+        aivax-management
+        aivax-pipeline
+        aivax-sslproxy
+        ai-engine
+        aivax-toolkit
+    )
+
+    for svc in "${SERVICES[@]}"; do
+        systemctl stop "$svc" 2>/dev/null
+        systemctl disable "$svc" 2>/dev/null
+
+        rm -f "/etc/systemd/system/${svc}.service"
+    done
+
+    systemctl daemon-reload
+
+    sleep 1
+}
+
+function clear_os_env()
+{
+
+    PROFILE="/root/.bash_profile"
+
+    if [ ! -f "$PROFILE" ]; then
+        echo "bash_profile not found"
+        return
+    fi
+
+    \cp "$PROFILE" "${PROFILE}.bak"
+
+    sed -i '\|^source /home1/aivax/aivax-venv/bin/activate$|d' "$PROFILE"
+
+    sed -i '/# >>> AIVAX VENV >>>/,/# <<< AIVAX VENV <<</d' "$PROFILE"
+
+}
+
+function stop_aivax_service()
+{
+    WRITE_LOG $FUNCNAME $LINENO "stop aivax service"
+
+    SERVICES=(
+        nginx
+        fluent-bit
+        opensearch
+        mariadb
+        squid
+        
+        aivax-management
+        aivax-pipeline
+        aivax-sslproxy
+        ai-engine
+        aivax-toolkit
+    )
+
+    for svc in "${SERVICES[@]}"; do
+        systemctl stop "$svc" 2>/dev/null
+        systemctl disable "$svc" 2>/dev/null
+
+    done
+
+    sleep 1
+}
+
+function print_log_status()
+{
+    WRITE_LOG $FUNCNAME $LINENO "print log status"
+
+    SERVICES=(
+        nginx
+        fluent-bit
+        opensearch
+        mariadb
+        squid
+        
+        aivax-management
+        aivax-pipeline
+        aivax-sslproxy
+        ai-engine
+        aivax-toolkit
+    )
+
+    WRITE_LOG $FUNCNAME $LINENO "+++ aivax system status"
+
+    for svc in "${SERVICES[@]}"; do
+        systemctl status "$svc" 
+    done
+
+    WRITE_LOG $FUNCNAME $LINENO "+++ python version"
+
+    python -V
+    which python
+
+    WRITE_LOG $FUNCNAME $LINENO "+++ dnf repolist"
+    dnf repolist all
+
+    WRITE_LOG $FUNCNAME $LINENO "+++ aivax directory info"
+    ls -al /home1/aivax
+    
+}
+
 function main()
 {
 
@@ -1366,28 +1575,24 @@ function main()
 
     ui_interface
 
-    # TODO: 경로를 생성해야 한다. 경로가 제일 먼저이다.
     init_default_setup
 
-    #패치전, 서비스를 내린다. 향후 개선
     stop_aivax
 
-    # 최초, 모듈 설치
+    clear_service
+
     install_module
 
-    # 외부 오픈소스 실행
-    # build_install_slm
+    build_install_slm
 
-    # 소스 패치
     patch_aivax_source
 
-    # 프로세스 기동
     start_aivax
 
-    # 시작후 부가작업 (opensearch 외)
     configure_after_install
 
-    # 최종 자원 정리, 우선 제외
-    # clear_install_resource
+    print_log_status
 
 }
+
+main $@ && exit

@@ -1,0 +1,1 @@
+{"time":"2026-09-21T13:26:34+09:00","cpu":{"usage":1.5,"load1":0,"load5":0.01,"load15":0},"memory":{"total_kb":3743396,"available_kb":2680452,"used_kb":1062944,"usage":28.4},"disks":{"/home1":{"total_gb":88.44,"used_gb":32.21,"usage":36.42}}}
