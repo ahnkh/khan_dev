@@ -63,6 +63,7 @@ type GPUInfo struct {
 
 type PowerInfo struct {
 	Count  int     `json:"count"`
+	WorkingCount int  `json:"working_count"`
 	PSU1   float64 `json:"psu1_w"`
 	PSU2   float64 `json:"psu2_w"`
 	Total  float64 `json:"total_w"`
@@ -73,6 +74,7 @@ type PowerInfo struct {
 
 type FanInfo struct {
 	Count int                `json:"count"`
+	WorkingCount int         `json:"working_count"`
 	Fans map[string]float64 `json:"fans"`
 }
 
@@ -461,14 +463,59 @@ func collectSensors() []SensorInfo {
 }
 
 func collectPower() PowerInfo {
-	var power PowerInfo
+	// var power PowerInfo
 
-	cmd := exec.Command(
-		"ipmitool",
-		"sensor",
-	)
+	power := PowerInfo{}
+
+	// cmd := exec.Command(
+	// 	"ipmitool",
+	// 	"sensor",
+	// )
+
+	 cmd := exec.Command(
+        "ipmitool",
+        "sdr",
+        "type",
+        "Power Supply",
+    )
 
 	output, err := cmd.Output()
+
+	if err == nil {
+
+        lines := strings.Split(string(output), "\n")
+
+        for _, line := range lines {
+
+            parts := strings.Split(line, "|")
+
+            if len(parts) < 3 {
+                continue
+            }
+
+            status := strings.TrimSpace(parts[2])
+
+            /*
+                SDR에 등록된 PSU
+            */
+            power.Count++
+
+            /*
+                현재 정상 상태인 PSU
+            */
+            if strings.EqualFold(status, "ok") {
+                power.WorkingCount++
+            }
+        }
+    }
+
+	cmd = exec.Command(
+        "ipmitool",
+        "sensor",
+    )
+
+	output, err = cmd.Output()
+
 	if err != nil {
 		return power
 	}
@@ -502,14 +549,17 @@ func collectPower() PowerInfo {
 		switch name {
 		case "PSU1_PIN":
 			power.PSU1 = value
-			power.Count++
+			// power.Count++
 
 		case "PSU2_PIN":
 			power.PSU2 = value
-			power.Count++
+			// power.Count++
 
 		case "Total_Power":
 			power.Total = value
+
+		case "FAN_Power":
+            power.FAN = value
 
 		case "CPU_Power":
 			power.CPU = value
@@ -526,15 +576,23 @@ func collectFan() FanInfo {
 // func collectFan() map[string]float64 {	
 	fan := FanInfo{
 		Count: 0,
+		WorkingCount: 0,
 		Fans: make(map[string]float64),
 	}
 
 	// fans := make(map[string]float64)
 
+	// cmd := exec.Command(
+	// 	"ipmitool",
+	// 	"sensor",
+	// )
+
 	cmd := exec.Command(
-		"ipmitool",
-		"sensor",
-	)
+        "ipmitool",
+        "sdr",
+        "type",
+        "Fan",
+    )
 
 	output, err := cmd.Output()
 	if err != nil {
@@ -546,25 +604,51 @@ func collectFan() FanInfo {
 	for _, line := range lines {
 		parts := strings.Split(line, "|")
 
-		if len(parts) < 3 {
-			continue
-		}
+		// if len(parts) < 3 {
+		// 	continue
+		// }
+
+		if len(parts) < 5 {
+            continue
+        }
+
+		// name := strings.TrimSpace(parts[0])
+		// valueString := strings.TrimSpace(parts[1])
+		// unit := strings.TrimSpace(parts[2])
 
 		name := strings.TrimSpace(parts[0])
-		valueString := strings.TrimSpace(parts[1])
-		unit := strings.TrimSpace(parts[2])
+        status := strings.TrimSpace(parts[2])
+        valueString := strings.TrimSpace(parts[4])
 
-		if !strings.EqualFold(unit, "RPM") {
-			continue
-		}
+		// if !strings.EqualFold(unit, "RPM") {
+		// 	continue
+		// }
+
+		fan.Count++
+
+		if !strings.EqualFold(status, "ok") {
+            continue
+        }
+
+		fields := strings.Fields(valueString)
+
+		if len(fields) < 2 {
+            continue
+        }
 
 		value, err := strconv.ParseFloat(valueString, 64)
 		if err != nil {
 			continue
 		}
 
+		unit := strings.ToUpper(fields[1])
+
+		if unit != "RPM" {
+            continue
+        }
+
 		fan.Fans[name] = value
-		fan.Count++
+		fan.WorkingCount++
 	}
 
 	return fan
