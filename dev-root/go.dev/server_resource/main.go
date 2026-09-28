@@ -467,54 +467,54 @@ func collectPower() PowerInfo {
 
 	power := PowerInfo{}
 
-	// cmd := exec.Command(
-	// 	"ipmitool",
-	// 	"sensor",
-	// )
+	// // cmd := exec.Command(
+	// // 	"ipmitool",
+	// // 	"sensor",
+	// // )
 
-	 cmd := exec.Command(
-        "ipmitool",
-        "sdr",
-        "type",
-        "Power Supply",
-    )
+	//  cmd := exec.Command(
+    //     "ipmitool",
+    //     "sdr",
+    //     "type",
+    //     "Power Supply",
+    // )
 
-	output, err := cmd.Output()
+	// output, err := cmd.Output()
 
-	if err == nil {
+	// if err == nil {
 
-        lines := strings.Split(string(output), "\n")
+    //     lines := strings.Split(string(output), "\n")
 
-        for _, line := range lines {
+    //     for _, line := range lines {
 
-            parts := strings.Split(line, "|")
+    //         parts := strings.Split(line, "|")
 
-            if len(parts) < 3 {
-                continue
-            }
+    //         if len(parts) < 3 {
+    //             continue
+    //         }
 
-            status := strings.TrimSpace(parts[2])
+    //         status := strings.TrimSpace(parts[2])
 
-            /*
-                SDR에 등록된 PSU
-            */
-            power.Count++
+    //         /*
+    //             SDR에 등록된 PSU
+    //         */
+    //         power.Count++
 
-            /*
-                현재 정상 상태인 PSU
-            */
-            if strings.EqualFold(status, "ok") {
-                power.WorkingCount++
-            }
-        }
-    }
+    //         /*
+    //             현재 정상 상태인 PSU
+    //         */
+    //         if strings.EqualFold(status, "ok") {
+    //             power.WorkingCount++
+    //         }
+    //     }
+    // }
 
-	cmd = exec.Command(
+	cmd := exec.Command(
         "ipmitool",
         "sensor",
     )
 
-	output, err = cmd.Output()
+	output, err := cmd.Output()
 
 	if err != nil {
 		return power
@@ -549,11 +549,11 @@ func collectPower() PowerInfo {
 		switch name {
 		case "PSU1_PIN":
 			power.PSU1 = value
-			// power.Count++
+			power.Count++
 
 		case "PSU2_PIN":
 			power.PSU2 = value
-			// power.Count++
+			power.Count++
 
 		case "Total_Power":
 			power.Total = value
