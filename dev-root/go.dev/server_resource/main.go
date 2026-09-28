@@ -572,86 +572,152 @@ func collectPower() PowerInfo {
 	return power
 }
 
+// func collectFan() FanInfo {
+// // func collectFan() map[string]float64 {	
+// 	fan := FanInfo{
+// 		Count: 0,
+// 		WorkingCount: 0,
+// 		Fans: make(map[string]float64),
+// 	}
+
+// 	// fans := make(map[string]float64)
+
+// 	// cmd := exec.Command(
+// 	// 	"ipmitool",
+// 	// 	"sensor",
+// 	// )
+
+// 	cmd := exec.Command(
+//         "ipmitool",
+//         "sdr",
+//         "type",
+//         "Fan",
+//     )
+
+// 	output, err := cmd.Output()
+// 	if err != nil {
+// 		return fan
+// 	}
+
+// 	lines := strings.Split(string(output), "\n")
+
+// 	for _, line := range lines {
+// 		parts := strings.Split(line, "|")
+
+// 		// if len(parts) < 3 {
+// 		// 	continue
+// 		// }
+
+// 		if len(parts) < 5 {
+//             continue
+//         }
+
+// 		// name := strings.TrimSpace(parts[0])
+// 		// valueString := strings.TrimSpace(parts[1])
+// 		// unit := strings.TrimSpace(parts[2])
+
+// 		name := strings.TrimSpace(parts[0])
+//         status := strings.TrimSpace(parts[2])
+//         valueString := strings.TrimSpace(parts[4])
+
+// 		// if !strings.EqualFold(unit, "RPM") {
+// 		// 	continue
+// 		// }
+
+// 		fan.Count++
+
+// 		if !strings.EqualFold(status, "ok") {
+//             continue
+//         }
+
+// 		fields := strings.Fields(valueString)
+
+// 		if len(fields) < 2 {
+//             continue
+//         }
+
+// 		value, err := strconv.ParseFloat(valueString, 64)
+// 		if err != nil {
+// 			continue
+// 		}
+
+// 		unit := strings.ToUpper(fields[1])
+
+// 		if unit != "RPM" {
+//             continue
+//         }
+
+// 		fan.Fans[name] = value
+// 		fan.WorkingCount++
+// 	}
+
+// 	return fan
+// }
+
 func collectFan() FanInfo {
-// func collectFan() map[string]float64 {	
-	fan := FanInfo{
-		Count: 0,
-		WorkingCount: 0,
-		Fans: make(map[string]float64),
-	}
 
-	// fans := make(map[string]float64)
+    fan := FanInfo{
+        Count:        0,
+        WorkingCount: 0,
+        Fans:         make(map[string]float64),
+    }
 
-	// cmd := exec.Command(
-	// 	"ipmitool",
-	// 	"sensor",
-	// )
-
-	cmd := exec.Command(
+    cmd := exec.Command(
         "ipmitool",
-        "sdr",
-        "type",
-        "Fan",
+        "sensor",
     )
 
-	output, err := cmd.Output()
-	if err != nil {
-		return fan
-	}
+    output, err := cmd.Output()
 
-	lines := strings.Split(string(output), "\n")
+    if err != nil {
+        return fan
+    }
 
-	for _, line := range lines {
-		parts := strings.Split(line, "|")
+    lines := strings.Split(
+        string(output),
+        "\n",
+    )
 
-		// if len(parts) < 3 {
-		// 	continue
-		// }
+    for _, line := range lines {
 
-		if len(parts) < 5 {
+        parts := strings.Split(line, "|")
+
+        if len(parts) < 3 {
             continue
         }
 
-		// name := strings.TrimSpace(parts[0])
-		// valueString := strings.TrimSpace(parts[1])
-		// unit := strings.TrimSpace(parts[2])
+        name := strings.TrimSpace(parts[0])
+        valueString := strings.TrimSpace(parts[1])
+        unit := strings.TrimSpace(parts[2])
 
-		name := strings.TrimSpace(parts[0])
-        status := strings.TrimSpace(parts[2])
-        valueString := strings.TrimSpace(parts[4])
-
-		// if !strings.EqualFold(unit, "RPM") {
-		// 	continue
-		// }
-
-		fan.Count++
-
-		if !strings.EqualFold(status, "ok") {
+        if !strings.EqualFold(unit, "RPM") {
             continue
         }
 
-		fields := strings.Fields(valueString)
+        /*
+            RPM 센서 자체가 존재하므로
+            BMC에서 Fan 센서로 인식하고 있는 개수
+        */
+        fan.Count++
 
-		if len(fields) < 2 {
+        value, err := strconv.ParseFloat(
+            valueString,
+            64,
+        )
+
+        if err != nil {
             continue
         }
 
-		value, err := strconv.ParseFloat(valueString, 64)
-		if err != nil {
-			continue
-		}
+        /*
+            실제 RPM 값을 읽을 수 있는 Fan
+        */
+        fan.WorkingCount++
 
-		unit := strings.ToUpper(fields[1])
+        fan.Fans[name] = value
+    }
 
-		if unit != "RPM" {
-            continue
-        }
-
-		fan.Fans[name] = value
-		fan.WorkingCount++
-	}
-
-	return fan
+    return fan
 }
 
 // --------------------------------------------------
