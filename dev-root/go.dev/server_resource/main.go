@@ -289,7 +289,7 @@ func collectSensors() []SensorInfo {
 
 		nameBytes, err := os.ReadFile(nameFile)
 		if err != nil {
-			fmt.Printf("[ERROR] name read failed: %s: %v\n", nameFile, err)
+			// fmt.Printf("[ERROR] name read failed: %s: %v\n", nameFile, err)
 			continue
 		}
 
