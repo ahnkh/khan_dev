@@ -309,6 +309,7 @@ function update_pycomlib()
 function make_version_text_file()
 {
 
+    # git_root=/data/git-root
     WRITE_LOG $FUNCNAME $LINENO "start make version text file"
 
     AIVAX_DIR="${git_root}/aivax"
@@ -319,6 +320,9 @@ function make_version_text_file()
     AIVAX_TAG=$(git -C ${git_root}/aivax describe --tags --abbrev=0 2>/dev/null)
     AIVAX_HASH=$(git -C ${git_root}/aivax rev-parse --short HEAD 2>/dev/null)
 
+    # AIVAX_COMMIT_COUNT=$(git -C ${git_root}/aivax rev-list --count HEAD 2>/dev/null)
+    AIVAX_COMMIT_COUNT=$(git -C ${git_root}/aivax rev-list --count ${AIVAX_TAG}..HEAD)
+
     #sslproxy hash
     ENGINE_FILE="${git_root}/aivax_public/aivax-package/sslproxy/sslproxy"
 
@@ -328,14 +332,17 @@ function make_version_text_file()
     #AIVAX VERSION
     AIVAX_TITLE_VERSION=${AIVAX_TAG//_/ }
 
+    release_date=$(date '+%Y-%m-%d %H:%M:%S')
+
     # PIPELINE_TAG=$(git -C "$PIPELINE_DIR" describe --tags --abbrev=0 2>/dev/null)
     # PIPELINE_HASH=$(git -C "$PIPELINE_DIR" rev-parse --short HEAD 2>/dev/null)
 
     WRITE_LOG $FUNCNAME $LINENO "TITLE VERSION = ${AIVAX_TITLE_VERSION}"
 
-    WRITE_LOG $FUNCNAME $LINENO "AIVAX HASH = ${AIVAX_HASH}"
+    WRITE_LOG $FUNCNAME $LINENO "AIVAX GIT HASH = ${AIVAX_HASH}"
     # WRITE_LOG $FUNCNAME $LINENO "ENGINE HASH = ${PIPELINE_HASH}"
     WRITE_LOG $FUNCNAME $LINENO "ENGINE HASH = ${ENGINE_HASH_SHORT}"
+    WRITE_LOG $FUNCNAME $LINENO "COMMIT COUNT = ${AIVAX_COMMIT_COUNT}"
 
     # echo "AIVAX    : ${AIVAX_TAG} ${AIVAX_HASH}"
     # echo "PIPELINE : ${PIPELINE_TAG}-${PIPELINE_HASH}"
@@ -351,6 +358,7 @@ cat > "$VERSION_FILE" <<EOF
 ${AIVAX_TITLE_VERSION}
 ${AIVAX_HASH}
 ${ENGINE_HASH_SHORT}
+${release_date}
 EOF
 
     WRITE_LOG $FUNCNAME $LINENO "finish make version text file"
@@ -381,12 +389,21 @@ function release_package()
     # cp -rf aivax-install/installer.sh aivax-install/aivax-patch/install-temp
     \cp -rf aivax-install/install.sh aivax-install/aivax-patch/install-temp
 
-    hash=$(tar -cf - aivax-install/aivax-patch/ | sha256sum | awk '{print $1}' | cut -c1-6)
+    # hash=$(tar -cf - aivax-install/aivax-patch/ | sha256sum | awk '{print $1}' | cut -c1-6)
 
     #패키지를 만들기전, 임시파일 삭제
     rm -rf aivax-install/aivax-patch/install-temp
 
-    aivax_package_file=aivax-install.${aivax_ver}.$package_date.${hash}
+    # git build 버전
+    # git commit_count
+    AIVAX_TAG=$(git -C ${git_root}/aivax describe --tags --abbrev=0 2>/dev/null)
+    AIVAX_HASH=$(git -C ${git_root}/aivax rev-parse --short HEAD 2>/dev/null)
+
+    # AIVAX_COMMIT_COUNT=$(git -C ${git_root}/aivax rev-list --count HEAD 2>/dev/null)
+    AIVAX_COMMIT_COUNT=$(git -C ${git_root}/aivax rev-list --count ${AIVAX_TAG}..HEAD)
+
+    # aivax_package_file=aivax-install.${aivax_ver}.$package_date.${hash}
+    aivax_package_file=aivax-install.${aivax_ver}.${package_date}-${AIVAX_COMMIT_COUNT}_${AIVAX_HASH}
 
     cp -rf aivax-install ${aivax_package_file}
 
