@@ -1594,5 +1594,3 @@ function main()
     print_log_status
 
 }
-
-main $@ && exit
