@@ -114,7 +114,7 @@ func cleanInstall() {
 		"mainapp",
 		"web_app_modules",
 		"local_resource",
-		"venv",
+		// "venv",
 		"__pycache__",
 		".vscode",
 	}
