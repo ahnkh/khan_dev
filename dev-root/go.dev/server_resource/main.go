@@ -32,6 +32,18 @@ type CPUInfo struct {
 	Load15 float64 `json:"load15"`
 }
 
+type CPUStat struct {
+    User    uint64
+    Nice    uint64
+    System  uint64
+    Idle    uint64
+    IOWait  uint64
+    IRQ     uint64
+    SoftIRQ uint64
+    Steal   uint64
+}
+
+
 type MemoryInfo struct {
 	TotalKB     uint64  `json:"total_kb"`
 	AvailableKB uint64  `json:"available_kb"`
@@ -82,73 +94,204 @@ type FanInfo struct {
 // CPU
 // --------------------------------------------------
 
-func readCPUStat() (uint64, uint64, error) {
-	file, err := os.Open("/proc/stat")
-	if err != nil {
-		return 0, 0, err
-	}
-	defer file.Close()
+func readCPUStat() (CPUStat, error) {
 
-	scanner := bufio.NewScanner(file)
+    file, err := os.Open("/proc/stat")
+    if err != nil {
+        return CPUStat{}, err
+    }
 
-	if !scanner.Scan() {
-		return 0, 0, fmt.Errorf("cannot read /proc/stat")
-	}
+    defer file.Close()
 
-	fields := strings.Fields(scanner.Text())
+    scanner := bufio.NewScanner(file)
 
-	if len(fields) < 9 || fields[0] != "cpu" {
-		return 0, 0, fmt.Errorf("invalid /proc/stat cpu line")
-	}
+    for scanner.Scan() {
 
-	var values [8]uint64
+        fields := strings.Fields(scanner.Text())
 
-	for i := 0; i < 8; i++ {
-		v, err := strconv.ParseUint(fields[i+1], 10, 64)
-		if err != nil {
-			return 0, 0, err
-		}
-		values[i] = v
-	}
+        if len(fields) < 9 {
+            continue
+        }
 
-	user := values[0]
-	nice := values[1]
-	system := values[2]
-	idle := values[3]
-	iowait := values[4]
-	irq := values[5]
-	softirq := values[6]
-	steal := values[7]
+        /*
+            첫 번째 cpu 항목만 사용
+        */
+        if fields[0] != "cpu" {
+            continue
+        }
 
-	total := user + nice + system + idle + iowait + irq + softirq + steal
-	idleTotal := idle + iowait
+        var stat CPUStat
 
-	return total, idleTotal, nil
+        stat.User, err = strconv.ParseUint(fields[1], 10, 64)
+        if err != nil {
+            return CPUStat{}, err
+        }
+
+        stat.Nice, err = strconv.ParseUint(fields[2], 10, 64)
+        if err != nil {
+            return CPUStat{}, err
+        }
+
+        stat.System, err = strconv.ParseUint(fields[3], 10, 64)
+        if err != nil {
+            return CPUStat{}, err
+        }
+
+        stat.Idle, err = strconv.ParseUint(fields[4], 10, 64)
+        if err != nil {
+            return CPUStat{}, err
+        }
+
+        stat.IOWait, err = strconv.ParseUint(fields[5], 10, 64)
+        if err != nil {
+            return CPUStat{}, err
+        }
+
+        stat.IRQ, err = strconv.ParseUint(fields[6], 10, 64)
+        if err != nil {
+            return CPUStat{}, err
+        }
+
+        stat.SoftIRQ, err = strconv.ParseUint(fields[7], 10, 64)
+        if err != nil {
+            return CPUStat{}, err
+        }
+
+        stat.Steal, err = strconv.ParseUint(fields[8], 10, 64)
+        if err != nil {
+            return CPUStat{}, err
+        }
+
+        return stat, nil
+    }
+
+    if err := scanner.Err(); err != nil {
+        return CPUStat{}, err
+    }
+
+    return CPUStat{}, fmt.Errorf("cpu information not found")
 }
 
-func getCPUUsage() float64 {
-	total1, idle1, err := readCPUStat()
-	if err != nil {
-		fmt.Printf("[ERROR] CPU first read failed: %v\n", err)
-		return 0
-	}
+// func readCPUStat() (uint64, uint64, error) {
+// 	file, err := os.Open("/proc/stat")
+// 	if err != nil {
+// 		return 0, 0, err
+// 	}
+// 	defer file.Close()
 
-	time.Sleep(time.Second)
+// 	scanner := bufio.NewScanner(file)
 
-	total2, idle2, err := readCPUStat()
-	if err != nil {
-		fmt.Printf("[ERROR] CPU second read failed: %v\n", err)
-		return 0
-	}
+// 	if !scanner.Scan() {
+// 		return 0, 0, fmt.Errorf("cannot read /proc/stat")
+// 	}
 
-	totalDiff := total2 - total1
-	idleDiff := idle2 - idle1
+// 	fields := strings.Fields(scanner.Text())
 
-	if totalDiff == 0 {
-		return 0
-	}
+// 	if len(fields) < 9 || fields[0] != "cpu" {
+// 		return 0, 0, fmt.Errorf("invalid /proc/stat cpu line")
+// 	}
 
-	return float64(totalDiff-idleDiff) / float64(totalDiff) * 100
+// 	var values [8]uint64
+
+// 	for i := 0; i < 8; i++ {
+// 		v, err := strconv.ParseUint(fields[i+1], 10, 64)
+// 		if err != nil {
+// 			return 0, 0, err
+// 		}
+// 		values[i] = v
+// 	}
+
+// 	user := values[0]
+// 	nice := values[1]
+// 	system := values[2]
+// 	idle := values[3]
+// 	iowait := values[4]
+// 	irq := values[5]
+// 	softirq := values[6]
+// 	steal := values[7]
+
+// 	total := user + nice + system + idle + iowait + irq + softirq + steal
+// 	idleTotal := idle + iowait
+
+// 	return total, idleTotal, nil
+// }
+
+// func getCPUUsage() float64 {
+// 	total1, idle1, err := readCPUStat()
+// 	if err != nil {
+// 		fmt.Printf("[ERROR] CPU first read failed: %v\n", err)
+// 		return 0
+// 	}
+
+// 	time.Sleep(time.Second)
+
+// 	total2, idle2, err := readCPUStat()
+// 	if err != nil {
+// 		fmt.Printf("[ERROR] CPU second read failed: %v\n", err)
+// 		return 0
+// 	}
+
+// 	totalDiff := total2 - total1
+// 	idleDiff := idle2 - idle1
+
+// 	if totalDiff == 0 {
+// 		return 0
+// 	}
+
+// 	return float64(totalDiff-idleDiff) / float64(totalDiff) * 100
+// }
+
+func collectCPUUsage() float64 {
+
+    before, err := readCPUStat()
+
+    if err != nil {
+        return 0
+    }
+
+    time.Sleep(100 * time.Millisecond)
+
+    after, err := readCPUStat()
+
+    if err != nil {
+        return 0
+    }
+
+    beforeTotal :=
+        before.User +
+            before.Nice +
+            before.System +
+            before.Idle +
+            before.IOWait +
+            before.IRQ +
+            before.SoftIRQ +
+            before.Steal
+
+    afterTotal :=
+        after.User +
+            after.Nice +
+            after.System +
+            after.Idle +
+            after.IOWait +
+            after.IRQ +
+            after.SoftIRQ +
+            after.Steal
+
+    beforeIdle := before.Idle + before.IOWait
+    afterIdle := after.Idle + after.IOWait
+
+    totalDiff := afterTotal - beforeTotal
+    idleDiff := afterIdle - beforeIdle
+
+    if totalDiff == 0 {
+        return 0
+    }
+
+    usage := float64(
+        totalDiff-idleDiff,
+    ) / float64(totalDiff) * 100
+
+    return usage
 }
 
 // --------------------------------------------------
@@ -238,7 +381,7 @@ func getDiskUsage(path string) DiskInfo {
 
 	err := syscall.Statfs(path, &stat)
 	if err != nil {
-		fmt.Printf("[ERROR] disk stat failed: %s: %v\n", path, err)
+		// fmt.Printf("[ERROR] disk stat failed: %s: %v\n", path, err)
 		return DiskInfo{}
 	}
 
@@ -785,7 +928,7 @@ func main() {
 	// fmt.Println("[DEBUG] monitor start")
 
 	// CPU
-	cpuUsage := getCPUUsage()
+	cpuUsage := collectCPUUsage()
 
 	load1, load5, load15 := getLoadAverage()
 
@@ -804,8 +947,8 @@ func main() {
 	for _, path := range diskPaths {
 
 		if _, err := os.Stat(path); err != nil {
-			fmt.Printf("[ERROR] disk path not found: %s: %v\n",
-				path, err)
+			// fmt.Printf("[ERROR] disk path not found: %s: %v\n",
+			// 	path, err)
 			continue
 		}
 
