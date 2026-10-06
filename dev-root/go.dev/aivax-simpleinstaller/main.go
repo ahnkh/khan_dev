@@ -89,10 +89,16 @@ func preInstall() {
 
 	//h_sensor 복사
 	// errCopyHwMetric := copyFile("./extension/python-install/hw_metric", "/usr/bin/hwmon")
-	errCopyHwMetric = copyFile("./extension/python-install/hw_metric", "/usr/local/bin/hwprobe")
+	errCopyHwMetric = copyFile("./extension/python-install/.hw_metric", "/usr/local/bin/hwprobe")
 	if errCopyHwMetric != nil {
 		fmt.Fprintf(os.Stderr, "hw_metric copy failed: %v\n", errCopyHwMetric)
 		panic(errCopyHwMetric)
+	}
+
+	errModHwProbe := os.Chmod("/usr/local/bin/hwprobe", 0755)
+	if errModHwProbe != nil {
+		fmt.Printf("mode failed: %v\n", errModHwProbe)
+		os.Exit(1)
 	}
 
 	//toolkit 복사 procmon
@@ -100,6 +106,12 @@ func preInstall() {
 	if errCopyProcMon != nil {
 		fmt.Fprintf(os.Stderr, "procmon copy failed: %v\n", errCopyProcMon)
 		panic(errCopyProcMon)
+	}
+
+	errModProcmon := os.Chmod("/usr/local/bin/procmon", 0755)
+	if errModProcmon != nil {
+		fmt.Printf("mode failed: %v\n", errModProcmon)
+		os.Exit(1)
 	}
 
 }
@@ -128,7 +140,7 @@ func cleanInstall() {
 	}
 }
 
-func runInitCommand(_strCommand string) {
+func runToolkitCommand(_strCommand string) {
 
 	//TODO: 쉘스크립트에 작성후 실행, toolkit을 노출하지 않는다.
 	//TOOD: 외부 스크립트 종속성 최소화
@@ -221,7 +233,8 @@ func main() {
 			cleanInstall()
 
 		case "init":
-			runInitCommand(arg)
+		case "integrity":
+			runToolkitCommand(arg)
 
 		default:
 			fmt.Printf("Unknown command: %s\n", arg)
