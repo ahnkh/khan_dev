@@ -59,6 +59,8 @@ function __setup_pip_venv()
         \cp -rf /usr/local/bin/uv ${VENV}/bin/
     fi
 
+    \cp -rf /usr/local/bin/uv ${VENV}/bin/
+
     WRITE_LOG $FUNCNAME $LINENO "activate python env"
     source ./venv/bin/activate
 

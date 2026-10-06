@@ -208,9 +208,9 @@ function __setup_aivax_venv()
     mkdir -p /home1/aivax
     
     VENV="/home1/aivax/aivax-venv"
-
+    
     if [ ! -d "$VENV" ]; then
-
+        
         /usr/local/bin/uv venv --python /usr/local/bin/python3.13 "$VENV"
         \cp -rf /usr/local/bin/uv ${VENV}/bin/
     fi
@@ -233,11 +233,6 @@ fi
     cd ./extension/python-install
 
     uv --quiet pip install --no-index --find-links=./offline-wheel/ -r aivax-requirement.txt
-
-    # uv --quiet pip install ./offline-wheel/pycomlib-1.1.7-py3-none-any.whl --force-reinstall
-    # uv --quiet pip install ./offline-wheel/pycomlibex-1.1.2-py3-none-any.whl --force-reinstall
-    # uv --quiet pip install ./offline-wheel/pyservice-1.0.3-py3-none-any.whl --force-reinstall
-    # uv --quiet pip install ./offline-wheel/pytoolkit-1.0.0-py3-none-any.whl --force-reinstall
 
     cd - > /dev/null 2>&1
 
