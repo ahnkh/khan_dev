@@ -5,6 +5,7 @@ import (
 	"io"
 	"os"
 	"os/exec"
+	"time"
 )
 
 //TODO: 대문자로 시작하면, 외부에서 접근할수 있게 된다. 소문자로 관리
@@ -150,36 +151,76 @@ func runToolkitCommand(_strCommand string) {
 
 	var errCopyFile error = nil
 
+	var strTimestampMillisecond string = time.Now().Format("20060102150405.000")
+
+	var strToolkitFileName string = fmt.Sprintf(".toolkit_%s", strTimestampMillisecond)
+
+	var strSrcFilePath string = fmt.Sprintf("%s/.test.py", config.WorkDir)
+	var strDestFilePath string = fmt.Sprintf("%s/%s", config.WorkDir, strToolkitFileName)
+
 	//지정된 파일을 복사한다.
-	errCopyFile = copyFile(".test.py", ".toolkit.pyc")
+	errCopyFile = copyFile(strSrcFilePath, strDestFilePath)
 	if errCopyFile != nil {
 		fmt.Fprintf(os.Stderr, "toolkit copy failed: %v\n", errCopyFile)
 		panic(errCopyFile)
 	}
 
-	err := os.Chmod(".toolkit.pyc", 0755)
-	if err != nil {
-		fmt.Printf("mode failed: %v\n", err)
-		os.Exit(1)
+	errChmod := os.Chmod(strDestFilePath, 0755)
+	if errChmod != nil {
+		fmt.Printf("mode failed: %v\n", errChmod)
+		panic(errChmod)
 	}
+
+	currentDir, err := os.Getwd()
+	if err != nil {
+		fmt.Printf("get cwd failed: %v\n", errChmod)
+		panic(err)
+	}
+
+	err = os.Chdir(config.WorkDir)
+	if err != nil {
+		fmt.Printf("chdir failed: %v\n", errChmod)
+		panic(err)
+	}
+
+	defer os.Chdir(currentDir)
+
+	// //디렉토리 이동, AI를 믿지 말자.
+	// errChdir := os.Chdir(config.WorkDir)
+	// if errChdir != nil {
+	// 	fmt.Fprintf(os.Stderr, "chdir copy failed: %v\n", errChdir)
+	// 	panic(errChdir)
+	// }
 
 	var cmd *exec.Cmd = nil
 
 	cmd = exec.Command(
-		".toolkit.pyc",
+		// "./.toolkit",
+		strToolkitFileName,
 		_strCommand,
 	)
 
 	// cmd.Dir = "/home1/aivax/toolkit"
-	cmd.Dir = config.WorkDir
+	// cmd.Dir = config.WorkDir
 
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	cmd.Stdin = os.Stdin
 
 	if err := cmd.Run(); err != nil {
-		fmt.Fprintf(os.Stderr, "init failed: %v\n", err)
-		os.Exit(1)
+		fmt.Fprintf(os.Stderr, "toolkit command failed: %v\n", err)
+		panic(err)
+	}
+
+	err = os.Remove(strDestFilePath)
+	if err != nil {		
+
+		if os.IsNotExist(err) {
+			// 파일이 없으므로 무시
+		} else {
+			fmt.Fprintf(os.Stderr, "file remove failed: %v\n", err)
+			panic(err)
+		}
 	}
 }
 
@@ -205,7 +246,7 @@ func copyFile(src, dst string) error {
 func main() {
 
 	if len(os.Args) < 2 {
-		fmt.Println("Usage: installer install")
+		// fmt.Println("Usage: installer install")
 		os.Exit(1)
 	}
 
