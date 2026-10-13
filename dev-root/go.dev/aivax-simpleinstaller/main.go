@@ -5,6 +5,7 @@ import (
 	"io"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"time"
 )
 
@@ -167,7 +168,7 @@ func runToolkitCommand(_strCommand string) {
 
 	errChmod := os.Chmod(strDestFilePath, 0755)
 	if errChmod != nil {
-		fmt.Printf("mode failed: %v\n", errChmod)
+		fmt.Printf("mod failed: %v\n", errChmod)
 		panic(errChmod)
 	}
 
@@ -196,7 +197,7 @@ func runToolkitCommand(_strCommand string) {
 
 	cmd = exec.Command(
 		// "./.toolkit",
-		strToolkitFileName,
+		"./"+strToolkitFileName,
 		_strCommand,
 	)
 
@@ -212,15 +213,30 @@ func runToolkitCommand(_strCommand string) {
 		panic(err)
 	}
 
-	err = os.Remove(strDestFilePath)
-	if err != nil {		
+	// err = os.Remove(strDestFilePath)
+	// if err != nil {		
 
-		if os.IsNotExist(err) {
-			// 파일이 없으므로 무시
-		} else {
-			fmt.Fprintf(os.Stderr, "file remove failed: %v\n", err)
-			panic(err)
+	// 	if os.IsNotExist(err) {
+	// 		// 파일이 없으므로 무시
+	// 	} else {
+	// 		fmt.Fprintf(os.Stderr, "file remove failed: %v\n", err)
+	// 		panic(err)
+	// 	}
+	// }
+
+	matches, err := filepath.Glob(".toolkit*")
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "toolkit command notexist: %v\n", err)
+		panic(err)
+	}
+
+	for _, filename := range matches {
+		if err := os.RemoveAll(filename); err != nil {
+			// fmt.Println("삭제 실패:", filename, err)
+			continue
 		}
+
+		// fmt.Println("삭제:", filename)
 	}
 }
 
