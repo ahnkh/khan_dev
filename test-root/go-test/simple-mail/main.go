@@ -141,7 +141,9 @@ JSON_DATA=$(jq -n \
     from_mail: "ghahn@wins21.co.kr",
     recv_mail_list: ["ghahn@wins21.co.kr"],
 	subject: "[AIVAX] winstest 게정 로그인 인증 실패 횟수 초과",
-	contents : "",
+	contents : "winstest 계정의 로그인 인증 실패 횟수를 초과하였습니다. <br/> 알람 요약 : winstest 인증 횟수 초과 : 5회 <br/> 발생시간 : 2026-10-13 12:00:00",
+	mail_loginid : ""
+	mail_loginpw : ""
 	"use_tls" : false
 	timeout : 10    
 }') || exit 1
