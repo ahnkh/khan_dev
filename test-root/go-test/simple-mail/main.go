@@ -47,7 +47,7 @@ func main() {
 	// 3. 기존 JSON에 항목 추가
 
 	data["method"] = []string{
-		"manage_operation_util_module",
+		"manage_operation_util_modules",
 	}
 
 	data["ext_module"] = "manage_etc_util_module"
