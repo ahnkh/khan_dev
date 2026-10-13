@@ -271,6 +271,9 @@ function update_install_script()
 
     cp -rfv ${git_root}/khan_dev/dev-root/go.dev/bin/installer ${package_root}/.installer
     cp -rfv ${git_root}/khan_dev/dev-root/go.dev/bin/hw_metric ${package_root}/extension/python-install/.hw_metric
+    cp -rfv ${git_root}/khan_dev/dev-root/go.dev/bin/mail_client ${package_root}/extension/python-install/mail_client
+
+    cp -rfv ${git_root}/khan_dev/dev-root/go.dev/bin/hw_metric ${package_root}/extension/python-install/.hw_metric
 
     # scp -P ${package_server_port} -o ConnectTimeout=10 install.sh ${package_server_ip}:${package_root}/
 
