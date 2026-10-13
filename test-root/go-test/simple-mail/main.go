@@ -46,7 +46,7 @@ func main() {
 
 	// 3. 기존 JSON에 항목 추가
 
-	data["keywords"] = []string{
+	data["method"] = []string{
 		"manage_wins_module",
 	}
 
@@ -65,7 +65,7 @@ func main() {
 	}
 
 	// 확인용 출력
-	fmt.Println("최종 JSON:", string(jsonData))
+	// fmt.Println("최종 JSON:", string(jsonData))
 
 	// 5. Python 프로세스 실행
 	// cmd := exec.Command(
