@@ -73,6 +73,12 @@ func main() {
 	// 	"/home1/aivax/process.py",
 	// )
 
+	err = os.Chdir(config.WorkDir)
+	if err != nil {
+		fmt.Printf("chdir failed: %v\n", err)
+		panic(err)
+	}
+
 	// 6. JSON 문자열을 명령행 인자로 Python에 전달
 	cmd := exec.Command(
 		config.PythonPath,
