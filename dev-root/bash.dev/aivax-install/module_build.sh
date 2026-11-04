@@ -84,6 +84,7 @@ function update_toolkit_config_and_source()
     \cp -rfv ${git_root}/khan.pythonscript/khan-shell-interface/local_resource/config/wins-config.json ${git_root}/aivax_toolkit/local_resource/config/
     \cp -rfv ${git_root}/khan.pythonscript/khan-shell-interface/local_resource/config/wins_resource.json ${git_root}/aivax_toolkit/local_resource/config/
 
+    \cp -rfv ${git_root}/khan.pythonscript/khan-shell-interface/local_resource/db_resource/db_custom_wins.json ${git_root}/aivax_toolkit/local_resource/db_resource/
     \cp -rfv ${git_root}/khan.pythonscript/khan-shell-interface/local_resource/db_resource/sql_query_map/rdb_query/json/* ${git_root}/aivax_toolkit/local_resource/db_resource/sql_query_map/rdb_query/json/
 
     mkdir -p ${git_root}/aivax_toolkit/local_resource/db_resource/db_init_script/wins_script/
