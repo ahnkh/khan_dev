@@ -142,6 +142,30 @@ function build_pipeline()
     WRITE_LOG $FUNCNAME $LINENO "finish build pipeline"
 }
 
+function build_pipeline_v2()
+{
+    #git_root=/data/git-root
+    WRITE_LOG $FUNCNAME $LINENO "start build pipeline"
+
+    # cd ${git_root}/pipeline
+    cd ${git_root}/aivax_pipelines_public
+
+    # branch 선택, 독립적, 한번 더 수행.
+    # git switch ${git_branch}
+
+    git pull
+
+    # cd ${git_root}/aivax
+
+    tar -czf pipeline.tar.gz --exclude='.git' --exclude='.gitignore' --exclude='.vscode' pipeline/
+
+    mv pipeline.tar.gz ${package_root}/aivax-patch/
+
+    cd ${g_path}
+
+    WRITE_LOG $FUNCNAME $LINENO "finish build pipeline"
+}
+
 function build_toolkit()
 {
     WRITE_LOG $FUNCNAME $LINENO "start build toolkit"
@@ -477,7 +501,8 @@ function main()
     build_management
     # build_management2
 
-    build_pipeline
+    # build_pipeline
+    build_pipeline_v2
 
     build_toolkit
 
