@@ -66,6 +66,8 @@ EnvironmentFile=-/etc/default/opensearch
 EnvironmentFile=-/etc/sysconfig/opensearch
 User=opensearch
 Group=opensearch
+Restart=always
+RestartSec=5
 
 #WorkingDirectory=/data/aivax/data_resource/opensearch
 WorkingDirectory=/data/opensearch
