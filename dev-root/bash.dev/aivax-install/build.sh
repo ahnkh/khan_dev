@@ -429,6 +429,14 @@ function release_package()
     # AIVAX_COMMIT_COUNT=$(git -C ${git_root}/aivax rev-list --count HEAD 2>/dev/null)
     AIVAX_COMMIT_COUNT=$(git -C ${git_root}/aivax rev-list --count ${AIVAX_TAG}..HEAD)
 
+    # Day count (기준일: 2026-01-01)
+    # AIVAX_DAY_COUNT=$(( ($(date +%s) - $(date -d "2026-01-01" +%s)) / 86400 ))
+    # AIVAX_DAY_COUNT=$(date +%-d)
+    AIVAX_DAY_COUNT=$(( ($(date +%s) - $(date -d "2026-11-1" +%s)) / 86400 + 1 ))
+
+    # Final count
+    AIVAX_COMMIT_COUNT=$((AIVAX_COMMIT_COUNT + AIVAX_DAY_COUNT))
+
     # aivax_package_file=aivax-install.${aivax_ver}.$package_date.${hash}
     aivax_package_file=aivax-install.${aivax_ver}.${package_date}-${AIVAX_COMMIT_COUNT}_${AIVAX_HASH}
 
